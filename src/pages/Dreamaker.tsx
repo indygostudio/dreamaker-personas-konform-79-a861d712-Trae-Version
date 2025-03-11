@@ -28,18 +28,22 @@ export default function Dreamaker() {
       
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="profiles" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 rounded-xl bg-dreamaker-purple/10 p-1">
-            <TabsTrigger value="profiles" className="w-full rounded-lg data-[state=active]:bg-dreamaker-purple">
-              User Profiles
+          <TabsList className="bg-black/60 w-full grid grid-cols-4 mb-4">
+            <TabsTrigger value="profiles" className="flex items-center gap-2 data-[state=active]:bg-dreamaker-purple">
+              <User className="h-4 w-4" />
+              <span>User Profiles</span>
             </TabsTrigger>
-            <TabsTrigger value="personas" className="w-full rounded-lg data-[state=active]:bg-dreamaker-purple">
-              Personas
+            <TabsTrigger value="personas" className="flex items-center gap-2 data-[state=active]:bg-dreamaker-purple">
+              <Users className="h-4 w-4" />
+              <span>Personas</span>
             </TabsTrigger>
-            <TabsTrigger value="collaborations" className="w-full rounded-lg data-[state=active]:bg-dreamaker-purple">
-              Collaborations
+            <TabsTrigger value="collaborations" className="flex items-center gap-2 data-[state=active]:bg-dreamaker-purple">
+              <Share2 className="h-4 w-4" />
+              <span>Collaborations</span>
             </TabsTrigger>
-            <TabsTrigger value="media" className="w-full rounded-lg data-[state=active]:bg-dreamaker-purple">
-              Media
+            <TabsTrigger value="media" className="flex items-center gap-2 data-[state=active]:bg-dreamaker-purple">
+              <Image className="h-4 w-4" />
+              <span>Media</span>
             </TabsTrigger>
           </TabsList>
 
