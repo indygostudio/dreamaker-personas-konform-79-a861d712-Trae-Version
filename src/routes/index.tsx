@@ -11,6 +11,8 @@ import { ArtistProfile } from "../pages/ArtistProfile";
 import KonformProduct from "../pages/KonformProduct";
 import { DreamakerProduct } from "../pages/DreamakerProduct";
 import MediaProfilePage from "../pages/MediaProfilePage";
+import { Pricing } from "../pages/Pricing";
+import { Privacy } from "../pages/Privacy";
 
 export const AppRoutes = () => {
   return (
@@ -28,6 +30,8 @@ export const AppRoutes = () => {
           <Route path="/konform-product" element={<KonformProduct />} />
           <Route path="/dreamaker" element={<DreamakerProduct />} />
           <Route path="/media/:id" element={<MediaProfilePage />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/privacy" element={<Privacy />} />
         </Routes>
       </div>
     </>
