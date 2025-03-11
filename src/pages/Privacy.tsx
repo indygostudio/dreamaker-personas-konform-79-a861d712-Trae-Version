@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { VideoBackground } from '@/components/dreamaker/VideoBackground';
+import { NavigationButton } from '@/components/persona/profile/header/NavigationButton';
 
 export const Privacy = () => {
   return (
@@ -19,6 +20,11 @@ export const Privacy = () => {
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 py-24">
+        {/* Back Button - positioned above the content */}
+        <div className="mb-6">
+          <NavigationButton />
+        </div>
+        
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
