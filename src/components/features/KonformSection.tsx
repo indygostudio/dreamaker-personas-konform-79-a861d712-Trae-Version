@@ -171,7 +171,17 @@ export const KonformSection = () => {
                     <li>Style-matched mixing suggestions based on reference tracks or genres</li>
                     <li>Real-time mix analysis with actionable feedback to improve your sound</li>
                   </ul>
-                  <img src="/lovable-uploads/Screenshot 2025-03-10 at 7.15.10 PM.png" alt="AI Mixer Interface" className="mt-6 rounded-lg w-full" />
+                  <img 
+                    src="/lovable-uploads/Screenshot 2025-03-10 at 7.15.10 PM.png" 
+                    alt="AI Mixer Interface" 
+                    className="mt-6 rounded-lg w-full object-contain" 
+                    loading="eager" 
+                    onError={(e) => {
+                      console.error('Image failed to load:', e);
+                      e.currentTarget.src = '/placeholder.svg';
+                      e.currentTarget.alt = 'AI Mixer Interface (Failed to load)';
+                    }}
+                  />
                 </div>
               </div>
             </TabsContent>
