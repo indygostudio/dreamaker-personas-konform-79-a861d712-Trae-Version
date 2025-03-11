@@ -18,7 +18,7 @@ export const PersonaSection = () => {
         {/* Background Video */}
         <div className="absolute inset-0">
           <video className="w-full h-full object-cover" autoPlay muted loop playsInline>
-            <source src="/Videos/PERSONAS_01.mp4" type="video/mp4" />
+            <source src="/Videos/Gen-3 Alpha 3165178086, scrolling frames of , imagepng (11), M 5 (1).mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
         </div>
@@ -103,7 +103,15 @@ export const PersonaSection = () => {
                     <li>Specify musical and artistic influences that shape your persona's output</li>
                     <li>Create personas that grow and evolve over time based on interactions</li>
                   </ul>
-                  <img src="/lovable-uploads/c83df97a-619d-42c9-b61f-d26f2549e849.png" alt="Character Development Interface" className="mt-6 rounded-lg w-full" />
+                  <div className="mt-6 rounded-lg w-full h-64 relative overflow-hidden">
+                    <VideoBackground
+                      videoUrl="/Videos/Gen-3 Alpha 1425044134, Handsome country sin, image-prompt, M 5.mp4"
+                      isHovering={true}
+                      continuePlayback={true}
+                      fallbackImage="/lovable-uploads/c83df97a-619d-42c9-b61f-d26f2549e849.png"
+                      priority={true}
+                    />
+                  </div>
                 </div>
               </div>
             </TabsContent>
@@ -141,7 +149,15 @@ export const PersonaSection = () => {
                     <li>Automatically create engaging social posts that maintain your persona's authentic voice</li>
                     <li>Enable collaborations between personas or with human artists to create unique content</li>
                   </ul>
-                  <img src="/lovable-uploads/b4d42ec2-c6c6-4d46-b7c9-348320864db2.png" alt="Content Generation Interface" className="mt-6 rounded-lg w-full" />
+                  <div className="mt-6 rounded-lg w-full h-64 relative overflow-hidden">
+                    <VideoBackground
+                      videoUrl="/Videos/Gen-3 Alpha 2708728073, Lyric book on a tabl, dreammakerstudio_a_d, M 5.mp4"
+                      isHovering={true}
+                      continuePlayback={true}
+                      fallbackImage="/lovable-uploads/b4d42ec2-c6c6-4d46-b7c9-348320864db2.png"
+                      priority={true}
+                    />
+                  </div>
                 </div>
               </div>
             </TabsContent>
