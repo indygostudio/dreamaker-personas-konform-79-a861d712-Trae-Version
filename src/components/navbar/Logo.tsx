@@ -11,12 +11,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Settings, User, LogOut } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/hooks/use-auth";
+import { useNavigate } from "react-router-dom";
 
 export const Logo = () => {
   const [userAvatarUrl, setUserAvatarUrl] = useState<string | null>(null);
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
   
-  // In a real app, you would fetch the user's avatar from your auth system
-  // This is just a placeholder implementation
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
   
   return (
     <div className="flex items-center gap-2">
@@ -39,7 +45,7 @@ export const Logo = () => {
             )}
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="bg-black/90 backdrop-blur-xl border border-white/10 text-white min-w-[200px] mr-2">
+        <DropdownMenuContent className="bg-black/90 backdrop-blur-xl border border-white/10 text-white min-w-[200px] mr-2 z-[200]">
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator className="bg-white/10" />
           <DropdownMenuItem className="hover:bg-blue-500/20 cursor-pointer">
@@ -51,7 +57,10 @@ export const Logo = () => {
             <span>Settings</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator className="bg-white/10" />
-          <DropdownMenuItem className="hover:bg-red-500/20 text-red-400 cursor-pointer">
+          <DropdownMenuItem 
+            className="hover:bg-red-500/20 text-red-400 cursor-pointer"
+            onClick={handleSignOut}
+          >
             <LogOut className="mr-2 h-4 w-4" />
             <span>Sign out</span>
           </DropdownMenuItem>
