@@ -13,7 +13,7 @@ export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-[100] bg-black/70 backdrop-blur-xl border-b border-white/10">
+    <nav className="fixed top-0 left-0 right-0 z-[100] bg-black/70 backdrop-blur-xl border-b border-white/10 shadow-md">
       <div className="container mx-auto max-w-[2400px] px-6 my-[5px]">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-8">

@@ -56,7 +56,7 @@ export const ProfileHeader = ({
   };
 
   return (
-    <div className="relative w-full" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
+    <div className="relative w-full mt-16" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
       <div className={`relative transition-all duration-300 ${isHeaderExpanded ? 'h-[300px]' : 'h-[80px]'}`} onDoubleClick={handleDoubleClick}>
         <BannerContextMenu 
           personaId={id || ''}
