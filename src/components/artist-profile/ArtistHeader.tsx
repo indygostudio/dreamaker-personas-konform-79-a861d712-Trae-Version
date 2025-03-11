@@ -37,30 +37,46 @@ export const ArtistHeader = ({
 
     try {
       setIsUploading(true);
+      toast.info("Uploading banner...");
+      
+      // Upload to Supabase Storage
       const fileExt = file.name.split(".").pop();
-      const filePath = `${crypto.randomUUID()}.${fileExt}`;
-
+      const fileName = `${crypto.randomUUID()}.${fileExt}`;
+      const filePath = `${session.user.id}/${fileName}`;
+      
+      // Use profile_assets bucket for consistency with other banner uploads
       const { error: uploadError } = await supabase.storage
-        .from("persona_avatars")
-        .upload(filePath, file);
+        .from("profile_assets")
+        .upload(filePath, file, {
+          cacheControl: "3600",
+          upsert: true
+        });
 
       if (uploadError) throw uploadError;
 
       const { data: { publicUrl } } = supabase.storage
-        .from("persona_avatars")
+        .from("profile_assets")
         .getPublicUrl(filePath);
 
       // Update both artist_profiles and profiles tables
       const { error: artistProfileError } = await supabase
         .from("artist_profiles")
-        .update({ video_url: publicUrl })
+        .update({ 
+          video_url: publicUrl,
+          banner_url: publicUrl, // Update banner_url as well for consistency
+          banner_position: { x: 50, y: 50 } // Default position
+        })
         .eq("id", session.user.id);
 
       if (artistProfileError) throw artistProfileError;
 
       const { error: profileError } = await supabase
         .from("profiles")
-        .update({ video_url: publicUrl })
+        .update({ 
+          video_url: publicUrl,
+          banner_url: publicUrl, // Update banner_url as well for consistency
+          banner_position: { x: 50, y: 50 } // Default position
+        })
         .eq("id", session.user.id);
 
       if (profileError) throw profileError;
