@@ -139,7 +139,7 @@ export const ArtistProfile = () => {
   }
 
   return (
-    <div className="relative min-h-screen bg-black/95">
+    <div className="relative min-h-screen bg-black/95 pt-16">
       <ProfileHeader 
         persona={profile} 
         id={id!}

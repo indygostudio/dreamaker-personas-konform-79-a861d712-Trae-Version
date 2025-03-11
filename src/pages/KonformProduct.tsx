@@ -165,11 +165,26 @@ export const KonformProduct = () => {
       <div className="container mx-auto px-4 py-16">
         <h2 className="text-4xl font-bold mb-12 text-center">Advanced Features</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8">
-          {advancedFeatures.map((feature, index) => <div key={index} className="text-center p-6 bg-konform-surface rounded-lg border border-konform-border hover:border-konform-neon-blue transition-colors">
-              <div className="mb-4 text-konform-neon-blue flex justify-center">{feature.icon}</div>
-              <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-              <p className="text-gray-400">{feature.description}</p>
-            </div>)}
+          {advancedFeatures.map((feature, index) => (
+            <Card
+              key={index}
+              className="group relative overflow-hidden bg-black/60 border-konform-border hover:border-konform-neon-blue transition-all duration-300 cursor-pointer h-[320px]"
+            >
+              <div className="absolute inset-0 z-0">
+                <VideoBackground
+                  videoUrl={feature.video || '/Videos/KONFORM_01.mp4'}
+                  isHovering={hoveredCard === index + 200}
+                  continuePlayback={false}
+                  darkness={80}
+                />
+              </div>
+              <div className="relative z-10 p-6 flex flex-col h-full">
+                <div className="mb-4 text-konform-neon-blue flex justify-center">{feature.icon}</div>
+                <h3 className="text-xl font-semibold mb-2 text-white">{feature.title}</h3>
+                <p className="text-gray-400 flex-grow">{feature.description}</p>
+              </div>
+            </Card>
+          ))}
         </div>
       </div>
 

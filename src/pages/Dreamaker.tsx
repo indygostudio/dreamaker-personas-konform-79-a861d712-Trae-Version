@@ -29,16 +29,16 @@ export default function Dreamaker() {
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="profiles" className="w-full">
           <TabsList className="grid w-full grid-cols-4 rounded-xl bg-dreamaker-purple/10 p-1">
-            <TabsTrigger value="profiles" className="rounded-lg data-[state=active]:bg-dreamaker-purple">
+            <TabsTrigger value="profiles" className="w-full rounded-lg data-[state=active]:bg-dreamaker-purple">
               User Profiles
             </TabsTrigger>
-            <TabsTrigger value="personas" className="rounded-lg data-[state=active]:bg-dreamaker-purple">
+            <TabsTrigger value="personas" className="w-full rounded-lg data-[state=active]:bg-dreamaker-purple">
               Personas
             </TabsTrigger>
-            <TabsTrigger value="collaborations" className="rounded-lg data-[state=active]:bg-dreamaker-purple">
+            <TabsTrigger value="collaborations" className="w-full rounded-lg data-[state=active]:bg-dreamaker-purple">
               Collaborations
             </TabsTrigger>
-            <TabsTrigger value="media" className="rounded-lg data-[state=active]:bg-dreamaker-purple">
+            <TabsTrigger value="media" className="w-full rounded-lg data-[state=active]:bg-dreamaker-purple">
               Media
             </TabsTrigger>
           </TabsList>
