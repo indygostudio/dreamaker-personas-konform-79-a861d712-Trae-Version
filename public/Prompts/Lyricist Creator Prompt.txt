@@ -1,0 +1,82 @@
+LYRICIST AND TEXT CREATION PROMPTS:
+
+1. Music Artist Names with Discography and Style, Personality Profiles
+You can use an API like DeepSeek R1 for this purpose, which specializes in generating detailed profiles and discographies for fictional artists. Here’s a simplified example of how you might integrate this:
+
+python
+Copy
+Edit
+# Example Python code using DeepSeek R1 API
+
+import requests
+
+# Replace 'YOUR_API_KEY' with your actual API key from DeepSeek R1
+api_key = 'YOUR_API_KEY'
+endpoint = 'https://api.deepseek.dev/r1/artist'
+
+def get_artist_profile(artist_name):
+    headers = {
+        'Authorization': f'Bearer {api_key}'
+    }
+    params = {
+        'name': artist_name
+    }
+    response = requests.get(endpoint, headers=headers, params=params)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return None
+
+# Example usage
+artist_name = 'Example Artist'
+profile = get_artist_profile(artist_name)
+if profile:
+    print(f"Artist Name: {profile['name']}")
+    print(f"Discography: {profile['discography']}")
+    print(f"Style: {profile['style']}")
+    print(f"Personality Profile: {profile['personality']}")
+else:
+    print("Failed to retrieve artist profile.")
+2. Advanced Lyric Writer for Different Genres
+For generating lyrics, you can utilize models trained on specific genres or a general-purpose model like GPT-3.5, customized with prompts for each genre. Here’s how you might integrate GPT-3.5 for lyric generation using OpenAI’s API:
+
+python
+Copy
+Edit
+# Example Python code using OpenAI's GPT-3.5 API (adapted for different genres)
+
+import openai
+
+# Replace 'YOUR_OPENAI_API_KEY' with your actual OpenAI API key
+openai.api_key = 'YOUR_OPENAI_API_KEY'
+
+def generate_lyrics(prompt, max_tokens=100):
+    response = openai.Completion.create(
+        engine="text-davinci-003",
+        prompt=prompt,
+        max_tokens=max_tokens
+    )
+    return response.choices[0].text.strip()
+
+# Example usage for different genres
+prompt_rock = "Generate rock lyrics:"
+prompt_country = "Generate country lyrics:"
+prompt_pop = "Generate pop lyrics:"
+
+rock_lyrics = generate_lyrics(prompt_rock)
+country_lyrics = generate_lyrics(prompt_country)
+pop_lyrics = generate_lyrics(prompt_pop)
+
+print("Rock Lyrics:")
+print(rock_lyrics)
+print("\nCountry Lyrics:")
+print(country_lyrics)
+print("\nPop Lyrics:")
+print(pop_lyrics)
+3. Music Video Storyline Creator
+For creating music video storylines integrating artist profiles and lyrics, you would combine the outputs from the previous steps into a coherent narrative. This would involve scripting and possibly using AI to assist in generating narrative arcs based on the artist’s style and lyrics.
+
+Integration with lovable.dev
+To integrate these functionalities into your web application on lovable.dev, you would typically create endpoints or functions that call these APIs and handle the responses. Ensure you securely store and manage API keys and handle errors gracefully.
+
+Remember to replace placeholders like 'YOUR_API_KEY' and 'YOUR_OPENAI_API_KEY' with your actual API keys from DeepSeek R1 and OpenAI respectively. This structure provides a starting point, and you can customize further based on specific needs and additional functionalities you want to incorporate.

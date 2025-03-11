@@ -1,0 +1,4 @@
+
+project_id = "eybrmzbvvckdlvlckfms"
+name = "get-elevenlabs-key"
+verify_jwt = true

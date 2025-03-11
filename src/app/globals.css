@@ -1,0 +1,8 @@
+
+
+/* Add draggable dialog styles */
+.draggable-dialog {
+  cursor: move;
+  user-select: none;
+}
+

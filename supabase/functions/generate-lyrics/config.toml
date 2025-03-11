@@ -1,0 +1,8 @@
+
+project_id = "eybrmzbvvckdlvlckfms"
+[build]
+command = "deno bundle index.ts"
+[config]
+max_execution_time = "60s"
+[secret]
+PIAPI_KEY = "PIAPI_KEY"
