@@ -4,6 +4,7 @@ import { FeatureCards } from "./features/FeatureCards";
 import { KonformSection } from "./features/KonformSection";
 import { PersonaSection } from "./features/PersonaSection";
 import { MarketplaceSection } from "./features/MarketplaceSection";
+import { DreamakerSection } from "./features/DreamakerSection";
 import { FAQ } from "./features/FAQ";
 import { PricingPlans } from "./features/PricingPlans";
 
@@ -21,6 +22,7 @@ export const Features = () => {
         </div>
 
         <FeatureCards />
+        <DreamakerSection />
         <MarketplaceSection />
         <KonformSection />
         <PersonaSection />

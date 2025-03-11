@@ -1,31 +1,79 @@
 
+import { useState } from "react";
+import { Card } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
+import { VideoBackground } from "@/components/dreamaker/VideoBackground";
+import { Disc3, Users, Sliders } from "lucide-react";
+
 export const FeatureCards = () => {
-  return <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
-      <div className="relative overflow-hidden bg-black border border-blue-500/20 hover:border-blue-500/60 transition-all duration-300 p-8 rounded-lg shadow-lg hover:shadow-blue-500/20 group">
-        <div className="relative z-10">
-          <h3 className="text-xl font-semibold mb-4 font-syne text-white group-hover:text-blue-400 transition-colors">AI Voice Generation</h3>
-          <p className="text-gray-400 font-syne group-hover:text-gray-300 transition-colors">
-            Generate unique, expressive voices for your virtual artist using advanced AI voice synthesis. Create voices that capture any style, emotion, or character with remarkable realism and flexibility. Perfect for crafting distinct vocal identities that stand out in the digital landscape.
-          </p>
-        </div>
-      </div>
-      
-      <div className="relative overflow-hidden bg-black border border-sky-500/20 hover:border-sky-500/60 transition-all duration-300 p-8 rounded-lg shadow-lg hover:shadow-sky-500/20 group">
-        <div className="relative z-10">
-          <h3 className="text-xl font-semibold mb-4 font-syne text-white group-hover:text-sky-400 transition-colors">Style Transfer</h3>
-          <p className="text-gray-400 font-syne group-hover:text-gray-300 transition-colors">
-            Transform your compositions by applying different musical styles and genres seamlessly. Our sophisticated AI analyzes the core elements of your music and intelligently applies the characteristics of any genre - from classical to EDM, jazz to hip-hop. Experiment with unlimited creative possibilities while maintaining your original vision.
-          </p>
-        </div>
-      </div>
-      
-      <div className="relative overflow-hidden bg-black border border-indigo-500/20 hover:border-indigo-500/60 transition-all duration-300 p-8 rounded-lg shadow-lg hover:shadow-indigo-500/20 group">
-        <div className="relative z-10">
-          <h3 className="text-xl font-semibold mb-4 font-syne text-white group-hover:text-indigo-400 transition-colors">Persona Creation</h3>
-          <p className="text-gray-400 font-syne group-hover:text-gray-300 transition-colors">
-            Design fully realized virtual artists with rich backstories, visual identities, and personality traits. Build memorable characters with distinct musical preferences, creative visions, and artistic trajectories. Our AI helps craft consistent, believable personas that can evolve and grow with your creative vision across all your projects.
-          </p>
-        </div>
-      </div>
-    </div>;
+  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+
+  const featureCards = [
+    {
+      title: "AI Record Label",
+      description: "Create your virtual artist persona with advanced AI technology and produce professional music with our integrated AI DAW",
+      videoUrl: "/Videos/DREAMAKER_01.mp4",
+      icon: <Disc3 className="h-6 w-6" />,
+      color: "border-purple-500/20 group-hover:border-purple-500/60",
+      bgColor: "from-purple-900/40 to-black/40",
+      hoverColor: "text-purple-400"
+    },
+    {
+      title: "AI Persona",
+      description: "Design fully realized virtual artists with rich backstories, visual identities, and personality traits. Build memorable characters with distinct musical preferences and creative visions.",
+      videoUrl: "/Videos/PERSONAS_01.mp4",
+      icon: <Users className="h-6 w-6" />,
+      color: "border-blue-500/20 group-hover:border-blue-500/60",
+      bgColor: "from-blue-900/40 to-black/40",
+      hoverColor: "text-blue-400"
+    },
+    {
+      title: "AI Studio",
+      description: "Transform your compositions by applying different musical styles and genres seamlessly. Our sophisticated AI analyzes your music and intelligently applies the characteristics of any genre.",
+      videoUrl: "/Videos/KONFORM_01.mp4",
+      icon: <Sliders className="h-6 w-6" />,
+      color: "border-indigo-500/20 group-hover:border-indigo-500/60",
+      bgColor: "from-indigo-900/40 to-black/40",
+      hoverColor: "text-indigo-400"
+    }
+  ];
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
+      {featureCards.map((card, index) => (
+        <Card 
+          key={index}
+          className={`group overflow-hidden relative bg-black/80 backdrop-blur-md border ${card.color} transition-all duration-300 cursor-pointer w-full h-[280px] flex flex-col shadow-lg hover:shadow-lg transform hover:-translate-y-1`}
+          onMouseEnter={() => setHoveredCard(index)}
+          onMouseLeave={() => setHoveredCard(null)}
+        >
+          <div className="absolute inset-0 w-full h-full overflow-hidden">
+            <VideoBackground 
+              videoUrl={card.videoUrl} 
+              isHovering={hoveredCard === index} 
+              continuePlayback={false}
+            />
+            <div 
+              className={`absolute inset-0 bg-gradient-to-b ${card.bgColor} opacity-70 group-hover:opacity-80 transition-opacity duration-300`} 
+            />
+          </div>
+          
+          <CardContent className="p-6 flex-1 relative z-10">
+            <div className="flex items-center gap-2 mb-4">
+              <div className={`text-white group-hover:${card.hoverColor} transition-colors`}>
+                {card.icon}
+              </div>
+              <h3 className={`text-xl font-semibold text-white group-hover:${card.hoverColor} transition-colors`}>
+                {card.title}
+              </h3>
+            </div>
+            
+            <p className="text-gray-400 group-hover:text-gray-300 transition-colors">
+              {card.description}
+            </p>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
 };
