@@ -3,12 +3,13 @@ import { VideoBackground } from '@/components/dreamaker/VideoBackground';
 import { PricingPlans } from '@/components/features/PricingPlans';
 import { useState } from 'react';
 import { NavigationButton } from '@/components/persona/profile/header/NavigationButton';
+import { Footer } from '@/components/Footer';
 
 export const Pricing = () => {
   const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly'>('monthly');
 
   return (
-    <div className="min-h-screen relative bg-black">
+    <div className="min-h-screen relative bg-black flex flex-col">
       {/* Video Background with gradient overlay */}
       <div className="absolute inset-0 z-0">
         <VideoBackground
@@ -23,7 +24,7 @@ export const Pricing = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 py-24 mt-[74px]">
+      <div className="relative z-10 container mx-auto px-4 py-24 mt-[74px] flex-grow">
         <div className="absolute top-4 left-4">
           <NavigationButton />
         </div>
@@ -142,6 +143,7 @@ export const Pricing = () => {
           </div>
         </motion.div>
       </div>
+      <Footer />
     </div>
   );
 };
