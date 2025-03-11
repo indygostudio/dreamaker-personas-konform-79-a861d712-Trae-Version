@@ -6,7 +6,6 @@ import { PersonaSection } from "./features/PersonaSection";
 import { MarketplaceSection } from "./features/MarketplaceSection";
 import { FAQ } from "./features/FAQ";
 import { PricingPlans } from "./features/PricingPlans";
-import { SparklesCore } from "./ui/sparkles-core";
 
 export const Features = () => {
   const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly'>('monthly');
@@ -27,22 +26,8 @@ export const Features = () => {
         <PersonaSection />
         
         {/* Pricing Section */}
-        <section className="py-24 relative overflow-hidden">
-          {/* SparklesCore background */}
-          <div className="absolute inset-0 w-full h-full z-0">
-            <SparklesCore
-              id="pricing-sparkles"
-              background="transparent"
-              minSize={0.6}
-              maxSize={1.4}
-              particleColor="#888888"
-              particleDensity={100}
-              className="w-full h-full"
-            />
-            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
-          </div>
-          
-          <div className="container px-4 mx-auto relative z-10">
+        <section className="py-24 bg-black/40">
+          <div className="container px-4 mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl font-bold mb-4 font-syne text-white">
                 Choose Your Plan
