@@ -1,5 +1,5 @@
 
-import { Copy, Upload, Download, StarIcon, Trash2Icon, Plus, UserPlus2 } from "lucide-react";
+import { Copy, Upload, Download, StarIcon, Trash2Icon, Plus, UserPlus2, ExternalLink } from "lucide-react";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -125,6 +125,13 @@ export const PersonaContextMenu = ({
       <ContextMenu>
         <ContextMenuTrigger>{children}</ContextMenuTrigger>
         <ContextMenuContent className="w-64 bg-dreamaker-gray border-dreamaker-purple/20">
+          <ContextMenuItem 
+            onClick={() => window.open(`/personas/${personaId}`, '_blank')}
+            className="text-gray-300 hover:text-white focus:text-white hover:bg-dreamaker-purple/10 focus:bg-dreamaker-purple/10"
+          >
+            <ExternalLink className="h-4 w-4 mr-2" />
+            Open in New Tab
+          </ContextMenuItem>
           <ContextMenuItem 
             onClick={handleAddToProject}
             className="text-gray-300 hover:text-white focus:text-white hover:bg-dreamaker-purple/10 focus:bg-dreamaker-purple/10"
