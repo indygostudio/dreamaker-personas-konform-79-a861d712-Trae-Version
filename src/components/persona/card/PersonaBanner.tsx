@@ -48,7 +48,7 @@ export const PersonaBanner = ({ persona }: PersonaBannerProps) => {
       </div>
 
       {/* The audio preview button - visible when persona has audio_preview_url */}
-      <AudioPreviewButton audioUrl={persona.audio_preview_url} />
+      <AudioPreviewButton audioUrl={persona.audio_preview_url} personaName={persona.name} />
 
       {persona.type && (
         <Badge

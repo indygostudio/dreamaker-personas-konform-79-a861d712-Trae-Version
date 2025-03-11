@@ -105,6 +105,10 @@ export const PersonaCard = ({
     
     setIsPlayingAudio(!isPlayingAudio);
   };
+  
+  const handleTransportClose = () => {
+    setIsPlayingAudio(false);
+  };
 
   const getTypeColors = () => {
     switch (artist.type) {
@@ -258,15 +262,16 @@ export const PersonaCard = ({
           <div className="absolute inset-0 bg-black/60 z-10 pointer-events-none transition-opacity duration-500"></div>
         )}
         
-        {/* Audio player - Hidden but functional */}
-        {artist.audio_preview_url && (
-          <div className="hidden">
+        {/* Audio player with transport UI */}
+        {artist.audio_preview_url && isPlayingAudio && (
+          <div className="fixed bottom-0 left-0 right-0 z-50">
             <MusicPlayer
               audioUrl={artist.audio_preview_url}
               isPlaying={isPlayingAudio}
               onPlayPause={() => setIsPlayingAudio(!isPlayingAudio)}
               trackTitle={`${artist.name} Preview`}
               artistName={artist.name}
+              onTransportClose={handleTransportClose}
             />
           </div>
         )}

@@ -2,9 +2,17 @@
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 
-export const useAudioPreview = (audioUrl: string | undefined) => {
+interface UseAudioPreviewOptions {
+  showTransport?: boolean;
+  personaName?: string;
+}
+
+export const useAudioPreview = (audioUrl: string | undefined, options?: UseAudioPreviewOptions) => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [showMusicPlayer, setShowMusicPlayer] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  
+  const { showTransport = true, personaName = "Audio Preview" } = options || {};
 
   useEffect(() => {
     // Clean up previous audio element
@@ -60,8 +68,17 @@ export const useAudioPreview = (audioUrl: string | undefined) => {
       return;
     }
 
+    // Toggle playing state
+    const newPlayingState = !isPlaying;
+    setIsPlaying(newPlayingState);
+    
+    // Show music player transport when playing starts
+    if (showTransport && newPlayingState) {
+      setShowMusicPlayer(true);
+    }
+
     if (audioRef.current) {
-      if (isPlaying) {
+      if (!newPlayingState) {
         audioRef.current.pause();
       } else {
         // Reset to beginning if it was played before
@@ -72,15 +89,31 @@ export const useAudioPreview = (audioUrl: string | undefined) => {
         audioRef.current.play().catch(error => {
           console.error('Error playing audio:', error);
           toast.error("Error playing audio preview");
+          setIsPlaying(false);
         });
       }
-      setIsPlaying(!isPlaying);
     }
   };
 
   const handleAudioEnded = () => {
     setIsPlaying(false);
   };
+  
+  const handleTransportClose = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    setIsPlaying(false);
+    setShowMusicPlayer(false);
+  };
 
-  return { isPlaying, handleAudioToggle };
+  return { 
+    isPlaying, 
+    handleAudioToggle, 
+    showMusicPlayer, 
+    handleTransportClose,
+    audioUrl,
+    personaName
+  };
 };
