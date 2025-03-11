@@ -41,6 +41,8 @@ export const ProfileTabs = ({
   const { showDropContainer, setShowDropContainer } = useSelectedPersonasStore();
   const { setHeaderExpanded } = useUIStore();
   const tabsRef = useRef<HTMLDivElement>(null);
+  const [isScrollingUp, setIsScrollingUp] = useState(false);
+  const lastScrollY = useRef(0);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -58,23 +60,31 @@ export const ProfileTabs = ({
   }, []);
 
   useEffect(() => {
-    const tabs = tabsRef.current;
-    if (!tabs) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting && window.scrollY > entry.boundingClientRect.top) {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const isScrollingUpNow = currentScrollY < lastScrollY.current;
+      
+      if (isScrollingUpNow && tabsRef.current) {
+        // Get the position of the navbar (72px from top plus 16px margin = 88px)
+        const navbarBottom = 88;
+        const tabsRect = tabsRef.current.getBoundingClientRect();
+        
+        // If tabs are about to go above the navbar
+        if (tabsRect.top < navbarBottom) {
+          // Prevent further scrolling by setting the scroll position
           window.scrollTo({
-            top: entry.boundingClientRect.top,
-            behavior: 'smooth'
+            top: currentScrollY + (navbarBottom - tabsRect.top),
+            behavior: 'auto'
           });
         }
-      },
-      { threshold: 0.1 }
-    );
+      }
+      
+      lastScrollY.current = currentScrollY;
+      setIsScrollingUp(isScrollingUpNow);
+    };
 
-    observer.observe(tabs);
-    return () => observer.disconnect();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -117,7 +127,7 @@ export const ProfileTabs = ({
     >
       <div 
         ref={tabsRef} 
-        className="sticky top-0 z-50 glass-morphism py-3"
+        className="sticky top-[88px] z-30 glass-morphism py-3"
       >
         <Tabs 
           defaultValue={activeTab} 

@@ -46,7 +46,9 @@ export function ArtistProfileDialog({
     genre: [] as string[],
     location: "",
     profile_type: "musician" as "musician" | "writer" | "mixer",
-    audio_preview_url: ""
+    audio_preview_url: "",
+    audio_trim_start: undefined as number | undefined,
+    audio_trim_end: undefined as number | undefined
   });
 
   useEffect(() => {
@@ -63,7 +65,9 @@ export function ArtistProfileDialog({
         genre: profile.genre || [],
         location: profile.location || "",
         profile_type: (profile.profile_type as "musician" | "writer" | "mixer") || "musician",
-        audio_preview_url: profile.audio_preview_url || ""
+        audio_preview_url: profile.audio_preview_url || "",
+        audio_trim_start: profile.audio_trim_start,
+        audio_trim_end: profile.audio_trim_end
       });
     }
   }, [open, profile]);
@@ -112,7 +116,9 @@ export function ArtistProfileDialog({
           genre: formData.genre,
           location: formData.location,
           profile_type: formData.profile_type,
-          audio_preview_url: formData.audio_preview_url
+          audio_preview_url: formData.audio_preview_url,
+          audio_trim_start: formData.audio_trim_start,
+          audio_trim_end: formData.audio_trim_end
         })
         .eq('id', profile.id);
 
@@ -131,9 +137,19 @@ export function ArtistProfileDialog({
     }
   };
 
-  const handleAudioSuccess = (url: string) => {
-    setFormData(prev => ({ ...prev, audio_preview_url: url }));
-    toast.success("Audio preview uploaded successfully");
+  const handleAudioSuccess = (url: string, trimData?: { start: number; end: number }) => {
+    setFormData(prev => ({
+      ...prev,
+      audio_preview_url: url,
+      audio_trim_start: trimData?.start,
+      audio_trim_end: trimData?.end
+    }));
+    
+    if (trimData) {
+      toast.success("Audio preview trimmed and ready to save");
+    } else {
+      toast.success("Audio preview uploaded successfully");
+    }
   };
 
   const handlePositionChange = (position: { x: number; y: number }) => {
@@ -156,46 +172,16 @@ export function ArtistProfileDialog({
     }, 100);
   };
 
-  const handleClearAvatar = async () => {
-    try {
-      setIsLoading(true);
-      const { error } = await supabase
-        .from('profiles')
-        .update({ avatar_url: "" })
-        .eq('id', profile.id);
-        
-      if (error) throw error;
-      
-      setFormData(prev => ({ ...prev, avatar_url: "" }));
-      toast.success("Avatar removed successfully");
-      queryClient.invalidateQueries({ queryKey: ["artist-profile"] });
-    } catch (error: any) {
-      console.error('Error clearing avatar:', error);
-      toast.error(`Failed to clear avatar: ${error.message || 'Unknown error'}`);
-    } finally {
-      setIsLoading(false);
-    }
+  const handleClearAvatar = () => {
+    // Only update local state, don't save to database yet
+    setFormData(prev => ({ ...prev, avatar_url: "" }));
+    toast.success("Avatar removed - click Save Changes to apply");
   };
 
-  const handleClearBanner = async () => {
-    try {
-      setIsLoading(true);
-      const { error } = await supabase
-        .from('profiles')
-        .update({ banner_url: "" })
-        .eq('id', profile.id);
-        
-      if (error) throw error;
-      
-      setFormData(prev => ({ ...prev, banner_url: "" }));
-      toast.success("Banner removed successfully");
-      queryClient.invalidateQueries({ queryKey: ["artist-profile"] });
-    } catch (error: any) {
-      console.error('Error clearing banner:', error);
-      toast.error(`Failed to clear banner: ${error.message || 'Unknown error'}`);
-    } finally {
-      setIsLoading(false);
-    }
+  const handleClearBanner = () => {
+    // Only update local state, don't save to database yet
+    setFormData(prev => ({ ...prev, banner_url: "" }));
+    toast.success("Banner removed - click Save Changes to apply");
   };
 
   return (

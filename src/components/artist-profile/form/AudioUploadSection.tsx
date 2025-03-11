@@ -1,17 +1,19 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Upload, AudioWaveform, Volume2, Clock, Music2 } from "lucide-react";
+import { Upload, AudioWaveform, Volume2, Clock, Music2, Scissors, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { WaveformPlayer } from "@/components/artist-profile/WaveformPlayer";
 import { useUser } from "@/hooks/useUser";
+import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
 
 interface AudioUploadSectionProps {
   audioUrl: string;
   profileId: string;
   userId: string;
-  onSuccess: (url: string) => void;
+  onSuccess: (url: string, trimData?: { start: number; end: number }) => void;
   isDisabled?: boolean;
   buttonVariant?: string;
   buttonSize?: string;
@@ -26,6 +28,11 @@ interface AudioMetadata {
   format?: string;
   fileSize?: number;
   peakAmplitude?: number;
+}
+
+interface TrimPoints {
+  start: number;
+  end: number;
 }
 
 const ALLOWED_AUDIO_TYPES = ['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/aac', 'audio/m4a'];
@@ -45,6 +52,10 @@ export function AudioUploadSection({
   const [isProcessing, setIsProcessing] = useState(false);
   const [audioMetadata, setAudioMetadata] = useState<AudioMetadata | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isTrimming, setIsTrimming] = useState(false);
+  const [trimPoints, setTrimPoints] = useState<TrimPoints>({ start: 0, end: 100 });
+  const [audioDuration, setAudioDuration] = useState<number>(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const { user } = useUser();
 
   const formatDuration = (seconds: number): string => {
@@ -174,6 +185,19 @@ export function AudioUploadSection({
     }
   };
 
+  // Initialize audio element for getting duration
+  useEffect(() => {
+    if (audioUrl && !audioRef.current) {
+      const audio = new Audio(audioUrl);
+      audio.addEventListener('loadedmetadata', () => {
+        setAudioDuration(audio.duration);
+        // Set default end point to full duration
+        setTrimPoints(prev => ({ ...prev, end: 100 }));
+      });
+      audioRef.current = audio;
+    }
+  }, [audioUrl]);
+
   const handleAudioUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
@@ -245,6 +269,15 @@ export function AudioUploadSection({
       onSuccess(publicUrl);
       toast.success("Audio uploaded successfully");
       
+      // Create a new audio element to get duration
+      const audio = new Audio(publicUrl);
+      audio.addEventListener('loadedmetadata', () => {
+        setAudioDuration(audio.duration);
+        // Set default end point to full duration
+        setTrimPoints({ start: 0, end: 100 });
+      });
+      audioRef.current = audio;
+      
       event.target.value = '';
       
     } catch (error) {
@@ -264,7 +297,45 @@ export function AudioUploadSection({
   };
 
   const handleLoad = () => {
-    // Placeholder for future load handling
+    if (audioRef.current) {
+      setAudioDuration(audioRef.current.duration);
+    }
+  };
+  
+  const handleTrimToggle = () => {
+    setIsTrimming(!isTrimming);
+  };
+  
+  const handleTrimChange = (values: number[]) => {
+    setTrimPoints({
+      start: values[0],
+      end: values[1]
+    });
+  };
+  
+  // Calculate the current trim positions in seconds for the waveform markers
+  const calculateTrimPositionsInSeconds = () => {
+    if (!audioDuration) return { startSec: 0, endSec: 0 };
+    const startSec = (trimPoints.start / 100) * audioDuration;
+    const endSec = (trimPoints.end / 100) * audioDuration;
+    return { startSec, endSec };
+  };
+  
+  const handleSaveTrim = () => {
+    if (audioUrl && trimPoints.start !== 0 || trimPoints.end !== 100) {
+      // Convert percentage to seconds
+      const startTime = (trimPoints.start / 100) * audioDuration;
+      const endTime = (trimPoints.end / 100) * audioDuration;
+      
+      // Pass the trim data to parent component
+      onSuccess(audioUrl, {
+        start: startTime,
+        end: endTime
+      });
+      
+      toast.success("Audio trim points saved");
+      setIsTrimming(false);
+    }
   };
 
   return (
@@ -351,14 +422,109 @@ export function AudioUploadSection({
       )}
 
       {audioUrl && (
-        <div className="mt-2 bg-black/20 rounded-lg p-4">
-          <WaveformPlayer 
-            audioUrl={audioUrl}
-            isPlaying={isPlaying}
-            onPlayPause={handlePlayPause}
-            onTimeUpdate={handleTimeUpdate}
-            onLoad={handleLoad}
-          />
+        <div className="mt-2 bg-black/20 rounded-lg p-4 space-y-4">
+          {isTrimming ? (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h3 className="text-sm font-medium">Trim Audio Preview</h3>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={handleTrimToggle}
+                    className="border-gray-600"
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    variant="default" 
+                    size="sm" 
+                    onClick={handleSaveTrim}
+                    className="bg-dreamaker-purple hover:bg-dreamaker-purple/80"
+                  >
+                    <Save className="w-4 h-4 mr-2" />
+                    Save Trim
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label className="text-xs text-gray-400">Select start and end points</Label>
+                <div className="relative mt-8 mb-6">
+                  <WaveformPlayer 
+                    audioUrl={audioUrl}
+                    isPlaying={isPlaying}
+                    onPlayPause={handlePlayPause}
+                    onTimeUpdate={handleTimeUpdate}
+                    onLoad={handleLoad}
+                  />
+                  
+                  {/* Trim markers overlay */}
+                  <div className="absolute top-0 left-0 right-0 bottom-0 pointer-events-none">
+                    <div 
+                      className="absolute top-0 bottom-0 bg-black/30"
+                      style={{
+                        left: 0,
+                        width: `${trimPoints.start}%`,
+                      }}
+                    />
+                    <div 
+                      className="absolute top-0 bottom-0 bg-black/30"
+                      style={{
+                        right: 0,
+                        width: `${100 - trimPoints.end}%`,
+                      }}
+                    />
+                    <div 
+                      className="absolute top-0 bottom-0 border-l-2 border-dreamaker-purple"
+                      style={{ left: `${trimPoints.start}%` }}
+                    />
+                    <div 
+                      className="absolute top-0 bottom-0 border-r-2 border-dreamaker-purple"
+                      style={{ left: `${trimPoints.end}%` }}
+                    />
+                  </div>
+                </div>
+                
+                <Slider
+                  defaultValue={[trimPoints.start, trimPoints.end]}
+                  value={[trimPoints.start, trimPoints.end]}
+                  onValueChange={handleTrimChange}
+                  max={100}
+                  step={0.1}
+                  className="mb-2"
+                />
+                <div className="flex justify-between text-xs text-gray-400">
+                  <span>{formatDuration((trimPoints.start / 100) * audioDuration)}</span>
+                  <span>{formatDuration((trimPoints.end / 100) * audioDuration)}</span>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-sm font-medium">Audio Preview</h3>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleTrimToggle}
+                  className="border-dreamaker-purple/30 text-dreamaker-purple"
+                >
+                  <Scissors className="w-4 h-4 mr-2" />
+                  Trim Audio
+                </Button>
+              </div>
+              <div className="relative">
+                <WaveformPlayer 
+                  audioUrl={audioUrl}
+                  isPlaying={isPlaying}
+                  onPlayPause={handlePlayPause}
+                  onTimeUpdate={handleTimeUpdate}
+                  onLoad={handleLoad}
+                />
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

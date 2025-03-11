@@ -26,6 +26,8 @@ export const VideoBackground = ({
   autoPlay = false,
   priority = false, // Default to false
 }: VideoBackgroundProps) => {
+  // Log the fallbackImage for debugging
+  console.log('VideoBackground fallbackImage:', fallbackImage);
   const { videoRef, isVideoLoaded, thumbnailUrl } = useVideoCache(videoUrl);
   const [isReversed, setIsReversed] = useState(false);
   const [lastPlaybackRate, setLastPlaybackRate] = useState(1);
@@ -100,10 +102,11 @@ export const VideoBackground = ({
 
   // Handle hover behavior 
   useEffect(() => {
-    if (videoUrl && videoRef.current && !autoPlay) {  // Don't interfere with autoPlay videos
+    if (videoUrl && videoRef.current) {
       const video = videoRef.current;
       
-      if (isHovering) {
+      if (isHovering && !autoPlay) {
+        // Only play on hover if not set to autoPlay
         const playTimer = setTimeout(() => {
           if (reverseOnEnd && lastPlaybackRate !== 0) {
             // Resume in the same direction
@@ -115,19 +118,19 @@ export const VideoBackground = ({
         }, 50);
         
         return () => clearTimeout(playTimer);
-      } else if (!continuePlayback) {
-        // Pause when not hovering and not set to continue
+      } else if (!isHovering && !continuePlayback) {
+        // Always pause when mouse leaves unless explicitly set to continue
         video.pause();
         setIsPlaying(false);
         
-        if (!continuePlayback) {
-          video.currentTime = 0;
-        }
+        // Reset to beginning
+        video.currentTime = 0;
       }
     }
   }, [videoUrl, isHovering, continuePlayback, reverseOnEnd, lastPlaybackRate, autoPlay]);
 
   if (!videoUrl && !fallbackImage) {
+    console.log('No video or fallback image provided');
     return <div className="w-full h-full bg-gradient-to-b from-black/20 to-black/60" />;
   }
 

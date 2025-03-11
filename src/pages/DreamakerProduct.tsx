@@ -24,10 +24,36 @@ export const DreamakerProduct = () => {
   const [sortBy, setSortBy] = useState("newest");
   const [selectedType, setSelectedType] = useState("all");
   const [selectedGenre, setSelectedGenre] = useState("all");
-  const [zoomLevel, setZoomLevel] = useState(() => {
-    const saved = localStorage.getItem('defaultZoom');
-    return saved ? parseInt(saved) : 75;
+  const [tabZoomLevels, setTabZoomLevels] = useState<Record<string, number>>(() => {
+    // Try to load saved tab zoom levels from localStorage
+    const savedZoomLevels = localStorage.getItem('tabZoomLevels');
+    if (savedZoomLevels) {
+      try {
+        return JSON.parse(savedZoomLevels);
+      } catch (e) {
+        console.error('Failed to parse saved zoom levels:', e);
+      }
+    }
+    
+    // Initialize with default zoom levels for each tab
+    return {
+      profiles: 75,
+      personas: 75,
+      collaborations: 75,
+      media: 75
+    };
   });
+  
+  // Get the current tab's zoom level
+  const zoomLevel = tabZoomLevels[activeTab] || 75;
+  
+  // Function to update zoom level for the current tab only
+  const setZoomLevel = (newZoomLevel: number) => {
+    setTabZoomLevels(prev => ({
+      ...prev,
+      [activeTab]: newZoomLevel
+    }));
+  };
   const [isHeaderHovered, setIsHeaderHovered] = useState(false);
   const [currentBanner, setCurrentBanner] = useState<Banner | null>(null);
   const { tier: subscriptionTier } = useSubscription();
@@ -73,10 +99,11 @@ export const DreamakerProduct = () => {
     selectedGenre
   );
 
-  // Update localStorage whenever zoom level changes
+  // Update localStorage whenever tab zoom levels change
   useEffect(() => {
-    localStorage.setItem('defaultZoom', zoomLevel.toString());
-  }, [zoomLevel]);
+    // Store all tab zoom levels in localStorage
+    localStorage.setItem('tabZoomLevels', JSON.stringify(tabZoomLevels));
+  }, [tabZoomLevels]);
 
   const handleAudioPlay = (fileUrl: string) => {
     if (!fileUrl) {
@@ -99,7 +126,8 @@ export const DreamakerProduct = () => {
 
   const saveCurrentStateAsDefault = () => {
     const currentState = {
-      zoomLevel: zoomLevel,
+      zoomLevel: zoomLevel, // Current tab's zoom level
+      tabZoomLevels: tabZoomLevels, // All tabs' zoom levels
       filterSettings: {
         sortBy,
         searchQuery,
@@ -120,7 +148,7 @@ export const DreamakerProduct = () => {
     
     toast({
       title: "Default state saved",
-      description: "Your current view settings will be applied next time",
+      description: `Your current view settings for the ${activeTab} tab will be applied next time`,
       variant: "default"
     });
   };

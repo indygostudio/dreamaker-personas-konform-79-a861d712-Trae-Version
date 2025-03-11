@@ -19,6 +19,7 @@ interface CollapsedSections {
 
 interface WindowState {
   zoomLevel: number;
+  tabZoomLevels: Record<string, number>;
   filterSettings: FilterSettings;
   collapsedSections: CollapsedSections;
   scrollPositions: Record<string, number>;
@@ -74,6 +75,12 @@ export const useUIStore = create<UIState>()(
       defaultCollapsedSections: DEFAULT_COLLAPSED_SECTIONS,
       defaultWindowState: {
         zoomLevel: 60,
+        tabZoomLevels: {
+          profiles: 60,
+          personas: 60,
+          collaborations: 60,
+          media: 60
+        },
         filterSettings: DEFAULT_FILTER_SETTINGS,
         collapsedSections: DEFAULT_COLLAPSED_SECTIONS,
         scrollPositions: {}

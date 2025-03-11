@@ -26,6 +26,8 @@ export interface Profile {
   is_public?: boolean;
   video_url?: string;
   audio_preview_url?: string;
+  audio_trim_start?: number;
+  audio_trim_end?: number;
   genre?: string[];
   location?: string;
   profile_type?: string;

@@ -165,11 +165,14 @@ export const ArtistProfile = () => {
         }}
       />
 
-      <MusicPlayer
-        audioUrl={profile?.audio_preview_url || null}
-        isPlaying={isPlaying}
-        onPlayPause={handlePlayPause}
-      />
+      {isPlaying && (
+        <MusicPlayer
+          audioUrl={profile?.audio_preview_url || null}
+          isPlaying={isPlaying}
+          onPlayPause={handlePlayPause}
+          onTransportClose={() => setIsPlaying(false)}
+        />
+      )}
     </div>
   );
 };

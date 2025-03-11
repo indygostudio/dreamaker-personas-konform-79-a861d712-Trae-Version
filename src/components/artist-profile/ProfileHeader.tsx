@@ -40,6 +40,7 @@ export const ProfileHeader = ({
     }
     if (persona?.banner_url) {
       setBannerUrl(persona.banner_url);
+      console.log('Setting banner URL in ProfileHeader:', persona.banner_url);
     }
   }, [persona?.banner_position, persona?.banner_url]);
 
@@ -56,7 +57,7 @@ export const ProfileHeader = ({
   };
 
   return (
-    <div className="relative w-full mt-16" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
+    <div className="sticky top-[72px] w-full mt-16 z-40" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
       <div className={`relative transition-all duration-300 ${isHeaderExpanded ? 'h-[300px]' : 'h-[80px]'}`} onDoubleClick={handleDoubleClick}>
         <BannerContextMenu 
           personaId={id || ''}
@@ -76,8 +77,45 @@ export const ProfileHeader = ({
         
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-transparent" />
         
-        <div className="absolute top-4 left-4">
+        <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-50">
           <NavigationButton />
+          
+          <div className="flex gap-2">
+            <ActionButtons 
+              isOwner={isOwner} 
+              personaId={persona.id} 
+              personaName={persona.display_name || persona.username || "Artist"} 
+              userId={persona.id} 
+              currentUserId={user?.id} 
+              onEditClick={onEditClick}
+            />
+          </div>
+        </div>
+        
+        <div className={`absolute transition-all duration-300 ${
+          isHeaderExpanded 
+            ? 'bottom-4 left-4 max-w-2xl' 
+            : 'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center w-full'
+        } z-20`}>
+          <div className="flex items-center gap-4">
+            {isHeaderExpanded && (
+              <AvatarSection 
+                avatarUrl={persona.avatar_url} 
+                name={persona.display_name || persona.username || "Artist"} 
+                isOwner={isOwner} 
+              />
+            )}
+            
+            <div className={`${!isHeaderExpanded ? 'w-full' : ''}`}>
+              <h1 className="text-4xl font-bold text-white mb-2 select-none">
+                {persona.display_name || persona.username || "Artist"}
+              </h1>
+              
+              {isHeaderExpanded && persona.bio && (
+                <p className="text-gray-300 text-lg">{persona.bio || persona.user_bio}</p>
+              )}
+            </div>
+          </div>
         </div>
       </div>
       
@@ -86,34 +124,6 @@ export const ProfileHeader = ({
         onToggle={() => setHeaderExpanded(!isHeaderExpanded)} 
         visible={true} 
       />
-      
-      <div className={`absolute bottom-0 w-full p-6 flex items-end justify-between`}>
-        <div className="flex items-center gap-4">
-          <AvatarSection 
-            avatarUrl={persona.avatar_url} 
-            name={persona.display_name || persona.username || "Artist"} 
-            isOwner={isOwner} 
-          />
-          
-          <ProfileInfo 
-            name={persona.display_name || persona.username || "Artist"} 
-            tagline={persona.bio || persona.user_bio}
-            isExpanded={isHeaderExpanded}
-            onDoubleClick={handleDoubleClick} 
-          />
-        </div>
-        
-        <div className="flex gap-2">
-          <ActionButtons 
-            isOwner={isOwner} 
-            personaId={persona.id} 
-            personaName={persona.display_name || persona.username || "Artist"} 
-            userId={persona.id} 
-            currentUserId={user?.id} 
-            onEditClick={onEditClick}
-          />
-        </div>
-      </div>
     </div>
   );
 };

@@ -167,37 +167,8 @@ export const FileUploader = ({ onSuccess, id, bannerPosition = { x: 50, y: 50 } 
           .from('profile_assets')
           .getPublicUrl(filePath);
           
-        // Update profile with the direct storage URL
-        let updateData: any = {};
-        if (uploadType === 'avatar') {
-          updateData = {
-            avatar_url: publicUrl
-          };
-        } else {
-          updateData = {
-            banner_url: publicUrl,
-            banner_position: {
-              x: bannerPosition.x,
-              y: bannerPosition.y
-            } as BannerPositionJson
-          };
-        }
-        
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update(updateData)
-          .eq('id', id);
-          
-        if (updateError) {
-          console.error('Profile update error:', updateError);
-          throw updateError;
-        }
-        
-        useToastNotify({
-          description: `${uploadType === 'avatar' ? 'Avatar' : 'Banner'} updated successfully`
-        });
-        
-        toast.success(`${uploadType === 'avatar' ? 'Avatar' : 'Banner'} updated successfully!`);
+        // Only update local state, don't save to database yet
+        toast.success(`${uploadType === 'avatar' ? 'Avatar' : 'Banner'} uploaded successfully!`);
         
         if (onSuccess && uploadType) {
           onSuccess(publicUrl, uploadType);
@@ -213,37 +184,8 @@ export const FileUploader = ({ onSuccess, id, bannerPosition = { x: 50, y: 50 } 
       
       const publicUrl = result.image.url;
       
-      // Update the profile with the new URL
-      let updateData: any = {};
-      if (uploadType === 'avatar') {
-        updateData = {
-          avatar_url: publicUrl
-        };
-      } else {
-        updateData = {
-          banner_url: publicUrl,
-          banner_position: {
-            x: bannerPosition.x,
-            y: bannerPosition.y
-          } as BannerPositionJson
-        };
-      }
-      
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update(updateData)
-        .eq('id', id);
-        
-      if (updateError) {
-        console.error('Profile update error:', updateError);
-        throw updateError;
-      }
-      
-      useToastNotify({
-        description: `${uploadType === 'avatar' ? 'Avatar' : 'Banner'} updated successfully`
-      });
-
-      toast.success(`${uploadType === 'avatar' ? 'Avatar' : 'Banner'} updated successfully!`);
+      // Only update local state, don't save to database yet
+      toast.success(`${uploadType === 'avatar' ? 'Avatar' : 'Banner'} uploaded successfully!`);
 
       if (onSuccess && uploadType) {
         onSuccess(publicUrl, uploadType);
