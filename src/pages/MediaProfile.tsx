@@ -7,6 +7,8 @@ import { ArrowLeft, Edit, Play } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { MediaSection } from "@/components/artist-profile/MediaSection";
+import { AdminContextMenu } from "@/components/admin/AdminContextMenu";
+import { useAdminMode } from "@/contexts/AdminModeContext";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -20,6 +22,7 @@ const MediaProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
+  const { isAdminMode, toggleAdminMode } = useAdminMode();
 
   const handleCopyImageUrl = (url: string) => {
     navigator.clipboard.writeText(url);
@@ -147,99 +150,99 @@ const MediaProfile = () => {
 
   return (
     <div className="min-h-screen bg-dreamaker-bg text-white">
-      <ContextMenu>
-        <ContextMenuTrigger>
-          <div 
-            className="relative h-[300px] bg-cover bg-center"
-            style={{ 
-              backgroundImage: `url(${profile.banner_url || profile.card_image_url || '/placeholder.svg'})`,
-              backgroundPosition: `${profile.banner_position?.x || 50}% ${profile.banner_position?.y || 50}%`
-            }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-transparent" />
-            
-            <div className="absolute top-4 left-4 flex gap-4">
-              <Button variant="ghost" onClick={() => navigate(-1)}>
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
-              </Button>
-              <Button 
+      <AdminContextMenu
+        contentType="banner"
+        contentData={{
+          id: profile.id,
+          url: profile.banner_url || profile.card_image_url,
+          tableName: 'artist_profiles',
+          columnName: 'banner_url',
+          storageBucket: 'profile_assets'
+        }}
+        onContentUpdate={(data) => refetch()}
+      >
+        <div 
+          className="relative h-[300px] bg-cover bg-center"
+          style={{ 
+            backgroundImage: `url(${profile.banner_url || profile.card_image_url || '/placeholder.svg'})`,
+            backgroundPosition: `${profile.banner_position?.x || 50}% ${profile.banner_position?.y || 50}%`
+          }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-transparent" />
+          
+          <div className="absolute top-4 left-4 flex gap-4">
+            <Button variant="ghost" onClick={() => navigate(-1)}>
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
+            </Button>
+            <Button 
+              variant="ghost"
+              onClick={() => setIsEditing(!isEditing)}
+            >
+              <Edit className="w-4 h-4 mr-2" />
+              Edit Media
+            </Button>
+            {profile.user_id && (
+              <Button
                 variant="ghost"
-                onClick={() => setIsEditing(!isEditing)}
+                onClick={toggleAdminMode}
+                className={isAdminMode ? "bg-dreamaker-purple/20" : ""}
               >
-                <Edit className="w-4 h-4 mr-2" />
-                Edit Media
+                Admin Mode
               </Button>
-            </div>
+            )}
           </div>
-        </ContextMenuTrigger>
-        <ContextMenuContent className="w-64">
-          <ContextMenuItem onClick={() => handleCopyImageUrl(profile.card_image_url || '/placeholder.svg')}>
-            Copy URL
-          </ContextMenuItem>
-          <ContextMenuItem onClick={() => handleDownloadImage(profile.card_image_url || '/placeholder.svg', 'banner.jpg')}>
-            Download
-          </ContextMenuItem>
-          {isEditing && (
-            <>
-              <ContextMenuSeparator />
-              <ContextMenuItem>
-                <label className="cursor-pointer w-full">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => handleFileUpload(e, 'banner')}
-                  />
-                  Upload New Banner
-                </label>
-              </ContextMenuItem>
-            </>
-          )}
-        </ContextMenuContent>
-      </ContextMenu>
+        </div>
+      </AdminContextMenu>
 
       <div className="container mx-auto px-4 -mt-16 relative z-10">
         <div className="flex items-end gap-6 mb-8">
-          <ContextMenu>
-            <ContextMenuTrigger>
-              <div className="w-32 h-32 rounded-lg overflow-hidden border-4 border-black bg-black">
-                <img 
-                  src={profile.card_image_url || '/placeholder.svg'} 
-                  alt={profile.title || 'Media'}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </ContextMenuTrigger>
-            <ContextMenuContent className="w-64">
-              <ContextMenuItem onClick={() => handleCopyImageUrl(profile.card_image_url || '/placeholder.svg')}>
-                Copy URL
-              </ContextMenuItem>
-              <ContextMenuItem onClick={() => handleDownloadImage(profile.card_image_url || '/placeholder.svg', 'cover.jpg')}>
-                Download
-              </ContextMenuItem>
-              {isEditing && (
-                <>
-                  <ContextMenuSeparator />
-                  <ContextMenuItem>
-                    <label className="cursor-pointer w-full">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => handleFileUpload(e, 'cover')}
-                      />
-                      Upload New Cover
-                    </label>
-                  </ContextMenuItem>
-                </>
-              )}
-            </ContextMenuContent>
-          </ContextMenu>
+          <AdminContextMenu
+            contentType="image"
+            contentData={{
+              id: profile.id,
+              url: profile.card_image_url,
+              tableName: 'artist_profiles',
+              columnName: 'card_image_url',
+              storageBucket: 'profile_assets'
+            }}
+            onContentUpdate={(data) => refetch()}
+          >
+            <div className="w-32 h-32 rounded-lg overflow-hidden border-4 border-black bg-black">
+              <img 
+                src={profile.card_image_url || '/placeholder.svg'} 
+                alt={profile.title || 'Media'}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </AdminContextMenu>
 
           <div className="flex-1">
-            <h1 className="text-3xl font-bold">{profile.title || 'Untitled Media'}</h1>
-            <p className="text-gray-400 mt-2">{profile.description || 'No description available'}</p>
+            <AdminContextMenu
+              contentType="text"
+              contentData={{
+                id: profile.id,
+                text: profile.title,
+                tableName: 'artist_profiles',
+                columnName: 'title'
+              }}
+              onContentUpdate={(data) => refetch()}
+            >
+              <h1 className="text-3xl font-bold">{profile.title || 'Untitled Media'}</h1>
+            </AdminContextMenu>
+            
+            <AdminContextMenu
+              contentType="text"
+              contentData={{
+                id: profile.id,
+                text: profile.description,
+                tableName: 'artist_profiles',
+                columnName: 'description'
+              }}
+              onContentUpdate={(data) => refetch()}
+            >
+              <p className="text-gray-400 mt-2">{profile.description || 'No description available'}</p>
+            </AdminContextMenu>
           </div>
           <Button variant="secondary">
             <Play className="w-4 h-4 mr-2" />

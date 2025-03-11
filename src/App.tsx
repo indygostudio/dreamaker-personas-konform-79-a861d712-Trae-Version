@@ -4,6 +4,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "./components/ui/toaster";
 import { AppRoutes } from "./routes";
 import { ThemeProvider } from "./components/providers/theme-provider";
+import { AdminModeProvider } from "./contexts/AdminModeContext";
+import { SessionContextProvider } from "@supabase/auth-helpers-react";
+import { supabase } from "./integrations/supabase/client";
 
 // Create a new QueryClient instance
 const queryClient = new QueryClient({
@@ -18,12 +21,16 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="dark" storageKey="dreamaker-theme">
-        <BrowserRouter>
-          <AppRoutes />
-          <Toaster />
-        </BrowserRouter>
-      </ThemeProvider>
+      <SessionContextProvider supabaseClient={supabase}>
+        <AdminModeProvider>
+          <ThemeProvider defaultTheme="dark" storageKey="dreamaker-theme">
+            <BrowserRouter>
+              <AppRoutes />
+              <Toaster />
+            </BrowserRouter>
+          </ThemeProvider>
+        </AdminModeProvider>
+      </SessionContextProvider>
     </QueryClientProvider>
   );
 }

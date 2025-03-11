@@ -5,6 +5,8 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useSession } from "@supabase/auth-helpers-react";
+import { AdminContextMenu } from "@/components/admin/AdminContextMenu";
+import { useAdminMode } from "@/contexts/AdminModeContext";
 
 interface ArtistHeaderProps {
   isOwner: boolean;
@@ -27,6 +29,7 @@ export const ArtistHeader = ({
   const navigate = useNavigate();
   const [isUploading, setIsUploading] = useState(false);
   const session = useSession();
+  const { isAdminMode, toggleAdminMode } = useAdminMode();
 
   const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -74,20 +77,32 @@ export const ArtistHeader = ({
 
   return (
     <div className="relative mt-16">
-      <div className={`relative transition-all duration-300 ${isHeaderExpanded ? 'h-[300px]' : 'h-[80px]'}`}>
-        {videoUrl ? (
-          <video
-            className="absolute inset-0 w-full h-full object-cover"
-            src={videoUrl}
-            autoPlay
-            loop
-            muted
-            playsInline
-          />
-        ) : (
-          <div className="absolute inset-0 w-full h-full bg-black/40" />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+      <AdminContextMenu
+        contentType="video"
+        contentData={{
+          id: session?.user?.id,
+          url: videoUrl,
+          tableName: "artist_profiles",
+          columnName: "video_url",
+          storageBucket: "persona_avatars"
+        }}
+        onContentUpdate={() => window.location.reload()}
+      >
+        <div className={`relative transition-all duration-300 ${isHeaderExpanded ? 'h-[300px]' : 'h-[80px]'}`}>
+          {videoUrl ? (
+            <video
+              className="absolute inset-0 w-full h-full object-cover"
+              src={videoUrl}
+              autoPlay
+              loop
+              muted
+              playsInline
+            />
+          ) : (
+            <div className="absolute inset-0 w-full h-full bg-black/40" />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+      </AdminContextMenu>
 
         {/* Navigation and Controls - Always visible */}
         <div className="absolute top-4 left-0 right-0 px-8 z-50">
@@ -146,6 +161,14 @@ export const ArtistHeader = ({
                 >
                   <Edit className="h-4 w-4" />
                 </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={toggleAdminMode}
+                  className={`bg-black/20 hover:bg-black/40 text-white ${isAdminMode ? 'ring-2 ring-dreamaker-purple' : ''}`}
+                >
+                  <span className="text-xs font-bold">A</span>
+                </Button>
               </div>
             )}
           </div>
@@ -159,7 +182,18 @@ export const ArtistHeader = ({
         }`}>
           <div className={`${isHeaderExpanded ? '' : 'text-center'}`}>
             <div className="text-center">
-              <h1 className="text-4xl font-bold text-white mb-4">{username}</h1>
+              <AdminContextMenu
+                contentType="text"
+                contentData={{
+                  id: session?.user?.id,
+                  text: username,
+                  tableName: "artist_profiles",
+                  columnName: "username"
+                }}
+                onContentUpdate={() => window.location.reload()}
+              >
+                <h1 className="text-4xl font-bold text-white mb-4">{username}</h1>
+              </AdminContextMenu>
             </div>
           </div>
         </div>
