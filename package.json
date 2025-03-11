@@ -50,6 +50,8 @@
     "@supabase/auth-ui-shared": "^0.1.8",
     "@supabase/supabase-js": "^2.48.1",
     "@tanstack/react-query": "^5.56.2",
+    "@tsparticles/react": "^3.0.0",
+    "@tsparticles/slim": "^3.8.1",
     "@types/three": "^0.173.0",
     "@uploadthing/react": "^5.7.0",
     "@xyflow/react": "^12.4.3",
