@@ -171,7 +171,7 @@ export const KonformSection = () => {
                     <li>Style-matched mixing suggestions based on reference tracks or genres</li>
                     <li>Real-time mix analysis with actionable feedback to improve your sound</li>
                   </ul>
-                  <img src="/lovable-uploads/4fcaace6-9ca6-4012-8e19-966bfcd94cc4.png" alt="AI Mixer Interface" className="mt-6 rounded-lg w-full" />
+                  <img src="/lovable-uploads/d64274af-4503-48fd-a28a-bcc55a780039.png" alt="AI Mixer Interface" className="mt-6 rounded-lg w-full" />
                 </div>
               </div>
             </TabsContent>
