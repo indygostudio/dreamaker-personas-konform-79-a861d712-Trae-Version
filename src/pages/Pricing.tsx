@@ -23,7 +23,7 @@ export const Pricing = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 py-24">
+      <div className="relative z-10 container mx-auto px-4 py-24 mt-[74px]">
         <div className="absolute top-4 left-4">
           <NavigationButton />
         </div>
