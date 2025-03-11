@@ -11,6 +11,11 @@ export function PersonaSplineSection() {
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const navigate = useNavigate();
   
+  // Previous frame for cloud morphing effect
+  const prevFrameRef = useRef<number | null>(null);
+  const cloudEffectCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const cloudCtxRef = useRef<CanvasRenderingContext2D | null>(null);
+  
   useEffect(() => {
     // Initialize video state once it's loaded
     const handleVideoLoaded = () => {
@@ -27,7 +32,12 @@ export function PersonaSplineSection() {
       videoElement.addEventListener('loadeddata', handleVideoLoaded);
     }
 
-    // Scroll event handler that controls video playback
+    // Initialize canvas for cloud morphing effect
+    if (cloudEffectCanvasRef.current) {
+      cloudCtxRef.current = cloudEffectCanvasRef.current.getContext('2d');
+    }
+
+    // Scroll event handler that controls video playback with smooth transitions
     const handleScroll = () => {
       if (!videoElement || !sectionRef.current || !isVideoLoaded) return;
       const rect = sectionRef.current.getBoundingClientRect();
@@ -41,22 +51,37 @@ export function PersonaSplineSection() {
       // Normalize to 0-1 range for the section's visibility in the viewport
       visiblePercentage = Math.max(0, Math.min(1, visiblePercentage));
 
-      // Set video currentTime based on scroll position
+      // Set video currentTime based on scroll position with smooth transition
       if (videoElement.duration) {
-        videoElement.currentTime = visiblePercentage * videoElement.duration;
+        const targetTime = visiblePercentage * videoElement.duration;
+        
+        // Apply cloud morphing effect between frames
+        if (prevFrameRef.current !== null && cloudCtxRef.current && cloudEffectCanvasRef.current) {
+          // Capture current frame for morphing effect
+          cloudCtxRef.current.drawImage(videoElement, 0, 0, cloudEffectCanvasRef.current.width, cloudEffectCanvasRef.current.height);
+        }
+        
+        // Update video time
+        videoElement.currentTime = targetTime;
+        prevFrameRef.current = targetTime;
       }
     };
-    window.addEventListener('scroll', handleScroll);
-
-    // Initial check
-    handleScroll();
+    
+    // Use requestAnimationFrame for smoother scrolling effect
+    let rafId: number;
+    const smoothScroll = () => {
+      handleScroll();
+      rafId = requestAnimationFrame(smoothScroll);
+    };
+    
+    smoothScroll();
 
     // Cleanup
     return () => {
       if (videoElement) {
         videoElement.removeEventListener('loadeddata', handleVideoLoaded);
       }
-      window.addEventListener('scroll', handleScroll);
+      cancelAnimationFrame(rafId);
     };
   }, [isVideoLoaded]);
   
@@ -64,10 +89,17 @@ export function PersonaSplineSection() {
       <Card className="w-full h-[400px] bg-black/[0.96] relative overflow-hidden rounded-3xl border-purple-900/20 mb-16">
         <Spotlight className="-top-40 left-0 md:left-60 md:-top-20" fill="purple" size={300} />
         
-        {/* Background video */}
+        {/* Background video with cloud morphing effect */}
         <div className="absolute inset-0 z-0">
           <video ref={videoRef} src="/Videos/Gen-3 Alpha 3165178086, scrolling frames of , imagepng (11), M 5 (1).mp4" muted playsInline preload="auto" className="w-full h-full object-cover opacity-70" />
-          <div className="absolute inset-0 bg-black/40"></div>
+          <canvas 
+            ref={cloudEffectCanvasRef} 
+            className="absolute inset-0 w-full h-full opacity-30 mix-blend-overlay pointer-events-none"
+            width="1280"
+            height="720"
+          />
+          {/* Gradient overlay with darker edges */}
+          <div className="absolute inset-0 bg-gradient-radial from-black/30 via-black/50 to-black/80"></div>
         </div>
 
         {/* Content overlay */}

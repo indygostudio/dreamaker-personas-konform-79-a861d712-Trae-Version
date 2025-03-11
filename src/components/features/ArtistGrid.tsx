@@ -83,8 +83,10 @@ export const ArtistGrid = () => {
                     videoUrl={feature.video} 
                     isHovering={hoveredFeature === feature.id} 
                     fallbackImage={feature.image}
+                    darkness={0.7} /* Increased darkness for better text readability */
                   />
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/50 to-black opacity-80 group-hover:opacity-70 transition-opacity duration-300" />
+                  <div className="absolute inset-0 backdrop-blur-xl" /> {/* Extreme blur effect */}
+                  <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/80 to-black/90 opacity-90 group-hover:opacity-85 transition-opacity duration-300" /> {/* Darkened gradient */}
                 </div>
                 
                 <div className="absolute bottom-4 left-0 right-0 px-4 z-10 text-center">

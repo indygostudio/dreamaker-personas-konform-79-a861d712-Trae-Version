@@ -15,16 +15,26 @@ export const DreamakerSection = () => {
       <div className="h-[40vh] relative overflow-hidden cursor-pointer" onClick={() => navigate("/dreamaker")}>
         {/* Background Video */}
         <div className="absolute inset-0">
-          <video className="w-full h-full object-cover" autoPlay muted loop playsInline>
+          <video 
+            className="w-full h-full object-cover" 
+            autoPlay 
+            muted 
+            loop 
+            playsInline
+          >
             <source src="/Videos/Gen-3 Alpha 1222913568, Dreamlike clouds in , imagepng, M 5.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
+          
+          {/* Enhanced gradient overlay with darker edges */}
+          <div className="absolute inset-0 bg-gradient-radial from-black/50 via-black/60 to-black/90"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/80"></div>
         </div>
         
         {/* Content Overlay */}
-        <div className="absolute inset-0 flex items-center justify-center flex-col bg-gradient-to-b from-black/40 to-black/80 p-8">
-          <h1 className="text-6xl font-bold text-white mb-4">DREAMAKER</h1>
-          <p className="text-gray-300 max-w-3xl mx-auto text-center text-lg">
+        <div className="absolute inset-0 flex items-center justify-center flex-col p-8">
+          <h1 className="text-6xl font-bold text-white mb-4 drop-shadow-lg">DREAMAKER</h1>
+          <p className="text-gray-300 max-w-3xl mx-auto text-center text-lg drop-shadow-md">
             Your AI Record Label and Marketplace. Create, collaborate, and distribute your music with AI-powered tools.
           </p>
         </div>
