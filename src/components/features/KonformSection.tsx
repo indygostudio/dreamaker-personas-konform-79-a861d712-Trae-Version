@@ -15,25 +15,16 @@ export const KonformSection = () => {
         {/* Background Video */}
         <div className="absolute inset-0">
           <video className="w-full h-full object-cover" autoPlay muted loop playsInline>
-            <source src="/Videos/PORTAL_01.mp4" type="video/mp4" />
+            <source src="/Videos/KONFORM_01.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
         </div>
 
-        {/* Modified text overlay to be centered both horizontally and vertically */}
-        <div className="absolute inset-0 flex items-center justify-center z-10 w-full">
-          <h2 className="text-6xl font-bold text-center font-syne text-white">
-            KONFORM
-          </h2>
-        </div>
+
       </div>
 
       <div className="w-full px-0 relative z-10">
         <div className="space-y-6 text-gray-400 w-full text-lg leading-relaxed px-4 md:px-8">
-          <p className="text-center font-syne hover:text-white transition-colors max-w-4xl mx-auto">
-            Konform is the groundbreaking digital audio workstation at the heart of the Dreamaker AI Platform. It combines cutting-edge AI Voice modeling, Suno API integration, and powerful stem separation technology to revolutionize music production. With an intuitive interface designed for both beginners and professionals, Konform enables unprecedented creative control over every aspect of your musical projects, from composition to final mastering.
-          </p>
-
           <Tabs defaultValue="style" className="w-full mt-8">
             <TabsList className="inline-flex items-center gap-4 bg-black/80 backdrop-blur-xl rounded-full p-2 shadow-[0_8px_32px_rgba(0,0,0,0.4)] border border-white/5 flex-wrap justify-center">
               <TabsTrigger 
