@@ -35,7 +35,7 @@ export const DreamakerSection = () => {
         <div className="absolute inset-0 flex items-center justify-center flex-col p-8">
           <h1 className="text-6xl font-bold text-white mb-4 drop-shadow-lg">DREAMAKER</h1>
           <p className="text-gray-300 max-w-3xl mx-auto text-center text-lg drop-shadow-md">
-            Your AI Record Label and Marketplace. Create, collaborate, and distribute your music with AI-powered tools.
+            Your Human-Driven AI Record Label and Creative Hub. Shape, evolve, and collaborate with AI tools that learn and grow with your artistic vision.
           </p>
         </div>
       </div>
@@ -84,12 +84,12 @@ export const DreamakerSection = () => {
               <div className="p-6 bg-zinc-950 rounded-none w-full">
                 <div className="max-w-7xl mx-auto">
                   <h3 className="text-2xl font-bold mb-4 text-white">AI Record Label</h3>
-                  <p className="mb-4">Dreamaker's AI Record Label revolutionizes how artists create, produce, and distribute music. Our platform combines cutting-edge AI technology with traditional record label services to help artists at every stage of their career.</p>
+                  <p className="mb-4">Dreamaker's human-centric AI Record Label revolutionizes music creation by putting you in control. Our adaptive platform learns from your creative choices, evolving with your artistic journey while providing cutting-edge AI technology that enhances your unique vision.</p>
                   <ul className="list-disc pl-6 space-y-2">
-                    <li>AI-powered talent discovery and development tailored to your unique sound</li>
-                    <li>Personalized marketing strategies using predictive analytics</li>
-                    <li>Automated royalty tracking and distribution with blockchain technology</li>
-                    <li>Virtual A&R services that provide real-time feedback on your music</li>
+                    <li>Personalized AI models that learn and evolve with your creative style</li>
+                    <li>User-driven transformers that adapt to your artistic preferences</li>
+                    <li>Collaborative royalty sharing for AI-assisted creations</li>
+                    <li>Continuous model updates based on your creative decisions</li>
                   </ul>
                   <div 
                     className="mt-6 rounded-lg w-full h-64 relative overflow-hidden"
@@ -111,12 +111,12 @@ export const DreamakerSection = () => {
               <div className="p-6 bg-zinc-950 rounded-none w-full">
                 <div className="max-w-7xl mx-auto">
                   <h3 className="text-2xl font-bold mb-4 text-white">Marketplace</h3>
-                  <p className="mb-4">Our vibrant marketplace connects artists, producers, and fans in a dynamic ecosystem where creativity thrives. Buy, sell, and trade AI personas, voice models, beats, and more in a secure and artist-friendly environment.</p>
+                  <p className="mb-4">Our creator-centric marketplace empowers artists to share and monetize their unique AI personas and models. Build a community around your creative vision and earn from your AI-enhanced innovations.</p>
                   <ul className="list-disc pl-6 space-y-2">
-                    <li>Browse thousands of AI personas and voice models across all genres</li>
-                    <li>Discover unique beats, samples, and production templates</li>
-                    <li>Commission custom AI personas from top creators</li>
-                    <li>Monetize your own AI creations with flexible licensing options</li>
+                    <li>Share and monetize your custom-trained AI personas</li>
+                    <li>Collaborative revenue sharing for merged AI models</li>
+                    <li>Community-driven model evolution and improvements</li>
+                    <li>Fair compensation for AI training contributions</li>
                   </ul>
                   <div 
                     className="mt-6 rounded-lg w-full h-64 relative overflow-hidden"
@@ -138,12 +138,12 @@ export const DreamakerSection = () => {
               <div className="p-6 bg-zinc-950 rounded-none w-full">
                 <div className="max-w-7xl mx-auto">
                   <h3 className="text-2xl font-bold mb-4 text-white">Collaboration</h3>
-                  <p className="mb-4">Dreamaker breaks down barriers to collaboration with powerful tools that connect artists across the globe. Work with AI personas or human collaborators seamlessly in our integrated platform.</p>
+                  <p className="mb-4">Dreamaker fosters a unique ecosystem where human creativity meets AI innovation. Collaborate with other artists, share royalties, and create hybrid personas that combine the best of human artistry and AI technology.</p>
                   <ul className="list-disc pl-6 space-y-2">
-                    <li>Real-time collaboration with multiple artists and AI personas</li>
-                    <li>Smart matching algorithm to find the perfect collaborators</li>
-                    <li>Integrated project management tools for tracking progress</li>
-                    <li>Fair revenue sharing and transparent royalty splits</li>
+                    <li>Create hybrid personas by merging multiple AI models</li>
+                    <li>Transparent royalty sharing for collaborative creations</li>
+                    <li>Community-driven model training and improvement</li>
+                    <li>Cross-pollination of creative styles and techniques</li>
                   </ul>
                   <div 
                     className="mt-6 rounded-lg w-full h-64 relative overflow-hidden"

@@ -57,7 +57,7 @@ export const ProfileHeader = ({
   };
 
   return (
-    <div className="sticky top-[72px] w-full mt-16 z-40" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
+    <div className="w-full mt-16">
       <div className={`relative transition-all duration-300 ${isHeaderExpanded ? 'h-[300px]' : 'h-[80px]'}`} onDoubleClick={handleDoubleClick}>
         <BannerContextMenu 
           personaId={id || ''}
@@ -71,13 +71,13 @@ export const ProfileHeader = ({
             fallbackImage={bannerUrl || persona.banner_url} 
             position={bannerPosition} 
             darkness={persona.banner_darkness}
-            priority={true} // Prioritize loading for profile headers
+            priority={true}
           />
         </BannerContextMenu>
         
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-transparent" />
         
-        <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-50">
+        <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-50 select-none">
           <NavigationButton />
           
           <div className="flex gap-2">
@@ -103,6 +103,7 @@ export const ProfileHeader = ({
                 avatarUrl={persona.avatar_url} 
                 name={persona.display_name || persona.username || "Artist"} 
                 isOwner={isOwner} 
+                className="select-none"
               />
             )}
             
@@ -112,7 +113,7 @@ export const ProfileHeader = ({
               </h1>
               
               {isHeaderExpanded && persona.bio && (
-                <p className="text-gray-300 text-lg">{persona.bio || persona.user_bio}</p>
+                <p className="text-gray-300 text-lg select-none">{persona.bio || persona.user_bio}</p>
               )}
             </div>
           </div>

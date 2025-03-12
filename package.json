@@ -61,6 +61,7 @@
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.3.0",
     "framer-motion": "^12.4.10",
+    "gsap": "^3.12.7",
     "input-otp": "^1.2.4",
     "lucide-react": "^0.462.0",
     "motion": "^12.4.11",

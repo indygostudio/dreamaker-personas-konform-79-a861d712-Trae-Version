@@ -41,8 +41,6 @@ export const ProfileTabs = ({
   const { showDropContainer, setShowDropContainer } = useSelectedPersonasStore();
   const { setHeaderExpanded } = useUIStore();
   const tabsRef = useRef<HTMLDivElement>(null);
-  const [isScrollingUp, setIsScrollingUp] = useState(false);
-  const lastScrollY = useRef(0);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -57,34 +55,6 @@ export const ProfileTabs = ({
     if (savedTab) {
       setActiveTab(savedTab);
     }
-  }, []);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      const isScrollingUpNow = currentScrollY < lastScrollY.current;
-      
-      if (isScrollingUpNow && tabsRef.current) {
-        // Get the position of the navbar (72px from top plus 16px margin = 88px)
-        const navbarBottom = 88;
-        const tabsRect = tabsRef.current.getBoundingClientRect();
-        
-        // If tabs are about to go above the navbar
-        if (tabsRect.top < navbarBottom) {
-          // Prevent further scrolling by setting the scroll position
-          window.scrollTo({
-            top: currentScrollY + (navbarBottom - tabsRect.top),
-            behavior: 'auto'
-          });
-        }
-      }
-      
-      lastScrollY.current = currentScrollY;
-      setIsScrollingUp(isScrollingUpNow);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const handleDragOver = (e: React.DragEvent) => {

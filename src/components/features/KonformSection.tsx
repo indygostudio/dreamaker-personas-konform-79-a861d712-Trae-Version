@@ -43,7 +43,7 @@ export const KonformSection = () => {
                 value="effects" 
                 className="px-6 py-3 rounded-full transition-all duration-300 font-medium uppercase border bg-black/20 text-white/80 border-white/10 hover:bg-[#0EA5E9]/10 hover:text-white hover:border-[#0EA5E9]/20 hover:shadow-[0_4px_20px_rgba(14,165,233,0.3)] hover:-translate-y-0.5 data-[state=active]:bg-[#0EA5E9]/10 data-[state=active]:text-white data-[state=active]:border-[#0EA5E9]/20 data-[state=active]:shadow-[0_4px_20px_rgba(14,165,233,0.3)] data-[state=active]:-translate-y-0.5 font-syne"
               >
-                Effect Blending
+                AI Effects
               </TabsTrigger>
               <TabsTrigger 
                 value="ai-instruments" 
@@ -109,15 +109,17 @@ export const KonformSection = () => {
             <TabsContent value="effects" className="mt-0">
               <div className="p-6 bg-zinc-950 rounded-none w-full">
                 <div className="max-w-7xl mx-auto">
-                  <h3 className="text-2xl font-bold mb-4 text-white">Effect Blending</h3>
-                  <p className="mb-4">A revolutionary approach to audio effects that lets you combine and morph between different effect characteristics to create sounds that have never been heard before. Move beyond traditional effect chains with our innovative blending technology.</p>
+                  <h3 className="text-2xl font-bold mb-4 text-white">AI Effects</h3>
+                  <p className="mb-4">Advanced AI-powered audio effects that intelligently enhance and transform your sound. Our cutting-edge neural networks analyze and process your audio in real-time, delivering professional-grade results with unprecedented control and creativity.</p>
                   <ul className="list-disc pl-6 space-y-2">
-                    <li>Seamlessly morph between different effect types to create unique hybrid sonics</li>
-                    <li>Create signature effect combinations that set your sound apart from the competition</li>
-                    <li>Intelligent parameter mapping ensures smooth transitions between completely different effect types</li>
-                    <li>Save and recall your custom effect blends to maintain consistency across projects</li>
+                    <li>Intelligent Audio Restoration - Remove unwanted noise, artifacts, and distortion while preserving audio quality</li>
+                    <li>Spatial Audio Enhancement - Create immersive 3D soundscapes and precise stereo field manipulation</li>
+                    <li>Adaptive Effects Processing - Dynamic effects that automatically adjust to your audio content</li>
+                    <li>Voice Enhancement & Clarity - Advanced processing for crystal-clear vocals and dialogue</li>
+                    <li>Custom Effect Generation - Create unique effects using natural language descriptions</li>
+                    <li>Real-time Audio Analysis - Instant feedback and visualization of effect parameters</li>
                   </ul>
-                  <img src="/lovable-uploads/6e8a4b75-aa40-4ace-aa45-dbbd669d80ea.png" alt="Effect Blending Interface" className="mt-6 rounded-lg w-full" />
+                  <img src="/lovable-uploads/6e8a4b75-aa40-4ace-aa45-dbbd669d80ea.png" alt="AI Effects Interface" className="mt-6 rounded-lg w-full" />
                 </div>
               </div>
             </TabsContent>

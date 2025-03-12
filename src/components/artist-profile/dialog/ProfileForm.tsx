@@ -138,24 +138,39 @@ export const ProfileForm = ({
               name={username}
             />
           </div>
-          <Button
-            type="button"
-            variant="outline"
-            className={`gap-2 ${isPublic ? 'text-green-500' : 'text-gray-400'}`}
-            onClick={() => setIsPublic(!isPublic)}
-          >
-            {isPublic ? (
-              <>
-                <Globe2 className="h-4 w-4" />
-                Public
-              </>
-            ) : (
-              <>
-                <Lock className="h-4 w-4" />
-                Private
-              </>
-            )}
-          </Button>
+          <div className="flex flex-col space-y-2">
+            <Label>Profile Visibility</Label>
+            <div className="flex gap-4">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  id="public"
+                  name="visibility"
+                  checked={isPublic}
+                  onChange={() => setIsPublic(true)}
+                  className="w-4 h-4 text-dreamaker-purple bg-black/50 border-dreamaker-purple/30"
+                />
+                <Label htmlFor="public" className="flex items-center gap-2 cursor-pointer">
+                  <Globe2 className="h-4 w-4" />
+                  Public
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  id="private"
+                  name="visibility"
+                  checked={!isPublic}
+                  onChange={() => setIsPublic(false)}
+                  className="w-4 h-4 text-dreamaker-purple bg-black/50 border-dreamaker-purple/30"
+                />
+                <Label htmlFor="private" className="flex items-center gap-2 cursor-pointer">
+                  <Lock className="h-4 w-4" />
+                  Private
+                </Label>
+              </div>
+            </div>
+          </div>
         </div>
         
         <BannerUpload
