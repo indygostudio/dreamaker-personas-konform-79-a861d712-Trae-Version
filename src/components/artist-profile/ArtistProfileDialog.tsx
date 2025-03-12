@@ -79,8 +79,18 @@ export function ArtistProfileDialog({
         setFormData(prev => ({ ...prev, avatar_url: imageUrl }));
         toast.success("Avatar uploaded successfully");
       } else if (type === 'banner') {
-        setFormData(prev => ({ ...prev, banner_url: imageUrl }));
-        toast.success("Banner uploaded successfully");
+        // For banner uploads, update both banner_url and video_url if it's a video
+        const isVideo = imageUrl.toLowerCase().includes('.mp4') || 
+                       imageUrl.toLowerCase().includes('.mov') || 
+                       imageUrl.toLowerCase().includes('.webm');
+        
+        setFormData(prev => ({
+          ...prev,
+          banner_url: imageUrl,
+          // If it's a video, set the video_url as well
+          video_url: isVideo ? imageUrl : prev.video_url
+        }));
+        toast.success(isVideo ? "Video banner uploaded successfully" : "Banner uploaded successfully");
       }
     },
     id: fileUploaderId,

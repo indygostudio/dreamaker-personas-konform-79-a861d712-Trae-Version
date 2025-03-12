@@ -15,6 +15,7 @@ interface ArtistHeaderProps {
   username: string;
   subscription: string;
   videoUrl?: string;
+  onContentUpdate?: () => void;
 }
 
 export const ArtistHeader = ({
@@ -24,6 +25,7 @@ export const ArtistHeader = ({
   username,
   subscription,
   videoUrl,
+  onContentUpdate,
 }: ArtistHeaderProps) => {
   const [isHeaderExpanded, setIsHeaderExpanded] = useState(true);
   const navigate = useNavigate();
@@ -44,9 +46,8 @@ export const ArtistHeader = ({
       const fileName = `${crypto.randomUUID()}.${fileExt}`;
       const filePath = `${session.user.id}/${fileName}`;
       
-      // Use profile_assets bucket for consistency with other banner uploads
       const { error: uploadError } = await supabase.storage
-        .from("profile_assets")
+        .from("persona_avatars")
         .upload(filePath, file, {
           cacheControl: "3600",
           upsert: true
@@ -55,16 +56,14 @@ export const ArtistHeader = ({
       if (uploadError) throw uploadError;
 
       const { data: { publicUrl } } = supabase.storage
-        .from("profile_assets")
+        .from("persona_avatars")
         .getPublicUrl(filePath);
 
       // Update both artist_profiles and profiles tables
       const { error: artistProfileError } = await supabase
         .from("artist_profiles")
         .update({ 
-          video_url: publicUrl,
-          banner_url: publicUrl, // Update banner_url as well for consistency
-          banner_position: { x: 50, y: 50 } // Default position
+          video_url: publicUrl
         })
         .eq("id", session.user.id);
 
@@ -73,16 +72,22 @@ export const ArtistHeader = ({
       const { error: profileError } = await supabase
         .from("profiles")
         .update({ 
-          video_url: publicUrl,
-          banner_url: publicUrl, // Update banner_url as well for consistency
-          banner_position: { x: 50, y: 50 } // Default position
+          video_url: publicUrl
         })
         .eq("id", session.user.id);
 
       if (profileError) throw profileError;
 
       toast.success("Banner updated successfully");
-      window.location.reload();
+      
+      // Instead of reloading the page, update the UI directly
+      // This will trigger a re-render with the new banner
+      if (onContentUpdate) {
+        onContentUpdate();
+      } else {
+        // If no callback is provided, reload as fallback
+        window.location.reload();
+      }
     } catch (error) {
       console.error("Error uploading banner:", error);
       toast.error("Failed to update banner");

@@ -19,7 +19,6 @@ export const FileUploader = ({ onSuccess, id, bannerPosition = { x: 50, y: 50 } 
 
   const ensureBucketExists = async () => {
     try {
-      // Check if the bucket exists
       const { data: buckets, error } = await supabase.storage.listBuckets();
       
       if (error) {
@@ -30,30 +29,22 @@ export const FileUploader = ({ onSuccess, id, bannerPosition = { x: 50, y: 50 } 
       const bucketExists = buckets.some(bucket => bucket.name === 'profile_assets');
       
       if (!bucketExists) {
-        // Try to create the bucket through edge function
-        try {
-          const { data: authData } = await supabase.auth.getSession();
-          
-          if (!authData.session) {
-            throw new Error('Not authenticated');
+        const { data: authData } = await supabase.auth.getSession();
+        
+        if (!authData.session) {
+          throw new Error('Not authenticated');
+        }
+        
+        const { error: functionError } = await supabase.functions.invoke('create-storage-bucket', {
+          body: { 
+            bucketName: 'profile_assets',
+            isPublic: true,
+            fileSizeLimit: 104857600 // 100MB to allow videos
           }
-          
-          const { error: functionError } = await supabase.functions.invoke('create-storage-bucket', {
-            body: { 
-              bucketName: 'profile_assets',
-              isPublic: true,
-              fileSizeLimit: 104857600 // 100MB to allow videos
-            }
-          });
-          
-          if (functionError) {
-            console.error('Error creating bucket:', functionError);
-            return false;
-          }
-          
-          return true;
-        } catch (err) {
-          console.error('Error creating bucket:', err);
+        });
+        
+        if (functionError) {
+          console.error('Error creating bucket:', functionError);
           return false;
         }
       }
@@ -67,128 +58,92 @@ export const FileUploader = ({ onSuccess, id, bannerPosition = { x: 50, y: 50 } 
 
   const handleFileUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !uploadType) return;
     
     try {
       setIsUploading(true);
       setUploadProgress(0);
       
-      console.log(`Uploading ${uploadType}: ${file.name}, type: ${file.type}, size: ${file.size} bytes`);
+      const isVideo = file.type.startsWith('video/');
+      const isImage = file.type.startsWith('image/');
       
-      // Display a toast for upload start
+      if (!isVideo && !isImage) {
+        throw new Error('Please upload a video or image file');
+      }
+      
       toast.info(`Starting ${uploadType} upload: ${file.name}`);
       
-      // Simple progress simulation
       const progressInterval = setInterval(() => {
         setUploadProgress((prev) => {
           const newProgress = prev + Math.random() * 15;
-          return newProgress > 90 ? 90 : newProgress; // Cap at 90% until actual completion
+          return newProgress > 90 ? 90 : newProgress;
         });
       }, 500);
       
-      // Ensure the bucket exists before uploading
-      const bucketExists = await ensureBucketExists();
-      
-      if (!bucketExists) {
-        clearInterval(progressInterval);
-        throw new Error('profile_assets bucket does not exist and could not be created');
+      let thumbnailUrl = '';
+      if (isVideo) {
+        thumbnailUrl = await generateVideoThumbnail(file);
       }
       
-      // Try using the upload-image edge function first, which can create buckets if needed
-      const formData = new FormData();
-      formData.append('image', file);
-      formData.append('bucket', 'profile_assets');
-      formData.append('title', uploadType === 'avatar' ? 'Avatar Image' : 'Banner Image');
+      const bucketExists = await ensureBucketExists();
+      if (!bucketExists) {
+        clearInterval(progressInterval);
+        throw new Error('Storage bucket does not exist and could not be created');
+      }
       
-      // Get auth token for the request
       const { data: { session } } = await supabase.auth.getSession();
-      
       if (!session?.access_token) {
         throw new Error('You must be logged in to upload files');
       }
       
-      console.log('Attempting upload with edge function...');
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${crypto.randomUUID()}.${fileExt}`;
+      const filePath = `${id}/${fileName}`;
       
-      // Get the Supabase URL from environment or fallback to hardcoded URL
-      const supabaseUrl = 'https://eybrmzbvvckdlvlckfms.supabase.co';
+      const { error: uploadError } = await supabase.storage
+        .from('profile_assets')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
       
-      const response = await fetch(`${supabaseUrl}/functions/v1/upload-image`, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`
-        }
-      });
-      
-      clearInterval(progressInterval);
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Edge function upload error:', errorData);
-        
-        // Fall back to direct storage upload
-        console.log('Falling back to direct storage upload...');
-        
-        // Check if bucket exists before uploading
-        const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
-        
-        if (bucketsError) {
-          console.error('Error listing buckets:', bucketsError);
-          throw new Error(`Failed to list buckets: ${bucketsError.message}`);
-        }
-        
-        const bucketExists = buckets.some(bucket => bucket.name === 'profile_assets');
-        console.log('Available buckets:', buckets.map(b => b.name));
-        console.log('profile_assets bucket exists:', bucketExists);
-        
-        if (!bucketExists) {
-          throw new Error('profile_assets bucket does not exist. Please ensure it\'s created in Supabase.');
-        }
-        
-        // Upload to Supabase storage
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${crypto.randomUUID()}.${fileExt}`;
-        const filePath = `${id}/${fileName}`;
-        
-        const { data, error } = await supabase.storage
-          .from('profile_assets')
-          .upload(filePath, file, {
-            cacheControl: '3600',
-            upsert: true
-          });
-        
-        if (error) {
-          console.error('Storage upload error:', error);
-          throw error;
-        }
-        
-        // Get the public URL
-        const { data: { publicUrl } } = supabase.storage
-          .from('profile_assets')
-          .getPublicUrl(filePath);
-          
-        // Only update local state, don't save to database yet
-        toast.success(`${uploadType === 'avatar' ? 'Avatar' : 'Banner'} uploaded successfully!`);
-        
-        if (onSuccess && uploadType) {
-          onSuccess(publicUrl, uploadType);
-        }
-        
-        return;
+      if (uploadError) {
+        throw uploadError;
       }
       
-      // Edge function successful
-      const result = await response.json();
-      console.log('Upload successful with edge function:', result);
+      const { data: { publicUrl } } = supabase.storage
+        .from('profile_assets')
+        .getPublicUrl(filePath);
+        
+      clearInterval(progressInterval);
       setUploadProgress(100);
       
-      const publicUrl = result.image.url;
-      
-      // Only update local state, don't save to database yet
       toast.success(`${uploadType === 'avatar' ? 'Avatar' : 'Banner'} uploaded successfully!`);
-
-      if (onSuccess && uploadType) {
-        onSuccess(publicUrl, uploadType);
+      
+      if (onSuccess) {
+        if (isVideo && thumbnailUrl) {
+          const thumbnailFileName = `${crypto.randomUUID()}_thumb.jpg`;
+          const thumbnailPath = `${id}/${thumbnailFileName}`;
+          
+          const response = await fetch(thumbnailUrl);
+          const blob = await response.blob();
+          
+          await supabase.storage
+            .from('profile_assets')
+            .upload(thumbnailPath, blob, {
+              contentType: 'image/jpeg',
+              cacheControl: '3600',
+              upsert: true
+            });
+            
+          const { data: { publicUrl: thumbnailPublicUrl } } = supabase.storage
+            .from('profile_assets')
+            .getPublicUrl(thumbnailPath);
+            
+          onSuccess(publicUrl, uploadType, thumbnailPublicUrl);
+        } else {
+          onSuccess(publicUrl, uploadType);
+        }
       }
     } catch (error: any) {
       console.error('Upload error:', error);
@@ -198,20 +153,43 @@ export const FileUploader = ({ onSuccess, id, bannerPosition = { x: 50, y: 50 } 
         variant: "destructive",
         description: `Failed to upload ${uploadType}: ${error.message || 'Unknown error'}`
       });
-      
-      toast.error(`Upload failed: ${error.message || 'Unknown error'}`);
     } finally {
       setIsUploading(false);
-      setUploadType(null);
-      setUploadProgress(0);
     }
-  }, [uploadType, bannerPosition, id, onSuccess, useToastNotify]);
+  }, [id, uploadType, onSuccess]);
 
-  return {
+  const generateVideoThumbnail = async (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+      video.src = URL.createObjectURL(file);
+      
+      video.onloadedmetadata = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        
+        if (ctx) {
+          video.currentTime = 0;
+          video.onseeked = () => {
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL('image/jpeg'));
+          };
+        } else {
+          reject(new Error('Failed to create canvas context'));
+        }
+      };
+      
+      video.onerror = () => reject(new Error('Failed to load video'));
+    });
+  };
+
+  return (
     isUploading,
     uploadType,
     setUploadType,
     handleFileUpload,
     uploadProgress
-  };
+  );
 };
