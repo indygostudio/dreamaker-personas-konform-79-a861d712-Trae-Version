@@ -3,9 +3,10 @@ import { useState } from "react";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Laptop2, Settings, Music2, Wand2, Layers } from "lucide-react";
-import { SamplerView } from "./sampler/SamplerView";
+import { Laptop2, Settings, Music2, Wand2, Layers, Grid3x3 } from "lucide-react";
+import { KeybaseView } from "../views/KeybaseView";
 import { TrackEditor } from "./TrackEditor";
+import { DrumPadView } from "../DrumPadView";
 
 export const EditorTabs = () => {
   const [activeTab, setActiveTab] = useState("trackEditor");
@@ -27,7 +28,14 @@ export const EditorTabs = () => {
             className="data-[state=active]:bg-black data-[state=active]:text-white px-4 py-2 rounded-t-md border-b-2 data-[state=active]:border-[#00D1FF] border-transparent"
           >
             <Layers className="h-4 w-4 mr-2" />
-            Sampler
+            Keybase
+          </TabsTrigger>
+          <TabsTrigger 
+            value="drumpad" 
+            className="data-[state=active]:bg-black data-[state=active]:text-white px-4 py-2 rounded-t-md border-b-2 data-[state=active]:border-[#00D1FF] border-transparent"
+          >
+            <Grid3x3 className="h-4 w-4 mr-2" />
+            Drumbase
           </TabsTrigger>
         </TabsList>
 
@@ -51,7 +59,7 @@ export const EditorTabs = () => {
                   {/* Main Editor Area */}
                   <ResizablePanel defaultSize={70}>
                     <div className="h-full bg-black/20 p-2">
-                      <SamplerView />
+                      <KeybaseView />
                     </div>
                   </ResizablePanel>
 
@@ -72,6 +80,10 @@ export const EditorTabs = () => {
               </ResizablePanel>
             </ResizablePanelGroup>
           </div>
+        </TabsContent>
+
+        <TabsContent value="drumpad" className="flex-1 p-0 m-0">
+          <DrumPadView />
         </TabsContent>
       </Tabs>
     </div>

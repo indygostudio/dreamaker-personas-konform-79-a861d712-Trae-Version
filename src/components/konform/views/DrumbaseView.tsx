@@ -37,8 +37,7 @@ export const DrumbaseView = () => {
 
   return (
     <div className="min-h-[600px] bg-black/40 rounded-lg p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-white">DRUMBASE</h2>
+      <div className="flex items-center justify-end">
         <div className="flex items-center gap-4">
           <Button
             variant="outline"
@@ -88,7 +87,7 @@ export const DrumbaseView = () => {
         </div>
       </div>
 
-      <div className="flex-1 bg-black/60 rounded-lg p-4 min-h-[400px] flex items-center justify-center">
+      <div className="flex-1 bg-black/60 rounded-lg p-4 min-h-[400px] flex items-center justify-center mt-4">
         {isPluginActive ? (
           <div className="w-full h-full bg-black/40 rounded-lg border border-konform-neon-blue/30">
             <div className="w-full h-full flex items-center justify-center text-gray-400">

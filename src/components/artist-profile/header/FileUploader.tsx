@@ -2,11 +2,10 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import type { BannerPositionJson } from '@/types/types';
 import { toast } from 'sonner';
 
 interface FileUploaderProps {
-  onSuccess: (imageUrl: string, uploadType: 'avatar' | 'banner') => void;
+  onSuccess: (imageUrl: string, uploadType: 'avatar' | 'banner', thumbnailUrl?: string) => void;
   id: string;
   bannerPosition?: { x: number; y: number };
 }
@@ -16,45 +15,6 @@ export const FileUploader = ({ onSuccess, id, bannerPosition = { x: 50, y: 50 } 
   const [uploadType, setUploadType] = useState<'avatar' | 'banner' | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const { toast: useToastNotify } = useToast();
-
-  const ensureBucketExists = async () => {
-    try {
-      const { data: buckets, error } = await supabase.storage.listBuckets();
-      
-      if (error) {
-        console.error('Error checking buckets:', error);
-        return false;
-      }
-      
-      const bucketExists = buckets.some(bucket => bucket.name === 'profile_assets');
-      
-      if (!bucketExists) {
-        const { data: authData } = await supabase.auth.getSession();
-        
-        if (!authData.session) {
-          throw new Error('Not authenticated');
-        }
-        
-        const { error: functionError } = await supabase.functions.invoke('create-storage-bucket', {
-          body: { 
-            bucketName: 'profile_assets',
-            isPublic: true,
-            fileSizeLimit: 104857600 // 100MB to allow videos
-          }
-        });
-        
-        if (functionError) {
-          console.error('Error creating bucket:', functionError);
-          return false;
-        }
-      }
-      
-      return true;
-    } catch (error) {
-      console.error('Error in ensureBucketExists:', error);
-      return false;
-    }
-  };
 
   const handleFileUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -69,6 +29,10 @@ export const FileUploader = ({ onSuccess, id, bannerPosition = { x: 50, y: 50 } 
       
       if (!isVideo && !isImage) {
         throw new Error('Please upload a video or image file');
+      }
+
+      if (uploadType === 'avatar' && isVideo) {
+        throw new Error('Avatar must be an image file');
       }
       
       toast.info(`Starting ${uploadType} upload: ${file.name}`);
@@ -85,12 +49,6 @@ export const FileUploader = ({ onSuccess, id, bannerPosition = { x: 50, y: 50 } 
         thumbnailUrl = await generateVideoThumbnail(file);
       }
       
-      const bucketExists = await ensureBucketExists();
-      if (!bucketExists) {
-        clearInterval(progressInterval);
-        throw new Error('Storage bucket does not exist and could not be created');
-      }
-      
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) {
         throw new Error('You must be logged in to upload files');
@@ -101,7 +59,7 @@ export const FileUploader = ({ onSuccess, id, bannerPosition = { x: 50, y: 50 } 
       const filePath = `${id}/${fileName}`;
       
       const { error: uploadError } = await supabase.storage
-        .from('profile_assets')
+        .from('persona_avatars')
         .upload(filePath, file, {
           cacheControl: '3600',
           upsert: true
@@ -112,7 +70,7 @@ export const FileUploader = ({ onSuccess, id, bannerPosition = { x: 50, y: 50 } 
       }
       
       const { data: { publicUrl } } = supabase.storage
-        .from('profile_assets')
+        .from('persona_avatars')
         .getPublicUrl(filePath);
         
       clearInterval(progressInterval);
@@ -129,7 +87,7 @@ export const FileUploader = ({ onSuccess, id, bannerPosition = { x: 50, y: 50 } 
           const blob = await response.blob();
           
           await supabase.storage
-            .from('profile_assets')
+            .from('persona_avatars')
             .upload(thumbnailPath, blob, {
               contentType: 'image/jpeg',
               cacheControl: '3600',
@@ -137,7 +95,7 @@ export const FileUploader = ({ onSuccess, id, bannerPosition = { x: 50, y: 50 } 
             });
             
           const { data: { publicUrl: thumbnailPublicUrl } } = supabase.storage
-            .from('profile_assets')
+            .from('persona_avatars')
             .getPublicUrl(thumbnailPath);
             
           onSuccess(publicUrl, uploadType, thumbnailPublicUrl);
@@ -149,10 +107,7 @@ export const FileUploader = ({ onSuccess, id, bannerPosition = { x: 50, y: 50 } 
       console.error('Upload error:', error);
       setUploadProgress(0);
       
-      useToastNotify({
-        variant: "destructive",
-        description: `Failed to upload ${uploadType}: ${error.message || 'Unknown error'}`
-      });
+      toast.error(`Failed to upload ${uploadType}: ${error.message || 'Unknown error'}`);
     } finally {
       setIsUploading(false);
     }
@@ -185,11 +140,11 @@ export const FileUploader = ({ onSuccess, id, bannerPosition = { x: 50, y: 50 } 
     });
   };
 
-  return (
+  return {
     isUploading,
     uploadType,
     setUploadType,
     handleFileUpload,
     uploadProgress
-  );
+  };
 };

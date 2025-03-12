@@ -7,11 +7,13 @@ import { PresetManager } from "./drumpad/PresetManager";
 import { PersonaSelector } from "./drumpad/PersonaSelector";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { VideoBackground } from "@/components/persona/VideoBackground";
 
 export const DrumPadView = () => {
   const { drumPadHeaderCollapsed, setDrumPadHeaderCollapsed } = useHeaderStore();
   const [currentPattern, setCurrentPattern] = useState<any[]>([]);
-  const pads = Array(16).fill(null);
+  const pads = Array(24).fill(null);
+  const [hoveredPad, setHoveredPad] = useState<number | null>(null);
 
   const handleLoadPreset = (pattern: any[]) => {
     setCurrentPattern(pattern);
@@ -55,13 +57,22 @@ export const DrumPadView = () => {
             </Button>
           )}
         </div>
-        <div className="grid grid-cols-4 gap-4 max-w-2xl mx-auto">
+        <div className="grid grid-cols-8 gap-4 max-w-[1200px] mx-auto">
           {pads.map((_, index) => (
             <button
               key={index}
-              className="aspect-square bg-[#1A1A1A] rounded-lg border border-[#353F51] hover:bg-[#2A2A2A] transition-colors flex items-center justify-center group"
+              className="aspect-square bg-gradient-to-br from-[#1A1A1A] to-[#252525] rounded-lg border border-konform-neon-blue/20 hover:border-konform-neon-blue/50 hover:from-[#202020] hover:to-[#303030] transition-all duration-200 flex items-center justify-center group relative overflow-hidden shadow-lg"
+              onMouseEnter={() => setHoveredPad(index)}
+              onMouseLeave={() => setHoveredPad(null)}
             >
-              <Grid3x3 className="w-8 h-8 text-[#00D1FF] opacity-50 group-hover:opacity-100 transition-opacity" />
+              {hoveredPad === index && (
+                <VideoBackground
+                  videoUrl="/Videos/KONFORM_BG_02.mp4"
+                  className="absolute inset-0 opacity-30"
+                />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-br from-konform-neon-blue/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+              <Grid3x3 className="w-6 h-6 text-konform-neon-blue opacity-50 group-hover:opacity-100 transition-all duration-200 group-hover:scale-110" />
             </button>
           ))}
         </div>

@@ -33,9 +33,8 @@ export const KeybaseView = () => {
   }, []);
 
   return (
-    <div className="min-h-[600px] bg-black/40 rounded-lg p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-white">KEYBASE</h2>
+    <div className="min-h-[600px] bg-black/40 rounded-lg p-6 flex flex-col gap-4">
+      <div className="flex items-center justify-end">
         <div className="flex items-center gap-4">
           <Button
             variant="outline"
@@ -152,18 +151,30 @@ export const KeybaseView = () => {
         </div>
       </div>
 
-      <div className="flex-1 bg-black/60 rounded-lg p-4 min-h-[400px] flex items-center justify-center">
-        {isPluginActive ? (
-          <div className="w-full h-full bg-black/40 rounded-lg border border-konform-neon-blue/30">
-            <div className="w-full h-full flex items-center justify-center text-gray-400">
-              Plugin Interface
-            </div>
+      <div className="flex-1 grid grid-rows-[1fr_auto_auto] gap-4">
+        {/* Library/Preset Management Section */}
+        <div className="bg-black/60 rounded-lg p-4 min-h-[200px]">
+          <div className="w-full h-full bg-black/40 rounded-lg border border-konform-neon-blue/30 p-4">
+            <h3 className="text-white text-lg mb-4">Library</h3>
+            {/* Add preset list here */}
           </div>
-        ) : (
-          <div className="text-gray-400">
-            Click the power button to activate plugin
+        </div>
+
+        {/* Parameters Section */}
+        <div className="bg-black/60 rounded-lg p-4 h-[200px]">
+          <div className="w-full h-full bg-black/40 rounded-lg border border-konform-neon-blue/30 p-4">
+            <h3 className="text-white text-lg mb-4">Parameters</h3>
+            {/* Add parameter controls here */}
           </div>
-        )}
+        </div>
+
+        {/* MIDI Keyboard Section */}
+        <div className="bg-black/60 rounded-lg p-4 h-[150px]">
+          <div className="w-full h-full bg-black/40 rounded-lg border border-konform-neon-blue/30 flex items-center justify-center">
+            {/* Add MIDI keyboard component here */}
+            <span className="text-gray-400">MIDI Keyboard</span>
+          </div>
+        </div>
       </div>
     </div>
   );
