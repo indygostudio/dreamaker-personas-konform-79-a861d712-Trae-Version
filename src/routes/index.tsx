@@ -13,6 +13,8 @@ import { DreamakerProduct } from "../pages/DreamakerProduct";
 import MediaProfilePage from "../pages/MediaProfilePage";
 import { Pricing } from "../pages/Pricing";
 import { Privacy } from "../pages/Privacy";
+import Blog from "../pages/Blog";
+import { Earn } from "../pages/Earn";
 
 export const AppRoutes = () => {
   return (
@@ -32,6 +34,8 @@ export const AppRoutes = () => {
           <Route path="/media/:id" element={<MediaProfilePage />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/privacy" element={<Privacy />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/earn" element={<Earn />} />
         </Routes>
       </div>
     </>

@@ -25,6 +25,7 @@ export const Footer = () => {
             <li><Link to="/personas" className={linkClass}>Browse Artists</Link></li>
             <li><Link to="/personas/create" className={linkClass}>Create Persona</Link></li>
             <li><Link to="/dreamaker" className={linkClass}>Generate Music</Link></li>
+            <li><Link to="/earn" className={linkClass}>Earn</Link></li>
           </ul>
         </div>
 
@@ -35,6 +36,7 @@ export const Footer = () => {
             <li><Link to="/docs" className={linkClass}>Documentation</Link></li>
             <li><Link to="/tutorials" className={linkClass}>Tutorials</Link></li>
             <li><Link to="/pricing" className={linkClass}>Pricing</Link></li>
+            <li><Link to="/blog" className={linkClass}>Blog</Link></li>
           </ul>
         </div>
 
