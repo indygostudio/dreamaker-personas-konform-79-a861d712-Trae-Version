@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Download, Share2, X } from "lucide-react";
 import { toast } from "sonner";
+import { MediaGrid } from "@/components/ui/media-grid";
 
 interface ImageSectionProps {
   persona?: {
@@ -86,6 +87,65 @@ export const ImageSection = ({ persona }: ImageSectionProps) => {
         toast.error('Failed to copy URL');
       }
     }
+  };
+
+  const ImageSection = () => {
+    const [images, setImages] = useState<MediaItemType[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+  
+    useEffect(() => {
+      fetchAvatarImages();
+    }, []);
+  
+    const fetchAvatarImages = async () => {
+      try {
+        const { data: avatars, error } = await supabase
+          .from('avatars')
+          .select('*')
+          .order('created_at', { ascending: false });
+  
+        if (error) throw error;
+  
+        const formattedImages = avatars?.map(avatar => ({
+          id: avatar.id,
+          type: 'image',
+          title: avatar.name || 'Avatar',
+          desc: '',
+          url: avatar.url,
+          span: ''
+        })) || [];
+  
+        setImages(formattedImages);
+      } catch (error) {
+        console.error('Error fetching avatar images:', error);
+        toast.error('Failed to load avatar images');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+  
+    const handleImageUpload = async (url: string) => {
+      const newImage = {
+        id: Date.now(),
+        type: 'image',
+        title: 'New Avatar',
+        desc: '',
+        url,
+        span: ''
+      };
+      setImages([newImage, ...images]);
+    };
+  
+    return (
+      <div className="space-y-4">
+        <MediaGrid
+          items={images}
+          onUpload={handleImageUpload}
+          isLoading={isLoading}
+          className="glass-panel p-4"
+        />
+      </div>
+    );
   };
 
   return (
