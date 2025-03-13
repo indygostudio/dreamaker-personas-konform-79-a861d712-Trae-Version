@@ -1,5 +1,6 @@
 
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import type { Banner } from "@/types/banner";
 import { SubscriptionDialog } from "@/components/SubscriptionDialog";
 import { VideoHeader } from "./VideoHeader";
@@ -23,6 +24,7 @@ export const HeroBanner = ({
   currentBanner,
   activeTab
 }: HeroBannerProps) => {
+  const navigate = useNavigate();
   const headerRef = useRef<HTMLDivElement>(null);
   const [previousTab, setPreviousTab] = useState(activeTab);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -89,13 +91,20 @@ export const HeroBanner = ({
     setCurrentVideoIndex(index);
   };
 
+  const handleBannerClick = () => {
+    if (activeTab !== "personas") {
+      navigate("/dreamaker", { state: { activeTab: "personas" } });
+    }
+  };
+
   return (
     <div 
       ref={headerRef}
-      className={`relative transition-all duration-300 ${isHeaderExpanded ? 'min-h-[42vh]' : 'h-[84px]'} flex items-center justify-center overflow-hidden w-full`}
+      className={`relative transition-all duration-300 ${isHeaderExpanded ? 'min-h-[42vh]' : 'h-[84px]'} flex items-center justify-center overflow-hidden w-full cursor-pointer`}
       onDoubleClick={onHeaderDoubleClick}
       onMouseEnter={() => onHeaderHover(true)}
       onMouseLeave={() => onHeaderHover(false)}
+      onClick={handleBannerClick}
     >
       {/* Background Video Layer (z-index: 0) */}
       <div className="absolute inset-0 w-full h-full z-0">
