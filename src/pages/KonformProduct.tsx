@@ -96,9 +96,19 @@ export const KonformProduct = () => {
   }, []);
   return <div className="min-h-screen bg-konform-bg text-white">
       {/* Hero Section */}
-      <div className="relative h-[60vh] overflow-hidden">
-        <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover" autoPlay muted loop playsInline>
-          <source src="/Videos/KONFORM_BG_03.mp4" type="video/mp4" />
+      <div 
+        className="relative h-[60vh] overflow-hidden"
+        onMouseEnter={() => videoRef.current?.play()}
+        onMouseLeave={() => videoRef.current?.pause()}
+      >
+        <video 
+          ref={videoRef} 
+          className="absolute inset-0 w-full h-full object-cover" 
+          muted 
+          loop 
+          playsInline
+        >
+          <source src="/Videos/KONFORM_01.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
         <div className="absolute inset-0 bg-black/50" />
