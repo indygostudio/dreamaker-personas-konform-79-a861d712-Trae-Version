@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { VideoBackground } from "@/components/dreamaker/VideoBackground";
 import { Music, Users, ShoppingBag, Sparkles, Disc3 } from "lucide-react";
 
@@ -8,14 +8,35 @@ export const DreamakerSection = () => {
   const navigate = useNavigate();
   const [isHoveringEffect, setIsHoveringEffect] = useState(false);
   const [activeTab, setActiveTab] = useState("ai-record-label");
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  const handleMouseEnter = () => {
+    if (videoRef.current) {
+      videoRef.current.pause();
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (videoRef.current) {
+      videoRef.current.play().catch(error => {
+        console.error("Video playback error:", error);
+      });
+    }
+  };
   
   return (
     <div className="py-12 bg-black relative">
       {/* Video Banner Container */}
-      <div className="h-[40vh] relative overflow-hidden cursor-pointer" onClick={() => navigate("/dreamaker")}>
+      <div 
+        className="h-[40vh] relative overflow-hidden cursor-pointer" 
+        onClick={() => navigate("/dreamaker")}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
         {/* Background Video */}
         <div className="absolute inset-0">
           <video 
+            ref={videoRef}
             className="w-full h-full object-cover" 
             autoPlay 
             muted 

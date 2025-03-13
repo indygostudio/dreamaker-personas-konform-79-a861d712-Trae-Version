@@ -69,25 +69,52 @@ export const PersonaSection = () => {
               <div className="p-6 bg-zinc-950 rounded-none w-full">
                 <div className="max-w-7xl mx-auto">
                   <h3 className="text-2xl font-bold mb-4 text-white">Voice Cloning Technology</h3>
-                  <p className="mb-4">Our advanced voice cloning technology allows you to create incredibly realistic AI voices that capture the nuance and character of any vocal style. Upload samples, train models, and fine-tune every aspect of your persona's voice.</p>
-                  <ul className="list-disc pl-6 space-y-2">
-                    <li>Upload voice samples and train our AI to clone any voice with remarkable accuracy</li>
-                    <li>Fine-tune accent, pitch, emotional range, breathiness, vibrato, and tone</li>
-                    <li>Optimize voices for specific musical genres, from rap and pop to classical</li>
-                    <li>Create personas that can sing and speak in multiple languages with authentic pronunciation</li>
-                  </ul>
-                  <div 
-                    className="mt-6 rounded-lg w-full h-64 relative overflow-hidden"
-                    onMouseEnter={() => setIsHoveringEffect(true)}
-                    onMouseLeave={() => setIsHoveringEffect(false)}
-                  >
-                    <VideoBackground
-                      videoUrl="/Videos/Gen-3 Alpha 3499529498, A close-up of a goth, dreammakerstudio_htt, M 5.mp4"
-                      isHovering={isHoveringEffect}
-                      continuePlayback={false}
-                      fallbackImage="/lovable-uploads/4fcaace6-9ca6-4012-8e19-966bfcd94cc4.png"
-                      priority={true}
-                    />
+                  <p className="mb-4">Our advanced voice cloning technology allows you to create incredibly realistic AI voices with precise control over multiple voice characteristics.</p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+                    {/* Voice Expression Card */}
+                    <div className="bg-black/40 rounded-xl p-6 border border-purple-500/20 hover:border-purple-500/40 transition-all">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-lg bg-purple-500/10">
+                          <Wand2 className="w-5 h-5 text-purple-400" />
+                        </div>
+                        <h4 className="text-xl font-semibold text-white">Voice Expression</h4>
+                      </div>
+                      <p className="text-gray-400">Control emotional range, style, and delivery. Fine-tune expressions from subtle to dramatic for authentic performances.</p>
+                    </div>
+
+                    {/* Voice Timbre Card */}
+                    <div className="bg-black/40 rounded-xl p-6 border border-purple-500/20 hover:border-purple-500/40 transition-all">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-lg bg-purple-500/10">
+                          <Mic2 className="w-5 h-5 text-purple-400" />
+                        </div>
+                        <h4 className="text-xl font-semibold text-white">Voice Timbre</h4>
+                      </div>
+                      <p className="text-gray-400">Shape the unique color and texture of the voice. Adjust resonance, breathiness, and tonal qualities for distinct character.</p>
+                    </div>
+
+                    {/* Voice Blending Card */}
+                    <div className="bg-black/40 rounded-xl p-6 border border-purple-500/20 hover:border-purple-500/40 transition-all">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-lg bg-purple-500/10">
+                          <FileText className="w-5 h-5 text-purple-400" />
+                        </div>
+                        <h4 className="text-xl font-semibold text-white">Voice Blending</h4>
+                      </div>
+                      <p className="text-gray-400">Mix and merge voice characteristics. Create hybrid voices by combining multiple voice profiles seamlessly.</p>
+                    </div>
+
+                    {/* Voice Age Card */}
+                    <div className="bg-black/40 rounded-xl p-6 border border-purple-500/20 hover:border-purple-500/40 transition-all">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-lg bg-purple-500/10">
+                          <User className="w-5 h-5 text-purple-400" />
+                        </div>
+                        <h4 className="text-xl font-semibold text-white">Voice Age</h4>
+                      </div>
+                      <p className="text-gray-400">Modify voice age characteristics. Adjust maturity, youthfulness, and age-specific vocal qualities naturally.</p>
+                    </div>
                   </div>
                 </div>
               </div>

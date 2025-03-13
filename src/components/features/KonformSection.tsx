@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
 import { VideoBackground } from "@/components/dreamaker/VideoBackground";
+import { Music, Users, Settings, Plug } from "lucide-react";
 
 export const KonformSection = () => {
   const navigate = useNavigate();
@@ -129,14 +130,52 @@ export const KonformSection = () => {
               <div className="p-6 bg-zinc-950 rounded-none w-full">
                 <div className="max-w-7xl mx-auto">
                   <h3 className="text-2xl font-bold mb-4 text-white">AI Instruments</h3>
-                  <p className="mb-4">Revolutionary virtual instruments powered by artificial intelligence that respond to your playing style and creative intentions. These next-generation instruments adapt and evolve based on your musical input, offering unprecedented expressivity.</p>
-                  <ul className="list-disc pl-6 space-y-2">
-                    <li>Adaptive virtual instruments that learn your playing style and preferences</li>
-                    <li>Generate unique instrument sounds based on text descriptions or audio references</li>
-                    <li>Intelligent performance assistance that enhances your playing in real-time</li>
-                    <li>Create impossible-to-sample hybrid instruments that blend multiple sound sources</li>
-                  </ul>
-                  <img src="/lovable-uploads/7598eec0-9726-4b14-b95a-add230e1f6af.png" alt="AI Instruments Interface" className="mt-6 rounded-lg w-full" />
+                  <p className="mb-4">Revolutionary virtual instruments powered by artificial intelligence that respond to your playing style and creative intentions.</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+                    {/* AI Instruments Card */}
+                    <div className="bg-black/40 rounded-xl p-6 border border-[#0EA5E9]/20 hover:border-[#0EA5E9]/40 transition-all">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-lg bg-[#0EA5E9]/10">
+                          <Music className="w-5 h-5 text-[#0EA5E9]" />
+                        </div>
+                        <h4 className="text-xl font-semibold text-white">AI Instruments</h4>
+                      </div>
+                      <p className="text-gray-400">Create and customize virtual instruments that adapt to your playing style and musical preferences in real-time.</p>
+                    </div>
+                    
+                    {/* AI Players Card */}
+                    <div className="bg-black/40 rounded-xl p-6 border border-[#0EA5E9]/20 hover:border-[#0EA5E9]/40 transition-all">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-lg bg-[#0EA5E9]/10">
+                          <Users className="w-5 h-5 text-[#0EA5E9]" />
+                        </div>
+                        <h4 className="text-xl font-semibold text-white">AI Players</h4>
+                      </div>
+                      <p className="text-gray-400">Intelligent virtual musicians that respond to your performance and provide dynamic accompaniment and improvisation.</p>
+                    </div>
+                    
+                    {/* AI Patches Card */}
+                    <div className="bg-black/40 rounded-xl p-6 border border-[#0EA5E9]/20 hover:border-[#0EA5E9]/40 transition-all">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-lg bg-[#0EA5E9]/10">
+                          <Settings className="w-5 h-5 text-[#0EA5E9]" />
+                        </div>
+                        <h4 className="text-xl font-semibold text-white">AI Patches</h4>
+                      </div>
+                      <p className="text-gray-400">Generate and customize intelligent presets that evolve based on your musical context and creative direction.</p>
+                    </div>
+                    
+                    {/* AI Controlled VST Integration Card */}
+                    <div className="bg-black/40 rounded-xl p-6 border border-[#0EA5E9]/20 hover:border-[#0EA5E9]/40 transition-all">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-lg bg-[#0EA5E9]/10">
+                          <Plug className="w-5 h-5 text-[#0EA5E9]" />
+                        </div>
+                        <h4 className="text-xl font-semibold text-white">VST Integration</h4>
+                      </div>
+                      <p className="text-gray-400">Seamlessly control and automate your favorite VST plugins with intelligent parameter optimization and modulation.</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </TabsContent>
@@ -145,13 +184,40 @@ export const KonformSection = () => {
                 <div className="max-w-7xl mx-auto">
                   <h3 className="text-2xl font-bold mb-4 text-white">AI Sessions</h3>
                   <p className="mb-4">Collaborative music creation with AI-powered session musicians that respond to your direction and musical ideas. Work with virtual collaborators that understand musical context and can generate complementary parts for any project.</p>
-                  <ul className="list-disc pl-6 space-y-2">
-                    <li>Virtual session musicians that respond to your musical direction and style preferences</li>
-                    <li>Generate complementary parts that enhance your compositions</li>
-                    <li>Intelligent arrangement suggestions based on your project's genre and mood</li>
-                    <li>Real-time collaboration with AI musicians that adapt to your playing</li>
-                  </ul>
-                  <img src="/lovable-uploads/c589acaa-fd9a-47bc-a181-2508ab0dbaf2.png" alt="AI Sessions Interface" className="mt-6 rounded-lg w-full" />
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                    {/* Collaboration Card */}
+                    <div className="bg-black/40 rounded-xl p-6 border border-[#0EA5E9]/20 hover:border-[#0EA5E9]/40 transition-all">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-lg bg-[#0EA5E9]/10">
+                          <Users className="w-5 h-5 text-[#0EA5E9]" />
+                        </div>
+                        <h4 className="text-xl font-semibold text-white">Collaboration</h4>
+                      </div>
+                      <p className="text-gray-400">Work seamlessly with AI-powered virtual musicians that adapt to your style and creative direction in real-time. Experience natural musical interaction and dynamic collaboration.</p>
+                    </div>
+                    
+                    {/* Session Templates Card */}
+                    <div className="bg-black/40 rounded-xl p-6 border border-[#0EA5E9]/20 hover:border-[#0EA5E9]/40 transition-all">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-lg bg-[#0EA5E9]/10">
+                          <Music className="w-5 h-5 text-[#0EA5E9]" />
+                        </div>
+                        <h4 className="text-xl font-semibold text-white">Session Templates</h4>
+                      </div>
+                      <p className="text-gray-400">Jump-start your projects with intelligent session templates tailored to your genre and production style. Quickly set up professional workflows and arrangements.</p>
+                    </div>
+                    
+                    {/* AI Training Data Card */}
+                    <div className="bg-black/40 rounded-xl p-6 border border-[#0EA5E9]/20 hover:border-[#0EA5E9]/40 transition-all">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-lg bg-[#0EA5E9]/10">
+                          <Settings className="w-5 h-5 text-[#0EA5E9]" />
+                        </div>
+                        <h4 className="text-xl font-semibold text-white">AI Training Data</h4>
+                      </div>
+                      <p className="text-gray-400">Customize and train AI models with your own musical data to create unique virtual collaborators that understand and complement your artistic vision.</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </TabsContent>
