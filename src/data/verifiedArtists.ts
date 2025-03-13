@@ -170,3 +170,5 @@ export const createVerifiedArtists = async () => {
     }
   }
 };
+
+export { verifiedArtists };
