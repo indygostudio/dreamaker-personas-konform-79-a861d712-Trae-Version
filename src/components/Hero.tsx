@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { VideoBackground } from "./dreamaker/VideoBackground";
 import { CircleDot, Circle } from "lucide-react";
+import { scrollToSection } from "@/utils/scrollUtils";
 
 export const Hero = () => {
   const navigate = useNavigate();
@@ -18,17 +19,20 @@ export const Hero = () => {
     {
       video: "/Videos/KONFORM_BG_04.mp4",
       title: "DREAMAKER",
-      description: "Experience the future of music creation with our AI-powered tools and virtual artists"
+      description: "Experience the future of music creation with our AI-powered tools and virtual artists",
+      sectionId: "dreamaker-section"
     },
     {
       video: "/Videos/KONFORM_BG_03.mp4",
       title: "KONFORM",
-      description: "The next generation Digital Audio Workstation powered by artificial intelligence"
+      description: "The next generation Digital Audio Workstation powered by artificial intelligence",
+      sectionId: "konform-section"
     },
     {
       video: "/Videos/Gen-3 Alpha 3165178086, scrolling frames of , imagepng (11), M 5 (1).mp4",
       title: "PERSONAS",
-      description: "Create your own AI Artists with Persona's"
+      description: "Create your own AI Artists with Persona's",
+      sectionId: "personas-section"
     }
   ];
 
@@ -85,6 +89,10 @@ export const Hero = () => {
     setCurrentVideoIndex(index);
   };
 
+  const handleSectionClick = (sectionId: string) => {
+    scrollToSection(sectionId);
+  };
+
   return (
     <div className="relative h-[60vh] overflow-hidden">
       {/* Hero background videos */}
@@ -109,7 +117,10 @@ export const Hero = () => {
         ))}
         
         {/* Content - No gradient overlay */}
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center">
+        <div 
+          className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center cursor-pointer" 
+          onClick={() => handleSectionClick(heroSections[currentVideoIndex].sectionId)}
+        >
           <div className="container mx-auto px-4">
             <h1 className="text-6xl font-bold mb-6 text-white">
               {heroSections[currentVideoIndex].title}

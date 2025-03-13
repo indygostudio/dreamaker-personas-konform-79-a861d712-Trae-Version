@@ -22,10 +22,16 @@ export const Features = () => {
         </div>
 
         <FeatureCards />
-        <DreamakerSection />
+        <div id="dreamaker-section">
+          <DreamakerSection />
+        </div>
         <MarketplaceSection />
-        <KonformSection />
-        <PersonaSection />
+        <div id="konform-section">
+          <KonformSection />
+        </div>
+        <div id="personas-section">
+          <PersonaSection />
+        </div>
         
         {/* Pricing Section */}
         <section className="py-24 bg-black/40">

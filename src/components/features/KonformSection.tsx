@@ -64,6 +64,8 @@ export const KonformSection = () => {
                 AI Mixer
               </TabsTrigger>
             </TabsList>
+            
+            {/* Tab content sections */}
             <TabsContent value="style" className="mt-0">
               <div className="p-6 bg-zinc-950 rounded-none w-full">
                 <div className="max-w-7xl mx-auto">

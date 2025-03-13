@@ -80,6 +80,7 @@ export const DreamakerSection = () => {
                 Distribution
               </TabsTrigger>
             </TabsList>
+            {/* Tab content sections */}
             <TabsContent value="ai-record-label" className="mt-0">
               <div className="p-6 bg-zinc-950 rounded-none w-full">
                 <div className="max-w-7xl mx-auto">
@@ -192,12 +193,12 @@ export const DreamakerSection = () => {
               <div className="p-6 bg-zinc-950 rounded-none w-full">
                 <div className="max-w-7xl mx-auto">
                   <h3 className="text-2xl font-bold mb-4 text-white">Distribution</h3>
-                  <p className="mb-4">Get your music to all major streaming platforms with our comprehensive distribution service. We handle everything from metadata optimization to royalty collection, so you can focus on creating great music.</p>
+                  <p className="mb-4">Get your music heard worldwide with our comprehensive distribution network. We ensure your music reaches all major streaming platforms while maintaining complete control over your releases.</p>
                   <ul className="list-disc pl-6 space-y-2">
-                    <li>One-click distribution to Spotify, Apple Music, Amazon Music, YouTube Music, and more</li>
-                    <li>Smart metadata optimization to improve discoverability</li>
-                    <li>Transparent royalty tracking and payment processing</li>
-                    <li>Release planning and promotional tools to maximize your launch</li>
+                    <li>Global distribution to all major streaming platforms</li>
+                    <li>Real-time analytics and performance tracking</li>
+                    <li>Automated royalty collection and distribution</li>
+                    <li>Strategic release planning and promotion tools</li>
                   </ul>
                   <div 
                     className="mt-6 rounded-lg w-full h-64 relative overflow-hidden"
@@ -205,10 +206,10 @@ export const DreamakerSection = () => {
                     onMouseLeave={() => setIsHoveringEffect(false)}
                   >
                     <VideoBackground
-                      videoUrl="/Videos/Gen-3 Alpha 2708728073, Lyric book on a tabl, dreammakerstudio_a_d, M 5.mp4"
+                      videoUrl="/Videos/KONFORM_01.mp4"
                       isHovering={isHoveringEffect}
                       continuePlayback={false}
-                      fallbackImage="/lovable-uploads/7598eec0-9726-4b14-b95a-add230e1f6af.png"
+                      fallbackImage="/lovable-uploads/70852851-a2d2-4659-badc-968b9337a106.png"
                       priority={true}
                     />
                   </div>
