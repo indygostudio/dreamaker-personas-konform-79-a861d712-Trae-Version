@@ -76,13 +76,13 @@ export const BannerPositionControls = ({
   };
 
   return (
-    <div className="grid grid-cols-3 gap-1 p-1 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
+    <div className="grid grid-cols-3 gap-1 p-1 bg-black/80 backdrop-blur-sm rounded-lg border border-konform-neon-blue/20">
       <div className="col-start-2">
         <Button 
           variant="outline" 
           size="sm" 
           onClick={() => adjustBannerPosition('up')} 
-          className="bg-black/60 border-white/20 text-white h-8 w-8 p-0"
+          className="bg-black/80 border-konform-neon-blue/30 text-white hover:bg-black/60 hover:border-konform-neon-blue/50 h-8 w-8 p-0"
         >
           <ChevronUp className="h-4 w-4" />
         </Button>
@@ -93,7 +93,7 @@ export const BannerPositionControls = ({
           variant="outline" 
           size="sm" 
           onClick={() => adjustBannerPosition('left')} 
-          className="bg-black/60 border-white/20 text-white h-8 w-8 p-0"
+          className="bg-black/80 border-konform-neon-blue/30 text-white hover:bg-black/60 hover:border-konform-neon-blue/50 h-8 w-8 p-0"
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -104,7 +104,7 @@ export const BannerPositionControls = ({
           variant="outline" 
           size="sm" 
           onClick={() => adjustBannerPosition('reset')} 
-          className="bg-black/60 border-white/20 text-white h-8 w-8 p-0"
+          className="bg-black/80 border-konform-neon-blue/30 text-white hover:bg-black/60 hover:border-konform-neon-blue/50 h-8 w-8 p-0"
         >
           <RotateCcw className="h-4 w-4" />
         </Button>
@@ -115,7 +115,7 @@ export const BannerPositionControls = ({
           variant="outline" 
           size="sm" 
           onClick={() => adjustBannerPosition('right')} 
-          className="bg-black/60 border-white/20 text-white h-8 w-8 p-0"
+          className="bg-black/80 border-konform-neon-blue/30 text-white hover:bg-black/60 hover:border-konform-neon-blue/50 h-8 w-8 p-0"
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
@@ -126,7 +126,7 @@ export const BannerPositionControls = ({
           variant="outline" 
           size="sm" 
           onClick={() => adjustBannerPosition('down')} 
-          className="bg-black/60 border-white/20 text-white h-8 w-8 p-0"
+          className="bg-black/80 border-konform-neon-blue/30 text-white hover:bg-black/60 hover:border-konform-neon-blue/50 h-8 w-8 p-0"
         >
           <ChevronDown className="h-4 w-4" />
         </Button>
