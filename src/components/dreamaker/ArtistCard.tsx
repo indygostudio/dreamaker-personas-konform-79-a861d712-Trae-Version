@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { ArtistProfile } from "@/hooks/use-artist-profiles";
-import { Trash2Icon, Share2 } from "lucide-react";
+import { Trash2Icon, Share2, Verified } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";

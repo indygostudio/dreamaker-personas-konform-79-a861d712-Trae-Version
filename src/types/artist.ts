@@ -18,6 +18,9 @@ export interface ArtistProfile {
     y: number;
   };
   location: string | null;
+  is_verified: boolean;
+  role: string | null;
+  verified_date: string | null;
   created_at: string;
   updated_at: string;
   analytics: Record<string, any>;
