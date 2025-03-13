@@ -11,6 +11,7 @@ import { VideoBackground } from '@/components/persona/VideoBackground';
 import { HeaderSkeleton } from './header/HeaderSkeleton';
 import { BannerContextMenu } from './header/BannerContextMenu';
 import type { BannerPosition } from '@/types/types';
+import { BioText } from './header/BioText';
 
 interface ProfileHeaderProps {
   persona?: any;
@@ -113,7 +114,7 @@ export const ProfileHeader = ({
               </h1>
               
               {isHeaderExpanded && persona.bio && (
-                <p className="text-gray-300 text-lg select-none">{persona.bio || persona.user_bio}</p>
+                <BioText text={persona.bio || persona.user_bio} />
               )}
             </div>
           </div>
