@@ -97,9 +97,9 @@ export const MindMap = ({ persona, personas = [] }: MindMapProps) => {
     });
 
     // Create neural network nodes (small dots representing neurons)
-    const neuronNodes: Node[] = Array.from({ length: 25 }, (_, i) => {
+    const neuronNodes: Node[] = Array.from({ length: 50 }, (_, i) => {
       const angle = Math.random() * 2 * Math.PI;
-      const distance = Math.random() * radius * 0.8;
+      const distance = Math.random() * radius * 0.9;
       const x = distance * Math.cos(angle);
       const y = distance * Math.sin(angle);
       
@@ -109,11 +109,12 @@ export const MindMap = ({ persona, personas = [] }: MindMapProps) => {
         position: { x, y },
         data: { label: '' },
         style: {
-          width: 6,
-          height: 6,
-          backgroundColor: `rgba(${Math.floor(Math.random() * 100) + 155}, ${Math.floor(Math.random() * 100) + 155}, 255, ${Math.random() * 0.5 + 0.3})`,
+          width: Math.random() * 4 + 2,
+          height: Math.random() * 4 + 2,
+          backgroundColor: `rgba(${Math.floor(Math.random() * 100) + 155}, ${Math.floor(Math.random() * 100) + 155}, 255, ${Math.random() * 0.7 + 0.3})`,
           borderRadius: '50%',
-          border: 'none'
+          border: 'none',
+          boxShadow: '0 0 10px rgba(255, 255, 255, 0.3)'
         }
       };
     });
@@ -174,16 +175,16 @@ export const MindMap = ({ persona, personas = [] }: MindMapProps) => {
     const neuronEdges: Edge[] = [];
     
     // Connect neurons to central node
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 20; i++) {
       neuronEdges.push({
         id: `e-neuron-central-${i}`,
         source: `neuron-${i}`,
         target: 'central',
         animated: true,
         style: { 
-          stroke: 'rgba(168, 85, 247, 0.4)',
-          strokeWidth: 1,
-          opacity: 0.4
+          stroke: 'rgba(168, 85, 247, 0.6)',
+          strokeWidth: Math.random() * 2 + 0.5,
+          opacity: Math.random() * 0.4 + 0.3
         }
       });
     }
@@ -207,13 +208,12 @@ export const MindMap = ({ persona, personas = [] }: MindMapProps) => {
     }
     
     // Connect neurons to other neurons
-    for (let i = 0; i < 15; i++) {
-      const source = Math.floor(Math.random() * 25);
-      let target = Math.floor(Math.random() * 25);
+    for (let i = 0; i < 30; i++) {
+      const source = Math.floor(Math.random() * 50);
+      let target = Math.floor(Math.random() * 50);
       
-      // Make sure source and target are different
       while (source === target) {
-        target = Math.floor(Math.random() * 25);
+        target = Math.floor(Math.random() * 50);
       }
       
       neuronEdges.push({
@@ -222,9 +222,9 @@ export const MindMap = ({ persona, personas = [] }: MindMapProps) => {
         target: `neuron-${target}`,
         animated: true,
         style: { 
-          stroke: 'rgba(150, 150, 255, 0.2)',
-          strokeWidth: 1,
-          opacity: 0.2
+          stroke: `rgba(${Math.floor(Math.random() * 100) + 155}, ${Math.floor(Math.random() * 100) + 155}, 255, ${Math.random() * 0.3 + 0.2})`,
+          strokeWidth: Math.random() * 1.5 + 0.5,
+          opacity: Math.random() * 0.3 + 0.2
         }
       });
     }

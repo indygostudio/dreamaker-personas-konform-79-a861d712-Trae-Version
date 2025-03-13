@@ -69,7 +69,13 @@ export const PersonaHeader = ({
             darkness={persona.banner_darkness}
           />
           
-          {/* Removed the conditional gradient */}
+          {/* Dynamic gradient overlay */}
+          <div 
+            className={`absolute inset-0 transition-opacity duration-300 ${isHeaderExpanded ? 'opacity-0' : 'opacity-100'}`}
+            style={{
+              background: 'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.85) 100%)'
+            }}
+          />
           
           <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-20">
             <NavigationButton />
