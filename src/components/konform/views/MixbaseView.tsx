@@ -1,9 +1,175 @@
 
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { useState } from "react";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import type { Track } from "../daw/Track";
+import { MixerChannel } from "../daw/MixerChannel";
+import { MasterVolume } from "../mixer/MasterVolume";
+
 export const MixbaseView = () => {
+  const [tracks, setTracks] = useState<Track[]>([
+    {
+      id: 1,
+      name: 'Track 1',
+      volume: 75,
+      isMuted: false,
+      mode: 'ai-audio',
+      clips: [],
+    },
+    {
+      id: 2,
+      name: 'Track 2',
+      volume: 70,
+      isMuted: false,
+      mode: 'ai-audio',
+      clips: [],
+    },
+    {
+      id: 3,
+      name: 'Track 3',
+      volume: 65,
+      isMuted: false,
+      mode: 'ai-audio',
+      clips: [],
+    },
+    {
+      id: 4,
+      name: 'Track 4',
+      volume: 80,
+      isMuted: false,
+      mode: 'ai-audio',
+      clips: [],
+    },
+  ]);
+
+  const [masterVolume, setMasterVolume] = useState(80);
+  const [viewMode, setViewMode] = useState<'large' | 'normal' | 'compact'>('normal');
+
+  const handleAddTrack = () => {
+    const newTrack: Track = {
+      id: Math.max(...tracks.map(t => t.id)) + 1,
+      name: `Track ${tracks.length + 1}`,
+      volume: 75,
+      isMuted: false,
+      mode: 'ai-audio',
+      clips: [],
+    };
+    setTracks([...tracks, newTrack]);
+  };
+
+  const handleDeleteTrack = (trackId: number) => {
+    setTracks(tracks => tracks.filter(track => track.id !== trackId));
+  };
+
+  const handleDuplicateTrack = (trackId: number) => {
+    const trackToDuplicate = tracks.find(track => track.id === trackId);
+    if (!trackToDuplicate) return;
+
+    const newTrack = {
+      ...trackToDuplicate,
+      id: Math.max(...tracks.map(t => t.id)) + 1,
+      name: `${trackToDuplicate.name} (Copy)`,
+      clips: []
+    };
+
+    setTracks([...tracks, newTrack]);
+  };
+
   return (
-    <div className="min-h-[600px] bg-black/40 rounded-lg p-6">
-      <h2 className="text-2xl font-bold text-white mb-4">MIXBASE</h2>
-      <p className="text-gray-400">Mixing console and effects interface will be displayed here.</p>
+    <div className="flex flex-col h-full bg-[#131415]">
+      <div className="p-4 border-b border-konform-neon-blue/20 bg-black/60 backdrop-blur-xl">
+        <div className="flex items-center justify-between">
+          <div className="flex gap-2">
+            <Button
+              variant={viewMode === 'large' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('large')}
+              className="text-konform-neon-blue"
+            >
+              Large
+            </Button>
+            <Button
+              variant={viewMode === 'normal' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('normal')}
+              className="text-konform-neon-blue"
+            >
+              Normal
+            </Button>
+            <Button
+              variant={viewMode === 'compact' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('compact')}
+              className="text-konform-neon-blue"
+            >
+              Compact
+            </Button>
+          </div>
+        </div>
+      </div>
+      <div className="p-6 h-[calc(100vh-8rem)] flex">
+        <ScrollArea className="flex-1 h-full">
+          <div className="flex items-stretch space-x-2 min-h-[500px]">
+            {tracks.map((track) => (
+              <div key={track.id} className={`flex-shrink-0 ${viewMode === 'large' ? 'w-96' : viewMode === 'normal' ? 'w-64' : 'w-48'}`}>
+                <MixerChannel
+                  id={track.id}
+                  index={tracks.indexOf(track)}
+                  name={track.name}
+                  type={track.mode}
+                  volume={track.volume}
+                  isMuted={track.isMuted}
+                  onVolumeChange={(value) => {
+                    setTracks(tracks.map(t =>
+                      t.id === track.id ? { ...t, volume: value } : t
+                    ));
+                  }}
+                  onMuteToggle={() => {
+                    setTracks(tracks.map(t =>
+                      t.id === track.id ? { ...t, isMuted: !t.isMuted } : t
+                    ));
+                  }}
+                  onTypeChange={(type) => {
+                    setTracks(tracks.map(t =>
+                      t.id === track.id ? { ...t, mode: type } : t
+                    ));
+                  }}
+                  onGenerate={() => {
+                    // Handle AI generation
+                  }}
+                  onDelete={() => handleDeleteTrack(track.id)}
+                  onDuplicate={() => handleDuplicateTrack(track.id)}
+                />
+              </div>
+            ))}
+            <div className="flex-shrink-0 w-24 flex items-center justify-center">
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={handleAddTrack}
+                className="w-12 h-12 rounded-full bg-black/60 border border-konform-neon-blue/30 hover:border-konform-neon-blue text-konform-neon-blue hover:text-konform-neon-orange transition-colors"
+              >
+                <Plus className="w-6 h-6" />
+              </Button>
+            </div>
+          </div>
+          <ScrollBar orientation="horizontal" className="bg-konform-neon-blue/20" />
+        </ScrollArea>
+        <MasterVolume volume={masterVolume} onVolumeChange={setMasterVolume} />
+      </div>
+      <div className="h-16 border-t border-konform-neon-blue/20 bg-black/60 backdrop-blur-xl">
+        <div className="flex items-center justify-between px-6 h-full">
+          <div className="flex items-center space-x-4">
+            {/* Transport controls */}
+          </div>
+          <div className="flex items-center space-x-4 text-konform-neon-blue">
+            <span>120 BPM</span>
+            <span>4/4</span>
+            <span>C Maj</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

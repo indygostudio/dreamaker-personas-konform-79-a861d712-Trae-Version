@@ -28,7 +28,9 @@ export interface Track {
   name: string;
   mode: TrackMode;
   volume: number;
+  pan?: number;
   isMuted: boolean;
+  isSolo?: boolean;
   clips: Clip[];
   persona?: {
     name: string;

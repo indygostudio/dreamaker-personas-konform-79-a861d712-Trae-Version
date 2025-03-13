@@ -1,11 +1,9 @@
 
-import { Grid3x3, UserRound } from "lucide-react";
-import { TransportControls } from "./TransportControls";
-import { KonformBanner } from "./KonformBanner";
+import { UserRound } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useHeaderStore } from "./store/headerStore";
 import { PresetManager } from "./drumpad/PresetManager";
 import { PersonaSelector } from "./drumpad/PersonaSelector";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { VideoBackground } from "@/components/persona/VideoBackground";
 
@@ -29,12 +27,6 @@ export const DrumPadView = () => {
 
   return (
     <div className="flex-1 overflow-y-auto bg-[#131415] flex flex-col">
-      <KonformBanner 
-        title="DRUM MACHINE" 
-        description="Create rhythms and patterns with AI-powered drum synthesis"
-        isCollapsed={drumPadHeaderCollapsed}
-        onCollapsedChange={setDrumPadHeaderCollapsed}
-      />
       <div className="p-6 space-y-6 flex-1">
         <div className="flex items-center justify-between mb-4">
           <PresetManager
@@ -61,24 +53,12 @@ export const DrumPadView = () => {
           {pads.map((_, index) => (
             <button
               key={index}
-              className="aspect-square bg-gradient-to-br from-[#1A1A1A] to-[#252525] rounded-lg border border-konform-neon-blue/20 hover:border-konform-neon-blue/50 hover:from-[#202020] hover:to-[#303030] transition-all duration-200 flex items-center justify-center group relative overflow-hidden shadow-lg"
-              onMouseEnter={() => setHoveredPad(index)}
-              onMouseLeave={() => setHoveredPad(null)}
+              className="aspect-square bg-black/40 backdrop-blur-sm border-dreamaker-purple/20 hover:border-dreamaker-purple/90 p-6 rounded-lg transition-all duration-300 flex items-center justify-center group relative overflow-hidden shadow-lg"
             >
-              {hoveredPad === index && (
-                <VideoBackground
-                  videoUrl="/Videos/KONFORM_BG_02.mp4"
-                  className="absolute inset-0 opacity-30"
-                />
-              )}
-              <div className="absolute inset-0 bg-gradient-to-br from-konform-neon-blue/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-              <Grid3x3 className="w-6 h-6 text-konform-neon-blue opacity-50 group-hover:opacity-100 transition-all duration-200 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-gradient-to-br from-dreamaker-purple/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
             </button>
           ))}
         </div>
-      </div>
-      <div className="sticky bottom-0 bg-black/40 backdrop-blur-xl border-t border-konform-neon-blue/20">
-        <TransportControls />
       </div>
     </div>
   );

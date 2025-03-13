@@ -12,28 +12,25 @@ export const FeatureCards = () => {
     {
       title: "AI Record Label",
       description: "Create your virtual artist persona with advanced AI technology and produce professional music with our integrated AI DAW",
-      bgGradient: "from-purple-900/40 to-black/40",
       icon: <Disc3 className="h-6 w-6" />,
       color: "border-purple-500/20 group-hover:border-purple-500/60",
-      video: "/Videos/PERSONAS_01.mp4",
+      bgColor: "from-purple-900/40 to-black/40",
       hoverColor: "text-purple-400"
     },
     {
       title: "AI Persona",
       description: "Design fully realized virtual artists with rich backstories, visual identities, and personality traits. Build memorable characters with distinct musical preferences and creative visions.",
-      bgGradient: "from-blue-900/40 to-black/40",
       icon: <Users className="h-6 w-6" />,
       color: "border-blue-500/20 group-hover:border-blue-500/60",
-      video: "/Videos/DREAMAKER_01.mp4",
+      bgColor: "from-blue-900/40 to-black/40",
       hoverColor: "text-blue-400"
     },
     {
       title: "AI Studio",
       description: "Transform your compositions by applying different musical styles and genres seamlessly. Our sophisticated AI analyzes your music and intelligently applies the characteristics of any genre.",
-      bgGradient: "from-indigo-900/40 to-black/40",
       icon: <Sliders className="h-6 w-6" />,
       color: "border-indigo-500/20 group-hover:border-indigo-500/60",
-      video: "/Videos/KONFORM_01.mp4",
+      bgColor: "from-indigo-900/40 to-black/40",
       hoverColor: "text-indigo-400"
     }
   ];
@@ -48,19 +45,8 @@ export const FeatureCards = () => {
           onMouseLeave={() => setHoveredIndex(null)}
         >
           <Card 
-            className={`relative overflow-hidden rounded-2xl bg-black/80 backdrop-blur-md border ${card.color} transition-all duration-500 hover:shadow-lg h-[300px]`}
+            className={`relative overflow-hidden rounded-2xl bg-zinc-950 backdrop-blur-md border ${card.color} transition-all duration-500 hover:shadow-lg h-[300px]`}
           >
-            <div className="absolute inset-0 w-full h-full overflow-hidden">
-              <VideoBackground 
-                videoUrl={card.video} 
-                isHovering={hoveredIndex === index} 
-                continuePlayback={false} 
-                reverseOnEnd={true} 
-                darkness={0.7}
-              />
-              <div className={`absolute inset-0 bg-gradient-to-b ${card.bgGradient} opacity-70 group-hover:opacity-80 transition-opacity duration-300`} />
-            </div>
-            
             <div className="absolute inset-0 flex flex-col p-6 bg-zinc-950/60 backdrop-blur-sm transition-transform duration-500 group-hover:translate-y-0 transform">
               <div className="flex justify-between items-start mb-4">
                 <div className={`p-3 rounded-full bg-black/60 backdrop-blur-sm ${card.color}`}>

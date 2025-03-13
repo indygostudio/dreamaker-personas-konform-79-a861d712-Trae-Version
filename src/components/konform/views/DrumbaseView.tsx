@@ -1,10 +1,7 @@
 
 import { useState } from "react";
-import { Power, Settings } from "lucide-react";
+import { Power } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
 import { scanPlugins } from "@/lib/audio/pluginScanner";
 import { nativeBridge } from "@/lib/audio/nativeBridge";
@@ -47,43 +44,6 @@ export const DrumbaseView = () => {
           >
             <Power className="h-4 w-4" />
           </Button>
-
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="icon">
-                <Settings className="h-4 w-4" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="bg-black/90 border-konform-neon-blue/30">
-              <DialogHeader>
-                <DialogTitle className="text-white">Drum Plugin Settings</DialogTitle>
-              </DialogHeader>
-              
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label className="text-white">Plugin</Label>
-                  <Select
-                    value={selectedPlugin}
-                    onValueChange={(value) => {
-                      setSelectedPlugin(value);
-                      setIsPluginActive(false);
-                    }}
-                  >
-                    <SelectTrigger className="col-span-3">
-                      <SelectValue placeholder="Select drum plugin" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {drumPlugins?.map((plugin) => (
-                        <SelectItem key={plugin.id} value={plugin.id}>
-                          {plugin.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
         </div>
       </div>
 

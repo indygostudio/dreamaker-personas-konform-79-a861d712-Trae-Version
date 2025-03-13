@@ -3,87 +3,109 @@ import { useState } from "react";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Laptop2, Settings, Music2, Wand2, Layers, Grid3x3 } from "lucide-react";
+import { Laptop2, Settings, Music2, Wand2, Layers, Grid3x3, FileText, Sliders } from "lucide-react";
 import { KeybaseView } from "../views/KeybaseView";
 import { TrackEditor } from "./TrackEditor";
 import { DrumPadView } from "../DrumPadView";
+import { LyricbaseView } from "../views/LyricbaseView";
+import { MixabaseView } from "../views/MixabaseView";
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, horizontalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+const SortableTab = ({ tab }) => {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: tab.id });
+  
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+  
+  return (
+    <TabsTrigger 
+      ref={setNodeRef}
+      value={tab.value}
+      className="data-[state=active]:bg-black data-[state=active]:text-white px-4 py-2 rounded-t-md border-b-2 data-[state=active]:border-[#00D1FF] border-transparent cursor-move"
+      style={style}
+      {...attributes}
+      {...listeners}
+    >
+      {tab.icon}
+      {tab.label}
+    </TabsTrigger>
+  );
+};
 
 export const EditorTabs = () => {
   const [activeTab, setActiveTab] = useState("trackEditor");
+  const [tabs, setTabs] = useState([
+    { id: 'trackEditor', value: 'trackEditor', label: 'Songbase', icon: <Wand2 className="h-4 w-4 mr-2" /> },
+    { id: 'sampler', value: 'sampler', label: 'Keybase', icon: <Layers className="h-4 w-4 mr-2" /> },
+    { id: 'drumpad', value: 'drumpad', label: 'Drumbase', icon: <Grid3x3 className="h-4 w-4 mr-2" /> },
+    { id: 'lyricbase', value: 'lyricbase', label: 'Lyricbase', icon: <FileText className="h-4 w-4 mr-2" /> },
+    { id: 'mixabase', value: 'mixabase', label: 'Mixbase', icon: <Sliders className="h-4 w-4 mr-2" /> },
+  ]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    
+    if (active.id !== over.id) {
+      setTabs((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
 
   return (
     <div className="w-full h-[calc(100vh-120px)] bg-black/40 rounded-lg flex flex-col">
-      {/* Editor Tabs */}
       <Tabs defaultValue="trackEditor" value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-        <TabsList className="flex justify-start items-center px-4 pt-2 bg-transparent gap-2 border-b border-konform-neon-blue/20">
-          <TabsTrigger 
-            value="trackEditor" 
-            className="data-[state=active]:bg-black data-[state=active]:text-white px-4 py-2 rounded-t-md border-b-2 data-[state=active]:border-[#00D1FF] border-transparent"
-          >
-            <Wand2 className="h-4 w-4 mr-2" />
-            Track Editor
-          </TabsTrigger>
-          <TabsTrigger 
-            value="sampler" 
-            className="data-[state=active]:bg-black data-[state=active]:text-white px-4 py-2 rounded-t-md border-b-2 data-[state=active]:border-[#00D1FF] border-transparent"
-          >
-            <Layers className="h-4 w-4 mr-2" />
-            Keybase
-          </TabsTrigger>
-          <TabsTrigger 
-            value="drumpad" 
-            className="data-[state=active]:bg-black data-[state=active]:text-white px-4 py-2 rounded-t-md border-b-2 data-[state=active]:border-[#00D1FF] border-transparent"
-          >
-            <Grid3x3 className="h-4 w-4 mr-2" />
-            Drumbase
-          </TabsTrigger>
-        </TabsList>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <TabsList className="flex justify-start items-center px-4 pt-2 bg-transparent gap-2 border-b border-konform-neon-blue/20">
+            <SortableContext 
+              items={tabs.map(tab => tab.id)}
+              strategy={horizontalListSortingStrategy}
+            >
+              {tabs.map((tab) => (
+                <SortableTab key={tab.id} tab={tab} />
+              ))}
+            </SortableContext>
+          </TabsList>
+        </DndContext>
 
         <TabsContent value="trackEditor" className="flex-1 p-0 m-0">
           <TrackEditor />
         </TabsContent>
 
         <TabsContent value="sampler" className="flex-1 p-0 m-0">
-          <div className="h-full flex flex-col">
-            <ResizablePanelGroup direction="horizontal">
-              {/* Left Panel */}
-              <ResizablePanel defaultSize={15} minSize={10} maxSize={30} className="bg-black/20">
-                <div className="h-full border-r border-konform-neon-blue/20 p-2" />
-              </ResizablePanel>
-
-              <ResizableHandle withHandle />
-
-              {/* Center Panel */}
-              <ResizablePanel defaultSize={65}>
-                <ResizablePanelGroup direction="vertical">
-                  {/* Main Editor Area */}
-                  <ResizablePanel defaultSize={70}>
-                    <div className="h-full bg-black/20 p-2">
-                      <KeybaseView />
-                    </div>
-                  </ResizablePanel>
-
-                  <ResizableHandle withHandle />
-
-                  {/* Pattern Editor */}
-                  <ResizablePanel defaultSize={30}>
-                    <div className="h-full bg-black/20 p-2" />
-                  </ResizablePanel>
-                </ResizablePanelGroup>
-              </ResizablePanel>
-
-              <ResizableHandle withHandle />
-
-              {/* Right Panel */}
-              <ResizablePanel defaultSize={20} minSize={15} maxSize={30}>
-                <div className="h-full bg-black/20 border-l border-konform-neon-blue/20 p-2" />
-              </ResizablePanel>
-            </ResizablePanelGroup>
+          <div className="h-full bg-black/20 p-2">
+            <KeybaseView />
           </div>
         </TabsContent>
 
         <TabsContent value="drumpad" className="flex-1 p-0 m-0">
           <DrumPadView />
+        </TabsContent>
+
+        <TabsContent value="lyricbase" className="flex-1 p-0 m-0">
+          <LyricbaseView />
+        </TabsContent>
+
+        <TabsContent value="mixabase" className="flex-1 p-0 m-0">
+          <MixabaseView />
         </TabsContent>
       </Tabs>
     </div>
