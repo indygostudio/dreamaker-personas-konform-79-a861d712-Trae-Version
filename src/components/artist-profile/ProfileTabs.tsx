@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { Save, Edit } from "lucide-react";
 import { useSelectedPersonasStore } from "@/stores/selectedPersonasStore";
 import { useUIStore } from "@/stores/uiStore";
+import { VideoBackground } from "@/components/dreamaker/VideoBackground";
 
 interface ProfileTabsProps {
   selectedPersona: Persona | null;
@@ -139,8 +140,21 @@ export const ProfileTabs = ({
           </TabsList>
 
           <TabsContent value="about" className="mt-6">
-            <div className="space-y-8">
-              <div className="glass-panel p-6">
+            <div className="space-y-8 relative">
+              {/* Video Background with gradient overlay */}
+              <div className="absolute inset-0 z-0 rounded-lg overflow-hidden">
+                <VideoBackground
+                  videoUrl="/Videos/KONFORM_BG_04.mp4"
+                  isHovering={false}
+                  continuePlayback={true}
+                  reverseOnEnd={true}
+                  autoPlay={true}
+                  darkness={0.7}
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-black/90" />
+              </div>
+              
+              <div className="glass-panel p-6 relative z-10">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-2xl font-bold text-white">About</h2>
                   <Button
@@ -177,7 +191,7 @@ export const ProfileTabs = ({
                 )}
               </div>
               
-              <div className="space-y-8">
+              <div className="space-y-8 relative z-10">
                 <ArtistStats profile={profile} />
                 <ArtistAchievements profile={profile} />
               </div>
