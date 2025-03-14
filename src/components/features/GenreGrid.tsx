@@ -106,8 +106,8 @@ export const GenreGrid = () => {
     },
     {
       type: 'AI_IMAGES',
-      title: 'AI IMAGES',
-      description: 'Generate AI images for your projects',
+      title: 'AI STORYTELLING',
+      description: 'Generate compelling narratives for your projects',
       icon: <Image className="h-6 w-6" />,
       image: '/lovable-uploads/4fcaace6-9ca6-4012-8e19-966bfcd94cc4.png',
       video: '/Videos/Gen-3 Alpha 4197653845, a whole mythological, Cropped - imagewebp, M 5.mp4',

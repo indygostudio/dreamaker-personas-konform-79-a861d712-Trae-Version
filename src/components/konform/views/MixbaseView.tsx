@@ -108,6 +108,110 @@ export const MixbaseView = () => {
   const busTracks = tracks.filter(t => t.mode === 'bus');
   const audioTracks = tracks.filter(t => t.mode === 'ai-audio');
 
+  // Render a mixer channel with the new UI based on the image
+  const renderMixerChannel = (track: Track, index: number) => {
+    return (
+      <div key={track.id} className={`flex-shrink-0 ${viewMode === 'large' ? 'w-96' : viewMode === 'normal' ? 'w-64' : 'w-48'}`}>
+        <div className="bg-black/80 rounded-lg border border-konform-neon-blue/30 overflow-hidden">
+          {/* Channel Header */}
+          <div className="p-2 border-b border-konform-neon-blue/20 flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <span className="text-konform-neon-blue text-xs">CH {index}</span>
+            </div>
+            <div className="flex space-x-1">
+              <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/></svg>
+              </Button>
+              <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+              </Button>
+              <Button variant="ghost" size="icon" className="h-6 w-6 text-konform-neon-blue hover:text-konform-neon-orange">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 20V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v14"/><path d="M2 20h20"/><path d="M14 12v.01"/></svg>
+              </Button>
+            </div>
+          </div>
+          
+          {/* Plugin Section */}
+          <div className="p-2 border-b border-konform-neon-blue/20">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs text-konform-neon-blue">Plugin</span>
+              <Button variant="ghost" size="icon" className="h-5 w-5 text-konform-neon-blue hover:text-konform-neon-orange">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+              </Button>
+            </div>
+            <Button variant="outline" size="sm" className="w-full text-xs h-8 border-konform-neon-blue/30 text-white bg-black/60 hover:bg-black/80 hover:text-konform-neon-blue">
+              Add Plugin
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><path d="m6 9 6 6 6-6"/></svg>
+            </Button>
+          </div>
+          
+          {/* Output Section */}
+          <div className="p-2 border-b border-konform-neon-blue/20">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs text-konform-neon-blue">Output</span>
+              <span className="text-xs text-konform-neon-orange">Φ</span>
+            </div>
+            <Button variant="outline" size="sm" className="w-full text-xs h-8 border-konform-neon-blue/30 text-white bg-black/60 hover:bg-black/80 hover:text-konform-neon-blue">
+              Select...
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><path d="m6 9 6 6 6-6"/></svg>
+            </Button>
+          </div>
+          
+          {/* Volume Slider */}
+          <div className="p-2 flex flex-col items-center">
+            <div className="w-full flex justify-between text-xs text-gray-400 mb-1">
+              <span>+12</span>
+            </div>
+            <div className="h-48 w-full flex justify-center mb-2">
+              <Slider
+                orientation="vertical"
+                value={[track.volume]}
+                onValueChange={([value]) => {
+                  setTracks(tracks.map(t =>
+                    t.id === track.id ? { ...t, volume: value } : t
+                  ));
+                }}
+                max={100}
+                step={1}
+                className="h-full"
+              />
+            </div>
+            <div className="w-full flex justify-between text-xs text-gray-400 mb-1">
+              <span>-48</span>
+            </div>
+            <div className="flex w-full justify-center space-x-2 mt-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-xs h-6 w-6 border-konform-neon-blue/30 bg-black/60 hover:bg-black/80 hover:text-konform-neon-blue"
+              >
+                M
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-xs h-6 w-6 border-konform-neon-blue/30 bg-black/60 hover:bg-black/80 hover:text-konform-neon-blue"
+              >
+                S
+              </Button>
+            </div>
+            <div className="text-xs text-konform-neon-blue mt-2">
+              0.0 dB
+            </div>
+          </div>
+          
+          {/* Track Name */}
+          <div className="p-2 border-t border-konform-neon-blue/20 flex justify-center">
+            <Button variant="ghost" className="text-xs text-white hover:text-konform-neon-blue">
+              {track.name}
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><path d="M12 19c-4.3 0-7.8-3.4-7.8-7.7 0-2 .8-3.8 2-5.1.5-.5 1.3-.5 1.8 0l.5.5c.3.3.3.8 0 1.1-.8.9-1.2 2-1.2 3.4 0 2.8 2.2 5 5 5s5-2.2 5-5c0-1.4-.4-2.6-1.2-3.4-.3-.3-.3-.8 0-1.1l.5-.5c.5-.5 1.3-.5 1.8 0 1.2 1.3 2 3.1 2 5.1-.3 4.3-3.8 7.7-8.2 7.7z"/><path d="M12 5v8"/></svg>
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="flex flex-col h-full bg-[#131415]">
       <div className="p-4 border-b border-konform-neon-blue/20 bg-black/60 backdrop-blur-xl">
@@ -144,119 +248,18 @@ export const MixbaseView = () => {
         <ScrollArea className="flex-1 h-full">
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <div className="flex items-stretch space-x-4 min-h-[500px]">
-              <div className="flex items-end gap-2 bg-gradient-to-b from-konform-neon-orange/5 to-transparent p-4 rounded-lg border border-konform-neon-orange/10">
-                <SortableContext items={masterTracks.map(t => t.id)} strategy={horizontalListSortingStrategy}>
-                  {masterTracks.map((track) => (
-                    <div key={track.id} className={`flex-shrink-0 ${viewMode === 'large' ? 'w-96' : viewMode === 'normal' ? 'w-64' : 'w-48'}`}>
-                      <MixerChannel
-                        id={track.id}
-                        index={tracks.indexOf(track)}
-                        name={track.name}
-                        type={track.mode}
-                        volume={track.volume}
-                        isMuted={track.isMuted}
-                        onVolumeChange={(value) => {
-                          setTracks(tracks.map(t =>
-                            t.id === track.id ? { ...t, volume: value } : t
-                          ));
-                        }}
-                        onMuteToggle={() => {
-                          setTracks(tracks.map(t =>
-                            t.id === track.id ? { ...t, isMuted: !t.isMuted } : t
-                          ));
-                        }}
-                        onTypeChange={(type) => {
-                          setTracks(tracks.map(t =>
-                            t.id === track.id ? { ...t, mode: type } : t
-                          ));
-                        }}
-                        onGenerate={() => {}}
-                        onDelete={() => handleDeleteTrack(track.id)}
-                        onDuplicate={() => handleDuplicateTrack(track.id)}
-                      />
-                    </div>
-                  ))}
-                </SortableContext>
-              </div>
-
-              <div className="flex items-end gap-2 bg-gradient-to-b from-konform-neon-blue/5 to-transparent p-4 rounded-lg border border-konform-neon-blue/10">
-                <SortableContext items={busTracks.map(t => t.id)} strategy={horizontalListSortingStrategy}>
-                  {busTracks.map((track) => (
-                    <div key={track.id} className={`flex-shrink-0 ${viewMode === 'large' ? 'w-96' : viewMode === 'normal' ? 'w-64' : 'w-48'}`}>
-                      <MixerChannel
-                        id={track.id}
-                        index={tracks.indexOf(track)}
-                        name={track.name}
-                        type={track.mode}
-                        volume={track.volume}
-                        isMuted={track.isMuted}
-                        onVolumeChange={(value) => {
-                          setTracks(tracks.map(t =>
-                            t.id === track.id ? { ...t, volume: value } : t
-                          ));
-                        }}
-                        onMuteToggle={() => {
-                          setTracks(tracks.map(t =>
-                            t.id === track.id ? { ...t, isMuted: !t.isMuted } : t
-                          ));
-                        }}
-                        onTypeChange={(type) => {
-                          setTracks(tracks.map(t =>
-                            t.id === track.id ? { ...t, mode: type } : t
-                          ));
-                        }}
-                        onGenerate={() => {}}
-                        onDelete={() => handleDeleteTrack(track.id)}
-                        onDuplicate={() => handleDuplicateTrack(track.id)}
-                      />
-                    </div>
-                  ))}
-                </SortableContext>
-              </div>
-
-              <div className="flex items-end gap-2 bg-gradient-to-b from-konform-neon-blue/5 to-transparent p-4 rounded-lg border border-konform-neon-blue/10">
-                <SortableContext items={audioTracks.map(t => t.id)} strategy={horizontalListSortingStrategy}>
-                  {audioTracks.map((track) => (
-                    <div key={track.id} className={`flex-shrink-0 ${viewMode === 'large' ? 'w-96' : viewMode === 'normal' ? 'w-64' : 'w-48'}`}>
-                      <MixerChannel
-                        id={track.id}
-                        index={tracks.indexOf(track)}
-                        name={track.name}
-                        type={track.mode}
-                        volume={track.volume}
-                        isMuted={track.isMuted}
-                        onVolumeChange={(value) => {
-                          setTracks(tracks.map(t =>
-                            t.id === track.id ? { ...t, volume: value } : t
-                          ));
-                        }}
-                        onMuteToggle={() => {
-                          setTracks(tracks.map(t =>
-                            t.id === track.id ? { ...t, isMuted: !t.isMuted } : t
-                          ));
-                        }}
-                        onTypeChange={(type) => {
-                          setTracks(tracks.map(t =>
-                            t.id === track.id ? { ...t, mode: type } : t
-                          ));
-                        }}
-                        onGenerate={() => {}}
-                        onDelete={() => handleDeleteTrack(track.id)}
-                        onDuplicate={() => handleDuplicateTrack(track.id)}
-                      />
-                    </div>
-                  ))}
-                </SortableContext>
-                <div className="flex-shrink-0 w-24 flex items-center justify-center">
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    onClick={handleAddTrack}
-                    className="w-12 h-12 rounded-full bg-black/60 border border-konform-neon-blue/30 hover:border-konform-neon-blue text-konform-neon-blue hover:text-konform-neon-orange transition-colors"
-                  >
-                    <Plus className="w-6 h-6" />
-                  </Button>
-                </div>
+              {/* Render all tracks in the new mixer channel UI */}
+              {tracks.map((track, index) => renderMixerChannel(track, index))}
+              
+              <div className="flex-shrink-0 w-24 flex items-center justify-center">
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={handleAddTrack}
+                  className="w-12 h-12 rounded-full bg-black/60 border border-konform-neon-blue/30 hover:border-konform-neon-blue text-konform-neon-blue hover:text-konform-neon-orange transition-colors"
+                >
+                  <Plus className="w-6 h-6" />
+                </Button>
               </div>
             </div>
           </DndContext>

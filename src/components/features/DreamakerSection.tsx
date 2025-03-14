@@ -232,18 +232,51 @@ export const DreamakerSection = () => {
                     <li>Automated royalty collection and distribution</li>
                     <li>Strategic release planning and promotion tools</li>
                   </ul>
-                  <div 
-                    className="mt-6 rounded-lg w-full h-64 relative overflow-hidden"
-                    onMouseEnter={() => setIsHoveringEffect(true)}
-                    onMouseLeave={() => setIsHoveringEffect(false)}
-                  >
-                    <VideoBackground
-                      videoUrl="/Videos/KONFORM_01.mp4"
-                      isHovering={isHoveringEffect}
-                      continuePlayback={false}
-                      fallbackImage="/lovable-uploads/70852851-a2d2-4659-badc-968b9337a106.png"
-                      priority={true}
-                    />
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+                    {/* Global Distribution Card */}
+                    <div className="bg-black/40 rounded-xl p-6 border border-[#6366F1]/20 hover:border-[#6366F1]/40 transition-all group">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-lg bg-[#6366F1]/10 group-hover:bg-[#6366F1]/20 transition-all">
+                          <Disc3 className="w-5 h-5 text-[#6366F1]" />
+                        </div>
+                        <h4 className="text-xl font-semibold text-white">Global Reach</h4>
+                      </div>
+                      <p className="text-gray-400">Distribute your music to all major streaming platforms worldwide with just a few clicks.</p>
+                    </div>
+                  
+                    {/* Analytics Card */}
+                    <div className="bg-black/40 rounded-xl p-6 border border-[#6366F1]/20 hover:border-[#6366F1]/40 transition-all group">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-lg bg-[#6366F1]/10 group-hover:bg-[#6366F1]/20 transition-all">
+                          <RefreshCw className="w-5 h-5 text-[#6366F1]" />
+                        </div>
+                        <h4 className="text-xl font-semibold text-white">Real-time Analytics</h4>
+                      </div>
+                      <p className="text-gray-400">Track your music's performance with comprehensive analytics and insights in real-time.</p>
+                    </div>
+                  
+                    {/* Royalty Collection Card */}
+                    <div className="bg-black/40 rounded-xl p-6 border border-[#6366F1]/20 hover:border-[#6366F1]/40 transition-all group">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-lg bg-[#6366F1]/10 group-hover:bg-[#6366F1]/20 transition-all">
+                          <ShoppingBag className="w-5 h-5 text-[#6366F1]" />
+                        </div>
+                        <h4 className="text-xl font-semibold text-white">Royalty Collection</h4>
+                      </div>
+                      <p className="text-gray-400">Automated royalty collection ensures you get paid for every stream across all platforms.</p>
+                    </div>
+                  
+                    {/* Release Planning Card */}
+                    <div className="bg-black/40 rounded-xl p-6 border border-[#6366F1]/20 hover:border-[#6366F1]/40 transition-all group">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-lg bg-[#6366F1]/10 group-hover:bg-[#6366F1]/20 transition-all">
+                          <Settings className="w-5 h-5 text-[#6366F1]" />
+                        </div>
+                        <h4 className="text-xl font-semibold text-white">Strategic Planning</h4>
+                      </div>
+                      <p className="text-gray-400">Plan and promote your releases with powerful tools designed to maximize your music's impact.</p>
+                    </div>
                   </div>
                 </div>
               </div>
