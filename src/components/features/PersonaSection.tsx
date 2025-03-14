@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
 import { VideoBackground } from "@/components/dreamaker/VideoBackground";
 import { GenreGrid } from "./GenreGrid";
-import { Mic2, User, Image, FileText, Wand2 } from "lucide-react";
+import { Mic2, User, Image, FileText, Wand2, TrendingUp } from "lucide-react";
 
 export const PersonaSection = () => {
   const navigate = useNavigate();
@@ -123,21 +123,52 @@ export const PersonaSection = () => {
               <div className="p-6 bg-zinc-950 rounded-none w-full">
                 <div className="max-w-7xl mx-auto">
                   <h3 className="text-2xl font-bold mb-4 text-white">Character Development</h3>
-                  <p className="mb-4">Build rich, compelling personas with detailed backstories, unique personality traits, and artistic influences. Our character development system helps you create virtual artists that feel authentic and engaging.</p>
-                  <ul className="list-disc pl-6 space-y-2">
-                    <li>Craft detailed character histories, motivations, and artistic journeys</li>
-                    <li>Define unique personality characteristics that influence creative style</li>
-                    <li>Specify musical and artistic influences that shape your persona's output</li>
-                    <li>Create personas that grow and evolve over time based on interactions</li>
-                  </ul>
-                  <div className="mt-6 rounded-lg w-full h-64 relative overflow-hidden">
-                    <VideoBackground
-                      videoUrl="/Videos/Gen-3 Alpha 1425044134, Handsome country sin, image-prompt, M 5.mp4"
-                      isHovering={true}
-                      continuePlayback={true}
-                      fallbackImage="/lovable-uploads/c83df97a-619d-42c9-b61f-d26f2549e849.png"
-                      priority={true}
-                    />
+                  <p className="mb-8">Build rich, compelling personas with detailed backstories, unique personality traits, and artistic influences. Our character development system helps you create virtual artists that feel authentic and engaging.</p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {/* Character Image Card */}
+                    <div className="bg-black/40 rounded-xl p-6 border border-purple-500/20 hover:border-purple-500/40 transition-all">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-lg bg-purple-500/10">
+                          <Image className="w-5 h-5 text-purple-400" />
+                        </div>
+                        <h4 className="text-xl font-semibold text-white">Character Image</h4>
+                      </div>
+                      <p className="text-gray-400">Generate stunning, photorealistic avatars and visuals that capture your character's unique essence and style.</p>
+                    </div>
+
+                    {/* Character Voice Card */}
+                    <div className="bg-black/40 rounded-xl p-6 border border-purple-500/20 hover:border-purple-500/40 transition-all">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-lg bg-purple-500/10">
+                          <Mic2 className="w-5 h-5 text-purple-400" />
+                        </div>
+                        <h4 className="text-xl font-semibold text-white">Character Voice</h4>
+                      </div>
+                      <p className="text-gray-400">Define your character's unique vocal characteristics, from tone and timbre to emotional expression and delivery style.</p>
+                    </div>
+
+                    {/* Character Personality Card */}
+                    <div className="bg-black/40 rounded-xl p-6 border border-purple-500/20 hover:border-purple-500/40 transition-all">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-lg bg-purple-500/10">
+                          <User className="w-5 h-5 text-purple-400" />
+                        </div>
+                        <h4 className="text-xl font-semibold text-white">Character Personality</h4>
+                      </div>
+                      <p className="text-gray-400">Shape your character's traits, behaviors, and artistic influences to create a compelling and authentic persona.</p>
+                    </div>
+
+                    {/* Character Growth Card */}
+                    <div className="bg-black/40 rounded-xl p-6 border border-purple-500/20 hover:border-purple-500/40 transition-all">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-lg bg-purple-500/10">
+                          <TrendingUp className="w-5 h-5 text-purple-400" />
+                        </div>
+                        <h4 className="text-xl font-semibold text-white">Character Growth</h4>
+                      </div>
+                      <p className="text-gray-400">Watch your character evolve through interactions and experiences, developing a dynamic and engaging personality over time.</p>
+                    </div>
                   </div>
                 </div>
               </div>

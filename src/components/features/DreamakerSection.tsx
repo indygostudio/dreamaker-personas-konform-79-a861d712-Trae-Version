@@ -2,27 +2,13 @@ import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState, useRef, useEffect } from "react";
 import { VideoBackground } from "@/components/dreamaker/VideoBackground";
-import { Music, Users, ShoppingBag, Sparkles, Disc3 } from "lucide-react";
+import { Music, Users, ShoppingBag, Sparkles, Disc3, Brain, Settings, RefreshCw } from "lucide-react";
 
 export const DreamakerSection = () => {
   const navigate = useNavigate();
   const [isHoveringEffect, setIsHoveringEffect] = useState(false);
   const [activeTab, setActiveTab] = useState("ai-record-label");
   const videoRef = useRef<HTMLVideoElement | null>(null);
-
-  const handleMouseEnter = () => {
-    if (videoRef.current) {
-      videoRef.current.pause();
-    }
-  };
-
-  const handleMouseLeave = () => {
-    if (videoRef.current) {
-      videoRef.current.play().catch(error => {
-        console.error("Video playback error:", error);
-      });
-    }
-  };
   
   return (
     <div className="py-12 bg-black relative">
@@ -30,8 +16,6 @@ export const DreamakerSection = () => {
       <div 
         className="h-[40vh] relative overflow-hidden cursor-pointer" 
         onClick={() => navigate("/dreamaker")}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
       >
         {/* Background Video */}
         <div className="absolute inset-0">
@@ -106,25 +90,52 @@ export const DreamakerSection = () => {
               <div className="p-6 bg-zinc-950 rounded-none w-full">
                 <div className="max-w-7xl mx-auto">
                   <h3 className="text-2xl font-bold mb-4 text-white">AI Record Label</h3>
-                  <p className="mb-4">Dreamaker's human-centric AI Record Label revolutionizes music creation by putting you in control. Our adaptive platform learns from your creative choices, evolving with your artistic journey while providing cutting-edge AI technology that enhances your unique vision.</p>
-                  <ul className="list-disc pl-6 space-y-2">
-                    <li>Personalized AI models that learn and evolve with your creative style</li>
-                    <li>User-driven transformers that adapt to your artistic preferences</li>
-                    <li>Collaborative royalty sharing for AI-assisted creations</li>
-                    <li>Continuous model updates based on your creative decisions</li>
-                  </ul>
-                  <div 
-                    className="mt-6 rounded-lg w-full h-64 relative overflow-hidden"
-                    onMouseEnter={() => setIsHoveringEffect(true)}
-                    onMouseLeave={() => setIsHoveringEffect(false)}
-                  >
-                    <VideoBackground
-                      videoUrl="/Videos/DREAMAKER_01.mp4"
-                      isHovering={isHoveringEffect}
-                      continuePlayback={false}
-                      fallbackImage="/lovable-uploads/4ae2356f-5155-4bf0-81b7-259f38368f76.png"
-                      priority={true}
-                    />
+                  <p className="mb-8 text-gray-400">Dreamaker's human-centric AI Record Label revolutionizes music creation by putting you in control. Our adaptive platform learns from your creative choices, evolving with your artistic journey while providing cutting-edge AI technology that enhances your unique vision.</p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {/* Personalized AI Models Card */}
+                    <div className="bg-black/40 rounded-xl p-6 border border-[#6366F1]/20 hover:border-[#6366F1]/40 transition-all group">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-lg bg-[#6366F1]/10 group-hover:bg-[#6366F1]/20 transition-all">
+                          <Brain className="w-5 h-5 text-[#6366F1]" />
+                        </div>
+                        <h4 className="text-xl font-semibold text-white">Personalized AI</h4>
+                      </div>
+                      <p className="text-gray-400">AI models that learn and evolve with your creative style, adapting to your unique artistic vision and preferences.</p>
+                    </div>
+                  
+                    {/* User-driven Transformers Card */}
+                    <div className="bg-black/40 rounded-xl p-6 border border-[#6366F1]/20 hover:border-[#6366F1]/40 transition-all group">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-lg bg-[#6366F1]/10 group-hover:bg-[#6366F1]/20 transition-all">
+                          <Settings className="w-5 h-5 text-[#6366F1]" />
+                        </div>
+                        <h4 className="text-xl font-semibold text-white">Smart Control</h4>
+                      </div>
+                      <p className="text-gray-400">User-driven transformers that adapt to your artistic preferences, giving you complete control over the creative process.</p>
+                    </div>
+                  
+                    {/* Collaborative Royalty Card */}
+                    <div className="bg-black/40 rounded-xl p-6 border border-[#6366F1]/20 hover:border-[#6366F1]/40 transition-all group">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-lg bg-[#6366F1]/10 group-hover:bg-[#6366F1]/20 transition-all">
+                          <Users className="w-5 h-5 text-[#6366F1]" />
+                        </div>
+                        <h4 className="text-xl font-semibold text-white">Fair Royalties</h4>
+                      </div>
+                      <p className="text-gray-400">Collaborative royalty sharing system ensures fair compensation for all contributors in AI-assisted creations.</p>
+                    </div>
+                  
+                    {/* Continuous Updates Card */}
+                    <div className="bg-black/40 rounded-xl p-6 border border-[#6366F1]/20 hover:border-[#6366F1]/40 transition-all group">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-lg bg-[#6366F1]/10 group-hover:bg-[#6366F1]/20 transition-all">
+                          <RefreshCw className="w-5 h-5 text-[#6366F1]" />
+                        </div>
+                        <h4 className="text-xl font-semibold text-white">Always Learning</h4>
+                      </div>
+                      <p className="text-gray-400">Continuous model updates based on your creative decisions, ensuring your AI tools evolve with your artistry.</p>
+                    </div>
                   </div>
                 </div>
               </div>

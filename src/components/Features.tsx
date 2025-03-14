@@ -25,12 +25,11 @@ export const Features = () => {
         <div id="dreamaker-section">
           <DreamakerSection />
         </div>
-        <MarketplaceSection />
-        <div id="konform-section">
-          <KonformSection />
-        </div>
         <div id="personas-section">
           <PersonaSection />
+        </div>
+        <div id="konform-section">
+          <KonformSection />
         </div>
         
         {/* Pricing Section */}
