@@ -60,7 +60,7 @@ export const HeroBanner = ({
       case "collections":
         return "COLLECTIONS";
       case "media":
-        return "MEDIA COLLECTIONS";
+        return "MEDIA";
       default:
         return "DREAMAKER";
     }

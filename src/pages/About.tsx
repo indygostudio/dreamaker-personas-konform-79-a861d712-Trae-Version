@@ -3,9 +3,9 @@ import { motion } from "framer-motion";
 
 export const About = () => {
   return (
-    <div className="min-h-screen relative bg-black">
+    <div className="min-h-screen relative bg-black flex flex-col">
       {/* Video Background with gradient overlay */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0 w-full h-full">
         <VideoBackground
           videoUrl="/Videos/KONFORM_BG_04.mp4"
           isHovering={false}
@@ -18,7 +18,7 @@ export const About = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 py-24">
+      <div className="relative z-10 container mx-auto px-4 py-24 flex-grow">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

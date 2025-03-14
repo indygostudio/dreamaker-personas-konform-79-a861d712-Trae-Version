@@ -9,6 +9,7 @@ import { Mic, Music, Star, Clock, Check, Edit2, Save } from "lucide-react";
 import type { Persona } from "@/types/persona";
 import { useColorScheme } from "@/contexts/ColorSchemeContext";
 import { UseMutationResult } from "@tanstack/react-query";
+import { VideoBackground } from "@/components/persona/VideoBackground";
 
 interface AboutTabContentProps {
   persona: Persona;
@@ -81,9 +82,22 @@ export const AboutTabContent: React.FC<AboutTabContentProps> = ({
   };
 
   return (
-    <div className="text-white space-y-8">
+    <div className="text-white space-y-8 relative">
+      {/* Video Background with gradient overlay */}
+      <div className="absolute inset-0 z-0 rounded-lg overflow-hidden">
+        <VideoBackground
+          videoUrl="/Videos/Gen-3 Alpha 3612719966, digital face emerges, dreammakerstudio_htt, M 5.mp4"
+          isHovering={false}
+          continuePlayback={true}
+          reverseOnEnd={true}
+          autoPlay={true}
+          darkness={0.7}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-black/90" />
+      </div>
+      
       <div 
-        className="rounded-xl p-6 border border-opacity-20" 
+        className="rounded-xl p-6 border border-opacity-20 relative z-10" 
         style={sectionStyle}
       >
         <div className="flex justify-between items-center mb-4">
