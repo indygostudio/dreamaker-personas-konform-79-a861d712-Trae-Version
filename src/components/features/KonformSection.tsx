@@ -10,7 +10,7 @@ export const KonformSection = () => {
   const [isHoveringEffect, setIsHoveringEffect] = useState(false);
   
   return (
-    <div className="py-12 bg-black relative">
+    <div id="konform-section" className="py-12 bg-black relative konform-section-wrapper">
       {/* Video Banner Container */}
       <div className="h-[40vh] relative overflow-hidden cursor-pointer" onClick={() => navigate("/konform")}>
         {/* Background Video */}

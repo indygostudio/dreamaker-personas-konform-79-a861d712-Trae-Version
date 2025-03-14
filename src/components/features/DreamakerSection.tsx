@@ -11,7 +11,7 @@ export const DreamakerSection = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   
   return (
-    <div className="py-12 bg-black relative">
+    <div id="dreamaker-section" className="py-12 bg-black relative dreamaker-section-wrapper">
       {/* Video Banner Container */}
       <div 
         className="h-[40vh] relative overflow-hidden cursor-pointer" 

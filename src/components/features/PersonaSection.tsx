@@ -12,7 +12,7 @@ export const PersonaSection = () => {
   const [activeTab, setActiveTab] = useState("voice-cloning");
   
   return (
-    <div className="py-12 bg-black relative">
+    <div id="personas-section" className="py-12 bg-black relative personas-section-wrapper">
       {/* Video Banner Container */}
       <div className="h-[40vh] relative overflow-hidden cursor-pointer" onClick={() => navigate("/personas")}>
         {/* Background Video */}

@@ -1,0 +1,12 @@
+/* Section IDs for smooth scrolling */
+.dreamaker-section-wrapper {
+  scroll-margin-top: 80px; /* Adjust based on navbar height */
+}
+
+.konform-section-wrapper {
+  scroll-margin-top: 80px; /* Adjust based on navbar height */
+}
+
+.personas-section-wrapper {
+  scroll-margin-top: 80px; /* Adjust based on navbar height */
+}

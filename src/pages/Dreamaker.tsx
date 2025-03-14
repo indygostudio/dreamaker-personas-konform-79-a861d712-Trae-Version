@@ -7,8 +7,13 @@ import { PersonaSection } from "@/components/dreamaker/PersonaSection";
 import { CollaborationSection } from "@/components/dreamaker/CollaborationSection";
 import { MediaSection } from "@/components/dreamaker/MediaSection";
 import { HeroSection } from "@/components/persona/sections/HeroSection";
+import { useLocation } from "react-router-dom";
+import { User, Users, Share2, Image } from "lucide-react";
 
 export default function Dreamaker() {
+  const location = useLocation();
+  const activeTab = location.state?.activeTab || "profiles";
+  
   const { data: publicProfiles } = useQuery({
     queryKey: ["public-profiles"],
     queryFn: async () => {
@@ -27,7 +32,7 @@ export default function Dreamaker() {
       <HeroSection />
       
       <div className="container mx-auto px-4 py-8">
-        <Tabs defaultValue="profiles" className="w-full">
+        <Tabs defaultValue={activeTab} className="w-full">
           <TabsList className="bg-black/60 w-full grid grid-cols-4 mb-4">
             <TabsTrigger value="profiles" className="flex items-center gap-2 data-[state=active]:bg-dreamaker-purple">
               <User className="h-4 w-4" />

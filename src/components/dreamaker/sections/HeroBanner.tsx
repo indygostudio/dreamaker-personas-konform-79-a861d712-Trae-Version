@@ -57,6 +57,8 @@ export const HeroBanner = ({
         return "PERSONAS";
       case "collaborations":
         return "COLLABORATIONS";
+      case "collections":
+        return "COLLECTIONS";
       case "media":
         return "MEDIA COLLECTIONS";
       default:
@@ -92,9 +94,8 @@ export const HeroBanner = ({
   };
 
   const handleBannerClick = () => {
-    if (activeTab !== "personas") {
-      navigate("/dreamaker", { state: { activeTab: "personas" } });
-    }
+    // Only handle collapse functionality
+    onHeaderDoubleClick();
   };
 
   return (

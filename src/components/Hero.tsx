@@ -90,7 +90,15 @@ export const Hero = () => {
   };
 
   const handleSectionClick = (sectionId: string) => {
-    scrollToSection(sectionId);
+    // Special case for Personas section - navigate to Dreamaker page with personas tab
+    if (sectionId === "personas-section") {
+      navigate("/dreamaker", { state: { activeTab: "personas" } });
+    } else {
+      // For other sections, scroll on the current page
+      setTimeout(() => {
+        scrollToSection(sectionId, 20); // Add a small offset for better visual experience
+      }, 100);
+    }
   };
 
   return (
