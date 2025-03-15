@@ -14,13 +14,48 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RecentCollaborations } from "./components/RecentCollaborations";
 import { FavoriteCollaborations } from "./components/FavoriteCollaborations";
 import { CollectionsTab } from "./components/CollectionsTab";
-import { Star, Users, ChevronDown, ChevronUp, FolderOpen } from "lucide-react";
+import { Star, Users, ChevronDown, ChevronUp, FolderOpen, Save } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, horizontalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 interface ArtistPersonasProps {
   personas: Persona[];
   onPersonaSelect: (persona: Persona) => void;
 }
+
+interface TabItem {
+  id: string;
+  value: string;
+  label: string;
+  icon: React.ReactNode;
+}
+
+const SortableTab = ({ tab }: { tab: TabItem }) => {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: tab.id });
+  
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+  
+  return (
+    <TabsTrigger 
+      ref={setNodeRef}
+      value={tab.value}
+      className="flex items-center gap-1 text-xs h-6"
+      style={style}
+      {...attributes}
+      {...listeners}
+    >
+      {tab.icon}
+      <span>{tab.label}</span>
+    </TabsTrigger>
+  );
+};
 
 export const ArtistPersonas = ({
   personas,
@@ -61,6 +96,12 @@ export const ArtistPersonas = ({
   const [activeTab, setActiveTab] = useState("recent");
   // Changed this to start in the collapsed state
   const [isTabsCollapsed, setIsTabsCollapsed] = useState(true);
+  const [tabs, setTabs] = useState<TabItem[]>([
+    { id: 'recent', value: 'recent', label: 'Collaborations', icon: <Users className="h-3 w-3" /> },
+    { id: 'favorites', value: 'favorites', label: 'Favorites', icon: <Star className="h-3 w-3 text-yellow-400" /> },
+    { id: 'collections', value: 'collections', label: 'Collections', icon: <FolderOpen className="h-3 w-3 text-blue-400" /> },
+  ]);
+  const { toast } = useToast();
   
   const { showDropContainer } = useSelectedPersonasStore();
   
@@ -185,6 +226,64 @@ export const ArtistPersonas = ({
     }
   }, [collectionsData]);
 
+  // Load tabs order from localStorage on component mount
+  useEffect(() => {
+    const savedOrder = localStorage.getItem('artist-profile-tabs-order');
+    if (savedOrder) {
+      try {
+        const orderIds = JSON.parse(savedOrder);
+        // Reorder tabs based on saved order
+        const newTabs = [...tabs];
+        const orderedTabs: TabItem[] = [];
+        
+        // First add tabs in the saved order
+        orderIds.forEach(id => {
+          const tab = newTabs.find(t => t.id === id);
+          if (tab) orderedTabs.push(tab);
+        });
+        
+        // Then add any new tabs that weren't in the saved order
+        newTabs.forEach(tab => {
+          if (!orderIds.includes(tab.id)) orderedTabs.push(tab);
+        });
+        
+        setTabs(orderedTabs);
+      } catch (error) {
+        console.error('Error loading saved tab order:', error);
+      }
+    }
+  }, []);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    
+    if (active.id !== over.id) {
+      setTabs((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
+
+  // Save tabs order to localStorage
+  const saveTabsOrder = () => {
+    localStorage.setItem('artist-profile-tabs-order', JSON.stringify(tabs.map(tab => tab.id)));
+    toast({
+      title: "Tab order saved",
+      description: "Your current tab arrangement will be applied next time",
+      variant: "default"
+    });
+  };
+
   const handleClearFilters = () => {
     setSearchQuery("");
     setSortBy("newest");
@@ -236,20 +335,34 @@ export const ArtistPersonas = ({
           <CollapsibleContent>
             <Tabs defaultValue="recent" value={activeTab} onValueChange={setActiveTab} className="w-full">
               <div className="px-3 pb-1 pt-2">
-                <TabsList className="bg-black/40 h-8">
-                  <TabsTrigger value="recent" className="flex items-center gap-1 text-xs h-6">
-                    <Users className="h-3 w-3" />
-                    <span>Collaborations</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="favorites" className="flex items-center gap-1 text-xs h-6">
-                    <Star className="h-3 w-3 text-yellow-400" />
-                    <span>Favorites</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="collections" className="flex items-center gap-1 text-xs h-6">
-                    <FolderOpen className="h-3 w-3 text-blue-400" />
-                    <span>Collections</span>
-                  </TabsTrigger>
-                </TabsList>
+                <div className="flex justify-between items-center">
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <TabsList className="bg-black/40 h-8">
+                      <SortableContext 
+                        items={tabs.map(tab => tab.id)}
+                        strategy={horizontalListSortingStrategy}
+                      >
+                        {tabs.map((tab) => (
+                          <SortableTab key={tab.id} tab={tab} />
+                        ))}
+                      </SortableContext>
+                    </TabsList>
+                  </DndContext>
+                  
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="ml-2 bg-black/20 border-white/20 hover:bg-black/40 text-white rounded-full h-6 w-6 p-0"
+                    onClick={saveTabsOrder}
+                    title="Save current tab arrangement"
+                  >
+                    <Save className="w-3 h-3" />
+                  </Button>
+                </div>
               </div>
               
               <TabsContent value="recent" className="px-3 pb-2 pt-1">

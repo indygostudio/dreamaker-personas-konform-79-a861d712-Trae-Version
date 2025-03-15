@@ -17,4 +17,6 @@ export interface Track {
   collaborators?: string[];
   mixer?: string;
   is_loop?: boolean;
+  trim_start?: number; // Start time in seconds for trimmed playback
+  trim_end?: number; // End time in seconds for trimmed playback
 }

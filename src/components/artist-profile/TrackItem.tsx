@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { GripVertical, Image } from "lucide-react";
+import { GripVertical, Image, Scissors } from "lucide-react";
 import type { Track } from "@/types/track";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";

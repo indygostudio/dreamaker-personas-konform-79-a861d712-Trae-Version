@@ -322,7 +322,7 @@ export function AudioUploadSection({
   };
   
   const handleSaveTrim = () => {
-    if (audioUrl && trimPoints.start !== 0 || trimPoints.end !== 100) {
+    if (audioUrl && (trimPoints.start !== 0 || trimPoints.end !== 100)) {
       // Convert percentage to seconds
       const startTime = (trimPoints.start / 100) * audioDuration;
       const endTime = (trimPoints.end / 100) * audioDuration;
@@ -333,7 +333,11 @@ export function AudioUploadSection({
         end: endTime
       });
       
-      toast.success("Audio trim points saved");
+      // Calculate duration of trimmed section
+      const trimmedDuration = endTime - startTime;
+      const formattedDuration = formatDuration(trimmedDuration);
+      
+      toast.success(`Preview set to ${formattedDuration} section`);
       setIsTrimming(false);
     }
   };
@@ -457,6 +461,17 @@ export function AudioUploadSection({
                     onPlayPause={handlePlayPause}
                     onTimeUpdate={handleTimeUpdate}
                     onLoad={handleLoad}
+                    enableRegionSelection={true}
+                    trimStartPercentage={trimPoints.start}
+                    trimEndPercentage={trimPoints.end}
+                    onRegionUpdate={(region) => {
+                      // Convert seconds to percentages
+                      if (audioDuration > 0) {
+                        const startPercent = (region.start / audioDuration) * 100;
+                        const endPercent = (region.end / audioDuration) * 100;
+                        handleTrimChange([startPercent, endPercent]);
+                      }
+                    }}
                   />
                   
                   {/* Trim markers overlay */}

@@ -143,7 +143,7 @@ export const AudioSection = ({ persona, selectedModel }: AudioSectionProps) => {
     enabled: !!selectedPlaylistId
   });
 
-  const handleAudioSuccess = async (url: string) => {
+  const handleAudioSuccess = async (url: string, trimData?: { start: number; end: number }) => {
     if (!persona?.id || !selectedPlaylistId) return;
 
     try {
@@ -154,7 +154,9 @@ export const AudioSection = ({ persona, selectedModel }: AudioSectionProps) => {
           audio_url: url,
           playlist_id: selectedPlaylistId,
           is_public: true,
-          order_index: tracks.length
+          order_index: tracks.length,
+          trim_start: trimData?.start,
+          trim_end: trimData?.end
         });
 
       if (error) throw error;
@@ -691,6 +693,8 @@ export const AudioSection = ({ persona, selectedModel }: AudioSectionProps) => {
             setCurrentTrack(track);
             setIsPlaying(true);
           }}
+          trimStart={currentTrack.trim_start}
+          trimEnd={currentTrack.trim_end}
         />
       )}
 

@@ -14,6 +14,8 @@ interface EnhancedMusicPlayerProps {
   audioRef: RefObject<HTMLAudioElement | null>;
   isAudioReady?: boolean;
   closeTransport?: () => void;
+  trimStart?: number; // Start time in seconds for trimmed playback
+  trimEnd?: number; // End time in seconds for trimmed playback
 }
 
 export const EnhancedMusicPlayer = ({
@@ -24,7 +26,9 @@ export const EnhancedMusicPlayer = ({
   artistName = 'Unknown Artist',
   audioRef,
   isAudioReady = false,
-  closeTransport
+  closeTransport,
+  trimStart,
+  trimEnd
 }: EnhancedMusicPlayerProps) => {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -182,6 +186,7 @@ export const EnhancedMusicPlayer = ({
               currentTime={currentTime}
               duration={duration}
               disableAudio={true}
+              initialRegion={trimStart !== undefined && trimEnd !== undefined ? { start: trimStart, end: trimEnd } : undefined}
             />
           </div>
         ) : (

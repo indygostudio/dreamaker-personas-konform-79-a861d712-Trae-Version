@@ -25,7 +25,9 @@ export const EditTrackDialog = ({ isOpen, onOpenChange, track, onTrackUpdated }:
     title: track.title,
     writers: track.writers?.join(", ") || "",
     collaborators: track.collaborators?.join(", ") || "",
-    mixer: track.mixer || ""
+    mixer: track.mixer || "",
+    trim_start: track.trim_start,
+    trim_end: track.trim_end
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -36,7 +38,9 @@ export const EditTrackDialog = ({ isOpen, onOpenChange, track, onTrackUpdated }:
         title: track.title,
         writers: track.writers?.join(", ") || "",
         collaborators: track.collaborators?.join(", ") || "",
-        mixer: track.mixer || ""
+        mixer: track.mixer || "",
+        trim_start: track.trim_start,
+        trim_end: track.trim_end
       });
     }
   }, [isOpen, track]);
@@ -59,7 +63,9 @@ export const EditTrackDialog = ({ isOpen, onOpenChange, track, onTrackUpdated }:
         title: trackData.title,
         writers: trackData.writers ? trackData.writers.split(",").map(w => w.trim()).filter(Boolean) : [],
         collaborators: trackData.collaborators ? trackData.collaborators.split(",").map(c => c.trim()).filter(Boolean) : [],
-        mixer: trackData.mixer.trim() || null
+        mixer: trackData.mixer.trim() || null,
+        trim_start: trackData.trim_start,
+        trim_end: trackData.trim_end
       };
       
       console.log("Updating track with data:", updatedTrackData);

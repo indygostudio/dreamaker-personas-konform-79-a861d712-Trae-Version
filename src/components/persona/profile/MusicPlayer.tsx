@@ -22,6 +22,8 @@ interface MusicPlayerProps {
   setIsShuffled: (isShuffled: boolean) => void;
   setIsLooping: (isLooping: boolean) => void;
   onTrackSelect: (track: Track) => void;
+  trimStart?: number; // Start time in seconds for trimmed playback
+  trimEnd?: number; // End time in seconds for trimmed playback
 }
 
 export const MusicPlayer = ({

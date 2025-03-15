@@ -8,7 +8,9 @@ interface MusicPlayerProps {
   onPlayPause: () => void;
   trackTitle?: string;
   artistName?: string;
-  onTransportClose?: () => void; // New callback prop for notifying parent
+  onTransportClose?: () => void; // Callback prop for notifying parent
+  trimStart?: number; // Start time in seconds for trimmed playback
+  trimEnd?: number; // End time in seconds for trimmed playback
 }
 
 export const MusicPlayer = ({ 
@@ -17,7 +19,9 @@ export const MusicPlayer = ({
   onPlayPause,
   trackTitle,
   artistName,
-  onTransportClose
+  onTransportClose,
+  trimStart,
+  trimEnd
 }: MusicPlayerProps) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isAudioReady, setIsAudioReady] = useState(false);
@@ -70,9 +74,34 @@ export const MusicPlayer = ({
     };
   }, [audioUrl, onPlayPause]);
   
-  // Handle play/pause state changes
+  // Handle trim end point for playback
+  useEffect(() => {
+    if (!audioRef.current || !isAudioReady || trimEnd === undefined) return;
+    
+    const handleTimeUpdate = () => {
+      if (audioRef.current && trimEnd !== undefined && audioRef.current.currentTime >= trimEnd) {
+        audioRef.current.pause();
+        onPlayPause(); // Toggle playback state
+      }
+    };
+    
+    audioRef.current.addEventListener('timeupdate', handleTimeUpdate);
+    
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.removeEventListener('timeupdate', handleTimeUpdate);
+      }
+    };
+  }, [trimEnd, isAudioReady, onPlayPause]);
+  
+  // Handle play/pause state changes and trim points
   useEffect(() => {
     if (!audioRef.current || !isAudioReady) return;
+    
+    // Set trim points if provided
+    if (trimStart !== undefined && audioRef.current) {
+      audioRef.current.currentTime = trimStart;
+    }
     
     const playAudio = async () => {
       if (isPlaying) {
@@ -90,7 +119,7 @@ export const MusicPlayer = ({
     };
     
     playAudio();
-  }, [isPlaying, isAudioReady, onPlayPause]);
+  }, [isPlaying, isAudioReady, onPlayPause, trimStart]);
   
   // Set up auto-hide functionality
   useEffect(() => {
@@ -192,6 +221,8 @@ export const MusicPlayer = ({
       audioRef={audioRef}
       isAudioReady={isAudioReady}
       closeTransport={closeTransport}
+      trimStart={trimStart}
+      trimEnd={trimEnd}
     />
   );
 };

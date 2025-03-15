@@ -1,6 +1,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import WaveSurfer from 'wavesurfer.js';
+import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions';
 
 interface WaveformPlayerProps {
   audioUrl: string;
@@ -12,6 +13,12 @@ interface WaveformPlayerProps {
   duration?: number;
   // Flag to indicate if we should disable audio in WaveSurfer
   disableAudio?: boolean;
+  // Region selection props
+  enableRegionSelection?: boolean;
+  initialRegion?: { start: number; end: number };
+  onRegionUpdate?: (region: { start: number; end: number }) => void;
+  trimStartPercentage?: number;
+  trimEndPercentage?: number;
 }
 
 export const WaveformPlayer = ({ 
@@ -22,10 +29,17 @@ export const WaveformPlayer = ({
   onLoad,
   currentTime,
   duration,
-  disableAudio = true // Default to true to prevent double audio playback
+  disableAudio = true, // Default to true to prevent double audio playback
+  enableRegionSelection = false,
+  initialRegion,
+  onRegionUpdate,
+  trimStartPercentage,
+  trimEndPercentage
 }: WaveformPlayerProps) => {
   const waveformRef = useRef<HTMLDivElement>(null);
   const wavesurfer = useRef<WaveSurfer | null>(null);
+  const regionsPlugin = useRef<any>(null);
+  const activeRegion = useRef<any>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const isSyncingRef = useRef(false);
 
@@ -38,6 +52,15 @@ export const WaveformPlayer = ({
       }
 
       try {
+        // Initialize plugins array
+        const plugins = [];
+        
+        // Add regions plugin if region selection is enabled
+        if (enableRegionSelection) {
+          regionsPlugin.current = RegionsPlugin.create();
+          plugins.push(regionsPlugin.current);
+        }
+        
         const ws = WaveSurfer.create({
           container: waveformRef.current!,
           waveColor: '#6366f1',
@@ -53,7 +76,8 @@ export const WaveformPlayer = ({
           hideScrollbar: true,
           interact: true,
           // Disable audio output from WaveSurfer to prevent double playback
-          media: disableAudio ? { volume: 0 } : undefined
+          media: disableAudio ? { volume: 0 } : undefined,
+          plugins: plugins
         });
 
         wavesurfer.current = ws;
@@ -61,6 +85,50 @@ export const WaveformPlayer = ({
         ws.on('ready', () => {
           console.log('WaveSurfer is ready');
           setIsInitialized(true);
+          
+          // Create region if region selection is enabled
+          if (enableRegionSelection && regionsPlugin.current) {
+            // Clear any existing regions
+            regionsPlugin.current.getRegions().forEach((region: any) => {
+              region.remove();
+            });
+            
+            // Calculate region start and end positions
+            const wsRegion = {
+              start: 0,
+              end: ws.getDuration()
+            };
+            
+            // If we have trim points as percentages, convert them to seconds
+            if (trimStartPercentage !== undefined && trimEndPercentage !== undefined) {
+              wsRegion.start = (trimStartPercentage / 100) * ws.getDuration();
+              wsRegion.end = (trimEndPercentage / 100) * ws.getDuration();
+            }
+            // If we have an initial region, use that
+            else if (initialRegion) {
+              wsRegion.start = initialRegion.start;
+              wsRegion.end = initialRegion.end;
+            }
+            
+            // Create the region
+            activeRegion.current = regionsPlugin.current.addRegion({
+              ...wsRegion,
+              color: 'rgba(0, 209, 255, 0.2)',
+              drag: true,
+              resize: true
+            });
+            
+            // Set up region update event handlers
+            activeRegion.current.on('update-end', () => {
+              if (onRegionUpdate && activeRegion.current) {
+                onRegionUpdate({
+                  start: activeRegion.current.start,
+                  end: activeRegion.current.end
+                });
+              }
+            });
+          }
+          
           if (onLoad) onLoad();
         });
 
@@ -92,6 +160,15 @@ export const WaveformPlayer = ({
     initWavesurfer();
 
     return () => {
+      // Clean up regions first if they exist
+      if (regionsPlugin.current) {
+        regionsPlugin.current.getRegions().forEach((region: any) => {
+          region.remove();
+        });
+        activeRegion.current = null;
+      }
+      
+      // Then destroy wavesurfer
       if (wavesurfer.current) {
         wavesurfer.current.destroy();
         wavesurfer.current = null;
