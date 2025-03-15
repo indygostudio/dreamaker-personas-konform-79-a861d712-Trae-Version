@@ -1,9 +1,9 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Laptop2, Settings, Music2, Wand2, Layers, Grid3x3, FileText, Sliders, Mic, Database } from "lucide-react";
+import { Laptop2, Settings, Music2, Wand2, Layers, Grid3x3, FileText, Sliders, Mic, Database, Save } from "lucide-react";
 import { KeybaseView } from "../views/KeybaseView";
 import { TrackEditor } from "./TrackEditor";
 import { DrumPadView } from "../DrumPadView";
@@ -14,6 +14,7 @@ import { SupabaseView } from "../views/SupabaseView";
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, horizontalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { useToast } from "@/hooks/use-toast";
 
 const SortableTab = ({ tab }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: tab.id });
@@ -39,8 +40,9 @@ const SortableTab = ({ tab }) => {
 };
 
 export const EditorTabs = () => {
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("trackEditor");
-  const [tabs, setTabs] = useState([
+  const [tabs, setTabs] = useState([    
     { id: 'trackEditor', value: 'trackEditor', label: 'Songbase', icon: <Wand2 className="h-4 w-4 mr-2" /> },
     { id: 'sampler', value: 'sampler', label: 'Keybase', icon: <Layers className="h-4 w-4 mr-2" /> },
     { id: 'drumpad', value: 'drumpad', label: 'Drumbase', icon: <Grid3x3 className="h-4 w-4 mr-2" /> },
@@ -49,6 +51,44 @@ export const EditorTabs = () => {
     { id: 'supabase', value: 'supabase', label: 'Subase', icon: <Database className="h-4 w-4 mr-2" /> },
     { id: 'voxbase', value: 'voxbase', label: 'Voxbase', icon: <Mic className="h-4 w-4 mr-2" /> },
   ]);
+
+  // Save tabs order to localStorage
+  const saveTabsOrder = () => {
+    localStorage.setItem('konform-tabs-order', JSON.stringify(tabs.map(tab => tab.id)));
+    toast({
+      title: "Tab order saved",
+      description: "Your current tab arrangement will be applied next time",
+      variant: "default"
+    });
+  };
+
+  // Load tabs order from localStorage on component mount
+  useEffect(() => {
+    const savedOrder = localStorage.getItem('konform-tabs-order');
+    if (savedOrder) {
+      try {
+        const orderIds = JSON.parse(savedOrder);
+        // Reorder tabs based on saved order
+        const newTabs = [...tabs];
+        const orderedTabs = [];
+        
+        // First add tabs in the saved order
+        orderIds.forEach(id => {
+          const tab = newTabs.find(t => t.id === id);
+          if (tab) orderedTabs.push(tab);
+        });
+        
+        // Then add any new tabs that weren't in the saved order
+        newTabs.forEach(tab => {
+          if (!orderIds.includes(tab.id)) orderedTabs.push(tab);
+        });
+        
+        setTabs(orderedTabs);
+      } catch (error) {
+        console.error('Error loading saved tab order:', error);
+      }
+    }
+  }, []);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -73,22 +113,34 @@ export const EditorTabs = () => {
   return (
     <div className="w-full h-[calc(100vh-120px)] bg-black/40 rounded-lg flex flex-col">
       <Tabs defaultValue="trackEditor" value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <TabsList className="flex justify-start items-center px-4 pt-2 bg-transparent gap-2 border-b border-konform-neon-blue/20">
-            <SortableContext 
-              items={tabs.map(tab => tab.id)}
-              strategy={horizontalListSortingStrategy}
-            >
-              {tabs.map((tab) => (
-                <SortableTab key={tab.id} tab={tab} />
-              ))}
-            </SortableContext>
-          </TabsList>
-        </DndContext>
+        <div className="flex justify-between items-center px-4 pt-2 bg-transparent border-b border-konform-neon-blue/20">
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <TabsList className="flex justify-start items-center gap-2 bg-transparent">
+              <SortableContext 
+                items={tabs.map(tab => tab.id)}
+                strategy={horizontalListSortingStrategy}
+              >
+                {tabs.map((tab) => (
+                  <SortableTab key={tab.id} tab={tab} />
+                ))}
+              </SortableContext>
+            </TabsList>
+          </DndContext>
+          
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="ml-2 bg-black/20 border-white/20 hover:bg-black/40 text-white rounded-full"
+            onClick={saveTabsOrder}
+            title="Save current tab arrangement"
+          >
+            <Save className="w-4 h-4" />
+          </Button>
+        </div>
 
         <TabsContent value="trackEditor" className="flex-1 p-0 m-0">
           <TrackEditor />

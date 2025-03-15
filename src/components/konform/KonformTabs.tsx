@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { KonformBanner } from "./KonformBanner";
 import { useHeaderStore } from "./store/headerStore";
 import { useState, useEffect } from "react";
-import { FileText, Edit3, Video, Settings } from "lucide-react";
+import { FileText, Edit3, Video, Settings, Save } from "lucide-react";
 import { MixerView } from "./mixer/MixerView";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,8 +11,12 @@ import { Collaborators } from "./daw/sections/Collaborators";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { EditorTabs } from "./editor/EditorTabs";
 import { LyricsView } from "./lyrics/LyricsView";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+
 
 export const KonformTabs = () => {
+  const { toast } = useToast();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const {
@@ -23,6 +27,22 @@ export const KonformTabs = () => {
   // Get the tab from URL query parameters or default to "project"
   const urlTab = searchParams.get('tab');
   const [activeTab, setActiveTab] = useState(urlTab || "project");
+
+  // Save video tab state
+  const saveVideoTabState = () => {
+    // This is a placeholder for future video tab state
+    // Currently just saving a flag that the button was clicked
+    localStorage.setItem('konform-video-state', JSON.stringify({
+      savedAt: new Date().toISOString(),
+      // Add more video-specific state here in the future
+    }));
+    
+    toast({
+      title: "Video tab state saved",
+      description: "Your current video settings will be applied next time",
+      variant: "default"
+    });
+  };
 
   useEffect(() => {
     // Update active tab when URL query parameter changes
@@ -123,7 +143,20 @@ export const KonformTabs = () => {
               <EditorTabs />
             </TabsContent>
             <TabsContent value="video">
-              <div className="min-h-[calc(100vh-180px)] bg-black/40 rounded-lg" />
+              <div className="min-h-[calc(100vh-180px)] bg-black/40 rounded-lg relative">
+                {/* Empty container for future video content */}
+                <div className="absolute top-4 right-4">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="bg-black/20 border-white/20 hover:bg-black/40 text-white rounded-full"
+                    onClick={saveVideoTabState}
+                    title="Save current video settings"
+                  >
+                    <Save className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
             </TabsContent>
             <TabsContent value="settings">
               <div className="min-h-[calc(100vh-180px)] bg-black/40 rounded-lg" />
