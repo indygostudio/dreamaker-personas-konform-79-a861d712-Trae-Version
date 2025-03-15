@@ -1,4 +1,4 @@
-
+are 
 import { CollapsibleSection } from "../daw/CollapsibleSection";
 import { ProjectInformation } from "../daw/sections/ProjectInformation";
 import { PluginSettings } from "../daw/sections/PluginSettings";
@@ -7,6 +7,7 @@ import { useState } from "react";
 export const ProjectView = () => {
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
     info: false,
+    timeline: false,
     parameters: false,
     plugins: false,
     routing: false

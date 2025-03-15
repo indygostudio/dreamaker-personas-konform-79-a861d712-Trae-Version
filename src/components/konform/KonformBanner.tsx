@@ -1,10 +1,16 @@
 
-import { ChevronDown, ChevronUp, Users } from "lucide-react";
+import { ChevronDown, ChevronUp, Users, Download, Save, Template } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { Collaborators } from "./daw/sections/Collaborators";
+import { PercentageSplits } from "./daw/sections/PercentageSplits";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { useBannerSectionsStore } from "./store/bannerSectionsStore";
+import { useKonformProject } from "@/hooks/useKonformProject";
+import { downloadProject, createProjectTemplate } from "@/utils/projectUtils";
+import { useToast } from "@/hooks/use-toast";
 
 interface KonformBannerProps {
   title: string;
@@ -23,6 +29,15 @@ export const KonformBanner = ({
   rightContent,
   latestSessionId,
 }: KonformBannerProps) => {
+  const { toast } = useToast();
+  const { currentProject } = useKonformProject();
+  const { 
+    collaboratorsCollapsed, 
+    percentageSplitsCollapsed,
+    setCollaboratorsCollapsed,
+    setPercentageSplitsCollapsed 
+  } = useBannerSectionsStore();
+  
   // Fetch latest session if not provided
   const { data: latestSession } = useQuery({
     queryKey: ['latest_collaboration_banner'],
@@ -95,7 +110,113 @@ export const KonformBanner = ({
         <div className={`flex-1 overflow-y-auto mt-6 transition-all duration-300 ${isCollapsed ? 'hidden' : 'block'}`}>
           {!isCollapsed && latestSession && (
             <div className="space-y-4">
-              <Collaborators sessionId={latestSession.id} />
+              {/* Project Actions */}
+              {currentProject && (
+                <div className="flex items-center justify-end gap-3 mb-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-black/20 border-white/20 hover:bg-black/40 text-white rounded-full"
+                    onClick={async () => {
+                      try {
+                        await downloadProject(currentProject);
+                        toast({
+                          title: "Project Downloaded",
+                          description: `Project ${currentProject.name} has been downloaded as a zip file.`
+                        });
+                      } catch (error) {
+                        console.error('Error downloading project:', error);
+                        toast({
+                          title: "Download Failed",
+                          description: "There was an error downloading the project.",
+                          variant: "destructive"
+                        });
+                      }
+                    }}
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download Project
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-black/20 border-white/20 hover:bg-black/40 text-white rounded-full"
+                    onClick={async () => {
+                      try {
+                        const template = await createProjectTemplate(currentProject);
+                        toast({
+                          title: "Template Created",
+                          description: `Template ${template.name} has been created successfully.`
+                        });
+                      } catch (error) {
+                        console.error('Error creating template:', error);
+                        toast({
+                          title: "Template Creation Failed",
+                          description: "There was an error creating the project template.",
+                          variant: "destructive"
+                        });
+                      }
+                    }}
+                  >
+                    <Save className="w-4 h-4 mr-2" />
+                    Create Template
+                  </Button>
+                </div>
+              )}
+              
+              {/* Collaborators Section */}
+              <Collapsible 
+                open={!collaboratorsCollapsed} 
+                onOpenChange={(open) => setCollaboratorsCollapsed(!open)}
+              >
+                <div className="bg-black/40 rounded-lg overflow-hidden">
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-konform-neon-blue/20">
+                    <h3 className="text-lg font-medium text-white flex items-center gap-2">
+                      <Users className="w-4 h-4" />
+                      Collaborators
+                    </h3>
+                    <CollapsibleTrigger asChild>
+                      <Button variant="ghost" size="sm" className="p-0 h-auto">
+                        {collaboratorsCollapsed ? (
+                          <ChevronDown className="h-5 w-5 text-gray-400" />
+                        ) : (
+                          <ChevronUp className="h-5 w-5 text-gray-400" />
+                        )}
+                      </Button>
+                    </CollapsibleTrigger>
+                  </div>
+                  <CollapsibleContent>
+                    <Collaborators sessionId={latestSession.id} />
+                  </CollapsibleContent>
+                </div>
+              </Collapsible>
+              
+              {/* Percentage Splits Section */}
+              <Collapsible 
+                open={!percentageSplitsCollapsed} 
+                onOpenChange={(open) => setPercentageSplitsCollapsed(!open)}
+              >
+                <div className="bg-black/40 rounded-lg overflow-hidden">
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-konform-neon-blue/20">
+                    <h3 className="text-lg font-medium text-white flex items-center gap-2">
+                      <Users className="w-4 h-4" />
+                      Percentage Splits
+                    </h3>
+                    <CollapsibleTrigger asChild>
+                      <Button variant="ghost" size="sm" className="p-0 h-auto">
+                        {percentageSplitsCollapsed ? (
+                          <ChevronDown className="h-5 w-5 text-gray-400" />
+                        ) : (
+                          <ChevronUp className="h-5 w-5 text-gray-400" />
+                        )}
+                      </Button>
+                    </CollapsibleTrigger>
+                  </div>
+                  <CollapsibleContent>
+                    <PercentageSplits sessionId={latestSession.id} />
+                  </CollapsibleContent>
+                </div>
+              </Collapsible>
             </div>
           )}
         </div>
