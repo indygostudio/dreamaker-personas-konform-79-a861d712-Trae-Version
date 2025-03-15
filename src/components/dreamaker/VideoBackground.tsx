@@ -120,11 +120,19 @@ export const VideoBackground = ({
       video.pause();
       setIsPlaying(false);
       
-      if (!continuePlayback) {
-        video.currentTime = 0;
-      }
+      // Don't reset to first frame - maintain position for next hover
     }
   }, [isHovering, videoUrl, continuePlayback, autoPlay]);
+  
+  // Ensure video pauses when component unmounts
+  useEffect(() => {
+    return () => {
+      const video = videoRef.current;
+      if (video) {
+        video.pause();
+      }
+    };
+  }, []);
 
   if (!videoUrl && !fallbackImage) {
     return <div className="w-full h-full bg-black" />;

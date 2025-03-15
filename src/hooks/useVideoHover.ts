@@ -75,9 +75,8 @@ export const useVideoHover = (options: UseVideoHoverOptions = {}) => {
       video.play().catch(console.error)
     } else {
       video.pause()
-      if (!continuePlayback) {
-        video.currentTime = 0
-      }
+      // Don't reset currentTime to 0 when mouse leaves
+      // This allows the video to resume from where it left off when hovered again
     }
   }, [isHovering, continuePlayback])
 
