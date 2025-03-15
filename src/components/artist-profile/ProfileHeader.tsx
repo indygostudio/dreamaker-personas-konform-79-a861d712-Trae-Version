@@ -57,9 +57,22 @@ export const ProfileHeader = ({
     setBannerUrl(newUrl);
   };
 
+  const handleMouseEnter = () => {
+    setIsHovering(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovering(false);
+  };
+
   return (
     <div className="w-full mt-16">
-      <div className={`relative transition-all duration-300 ${isHeaderExpanded ? 'h-[300px]' : 'h-[80px]'}`} onDoubleClick={handleDoubleClick}>
+      <div 
+        className={`relative transition-all duration-300 ${isHeaderExpanded ? 'h-[300px]' : 'h-[80px]'}`} 
+        onDoubleClick={handleDoubleClick}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
         <BannerContextMenu 
           personaId={id || ''}
           bannerUrl={bannerUrl}
@@ -73,6 +86,7 @@ export const ProfileHeader = ({
             position={bannerPosition} 
             darkness={persona.banner_darkness}
             priority={true}
+            continuePlayback={true}
           />
         </BannerContextMenu>
         

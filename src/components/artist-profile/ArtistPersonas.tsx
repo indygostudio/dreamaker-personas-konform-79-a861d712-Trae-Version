@@ -13,7 +13,8 @@ import { PersonaGrid } from "./components/PersonaGrid";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RecentCollaborations } from "./components/RecentCollaborations";
 import { FavoriteCollaborations } from "./components/FavoriteCollaborations";
-import { Star, Users, ChevronDown, ChevronUp } from "lucide-react";
+import { CollectionsTab } from "./components/CollectionsTab";
+import { Star, Users, ChevronDown, ChevronUp, FolderOpen } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface ArtistPersonasProps {
@@ -56,6 +57,7 @@ export const ArtistPersonas = ({
   const [isRecentCollabsOpen, setIsRecentCollabsOpen] = useState(!collapsedSectionSettings.recentCollaborations);
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(true);
   const [favoritePersonas, setFavoritePersonas] = useState<Persona[]>([]);
+  const [collections, setCollections] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState("recent");
   // Changed this to start in the collapsed state
   const [isTabsCollapsed, setIsTabsCollapsed] = useState(true);
@@ -107,6 +109,29 @@ export const ArtistPersonas = ({
     },
     enabled: !!id
   });
+  
+  // Fetch user's collections
+  const {
+    data: collectionsData = [],
+    refetch: refetchCollections
+  } = useQuery({
+    queryKey: ["user-collections", id],
+    queryFn: async () => {
+      if (!id) throw new Error("No artist ID provided");
+      const {
+        data,
+        error
+      } = await supabase
+        .from("media_collections")
+        .select("*")
+        .eq("user_id", id)
+        .order("created_at", { ascending: false });
+        
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!id
+  });
 
   const {
     data: favorites = [],
@@ -153,6 +178,12 @@ export const ArtistPersonas = ({
       setFavoritePersonas(favorites);
     }
   }, [favorites]);
+  
+  useEffect(() => {
+    if (collectionsData) {
+      setCollections(collectionsData);
+    }
+  }, [collectionsData]);
 
   const handleClearFilters = () => {
     setSearchQuery("");
@@ -214,6 +245,10 @@ export const ArtistPersonas = ({
                     <Star className="h-3 w-3 text-yellow-400" />
                     <span>Favorites</span>
                   </TabsTrigger>
+                  <TabsTrigger value="collections" className="flex items-center gap-1 text-xs h-6">
+                    <FolderOpen className="h-3 w-3 text-blue-400" />
+                    <span>Collections</span>
+                  </TabsTrigger>
                 </TabsList>
               </div>
               
@@ -229,6 +264,15 @@ export const ArtistPersonas = ({
               <TabsContent value="favorites" className="px-3 pb-2 pt-1">
                 <FavoriteCollaborations 
                   favoritePersonas={favoritePersonas} 
+                  isOpen={true} 
+                  onOpenChange={() => {}} 
+                  onPersonaSelect={onPersonaSelect} 
+                />
+              </TabsContent>
+              
+              <TabsContent value="collections" className="px-3 pb-2 pt-1">
+                <CollectionsTab 
+                  collections={collections} 
                   isOpen={true} 
                   onOpenChange={() => {}} 
                   onPersonaSelect={onPersonaSelect} 
@@ -258,6 +302,7 @@ export const ArtistPersonas = ({
           onRefetchCollaborations={() => {
             refetchCollaborations();
             refetchFavorites();
+            refetchCollections();
           }} 
         />}
       </div>

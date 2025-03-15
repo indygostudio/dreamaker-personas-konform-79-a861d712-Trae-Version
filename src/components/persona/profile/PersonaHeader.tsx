@@ -67,6 +67,7 @@ export const PersonaHeader = ({
             fallbackImage={persona.banner_url}
             position={bannerPosition}
             darkness={persona.banner_darkness}
+            continuePlayback={true}
           />
           
           {/* Dynamic gradient overlay */}
