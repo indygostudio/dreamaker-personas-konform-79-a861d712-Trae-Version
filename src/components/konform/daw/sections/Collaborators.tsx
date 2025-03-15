@@ -102,9 +102,16 @@ export const Collaborators = ({ sessionId }: { sessionId: string }) => {
 
   const handleClearCollaborators = async () => {
     try {
+      // Clear both personas and percentage splits
       const { error } = await supabase
         .from('collaboration_sessions')
-        .update({ personas: [] })
+        .update({ 
+          personas: [],
+          style_blend_settings: {
+            ...session?.style_blend_settings,
+            percentage_splits: {}
+          }
+        })
         .eq('id', sessionId);
 
       if (error) throw error;
@@ -112,10 +119,15 @@ export const Collaborators = ({ sessionId }: { sessionId: string }) => {
       await queryClient.invalidateQueries({
         queryKey: ['collaboration_session', sessionId]
       });
+      
+      // Also invalidate the percentage splits query
+      await queryClient.invalidateQueries({
+        queryKey: ['collaboration_session_splits', sessionId]
+      });
 
       toast({
         title: "Collaborators Cleared",
-        description: "All collaborators have been removed",
+        description: "All collaborators and percentage splits have been removed",
       });
     } catch (error) {
       console.error('Error clearing collaborators:', error);

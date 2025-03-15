@@ -3,6 +3,9 @@ import { Badge } from "@/components/ui/badge";
 import { VideoBackground } from "@/components/dreamaker/VideoBackground";
 import type { MediaCollection } from "@/types/media";
 import { MediaActionButtons } from "./MediaActionButtons";
+import { Button } from "@/components/ui/button";
+import { Share } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface MediaProfileHeaderProps {
   mediaCollection: MediaCollection;
@@ -74,6 +77,29 @@ export const MediaProfileHeader = ({ mediaCollection, isHovering, isPlaying, onP
       
       {/* Action Buttons Overlay */}
       <div className="absolute bottom-4 right-4 flex gap-2">
+        {/* Share Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="secondary" size="icon" className="bg-black/60 backdrop-blur-sm hover:bg-black/80">
+              <Share className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="bg-black/90 border-dreamaker-purple/20">
+            <DropdownMenuItem className="cursor-pointer hover:bg-dreamaker-purple/20">
+              Share to Twitter
+            </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer hover:bg-dreamaker-purple/20">
+              Share to Facebook
+            </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer hover:bg-dreamaker-purple/20">
+              Share to Instagram
+            </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer hover:bg-dreamaker-purple/20">
+              Copy Link
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        
         <MediaActionButtons 
           mediaCollection={mediaCollection}
           isPlaying={isPlaying}

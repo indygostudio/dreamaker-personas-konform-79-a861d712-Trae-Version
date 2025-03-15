@@ -5,6 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Search, Calendar } from "lucide-react";
+import { motion } from 'framer-motion';
+import { VideoBackground } from '@/components/dreamaker/VideoBackground';
+import { NavigationButton } from '@/components/persona/profile/header/NavigationButton';
 
 interface BlogPost {
   id: string;
@@ -93,19 +96,49 @@ const Blog = () => {
   });
 
   return (
-    <div className="min-h-screen bg-dreamaker-bg text-white">
+    <div className="min-h-screen bg-black text-white relative">
+      {/* Video Background with gradient overlay */}
+      <div className="absolute inset-0 z-0">
+        <VideoBackground
+          videoUrl="/Videos/KONFORM_BG_04.mp4"
+          isHovering={false}
+          continuePlayback={true}
+          reverseOnEnd={true}
+          autoPlay={true}
+          darkness={0.7}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-black/90" />
+      </div>
+      
       {/* Header Section */}
-      <div className="relative py-20 px-4 bg-gradient-to-b from-black to-dreamaker-bg">
+      <div className="relative z-10 py-20 px-4">
+        {/* Back Button */}
+        <div className="max-w-6xl mx-auto mb-6">
+          <NavigationButton />
+        </div>
+        
         <div className="max-w-6xl mx-auto text-center">
-          <h1 className="text-5xl font-bold mb-6">Blog</h1>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-5xl font-bold mb-6"
+          >
+            Blog
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-xl text-gray-300 max-w-3xl mx-auto"
+          >
             Insights, tutorials, and updates from the world of AI-powered music production
-          </p>
+          </motion.p>
         </div>
       </div>
 
       {/* Filters Section */}
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-12">
           <div className="relative w-full md:w-96">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />

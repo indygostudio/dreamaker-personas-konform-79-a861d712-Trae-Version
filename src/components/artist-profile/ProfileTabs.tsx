@@ -144,7 +144,7 @@ export const ProfileTabs = ({
               {/* Video Background with gradient overlay */}
               <div className="absolute inset-0 z-0 rounded-lg overflow-hidden">
                 <VideoBackground
-                  videoUrl="/Videos/KONFORM_BG_04.mp4"
+                  videoUrl={selectedPersona?.profile_video_url || "/Videos/KONFORM_BG_04.mp4"}
                   isHovering={false}
                   continuePlayback={true}
                   reverseOnEnd={true}

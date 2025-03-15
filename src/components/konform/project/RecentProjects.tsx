@@ -83,7 +83,18 @@ export const RecentProjects = () => {
                 <Button variant="outline" size="sm">
                   Open
                 </Button>
-                <Button variant="ghost" size="sm">
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  title="Download Project"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // Use the downloadProject function from the hook
+                    if (project) {
+                      downloadProject.mutate(project);
+                    }
+                  }}
+                >
                   <Download className="w-4 h-4" />
                 </Button>
               </div>
