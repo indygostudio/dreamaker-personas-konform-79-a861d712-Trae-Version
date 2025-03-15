@@ -123,7 +123,8 @@ export const VideoBackground = ({
         video.pause();
         setIsPlaying(false);
         
-        // Don't reset to beginning - maintain position for next hover
+        // Reset to beginning when mouse leaves
+        video.currentTime = 0;
       }
     }
   }, [videoUrl, isHovering, continuePlayback, reverseOnEnd, lastPlaybackRate, autoPlay]);

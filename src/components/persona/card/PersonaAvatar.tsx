@@ -68,8 +68,8 @@ export const PersonaAvatar = ({
       onRemove();
     } else if (name) {
       removePersona(name);
-      // Important: Also remove the wormhole animation for this persona
-      removeWormholeAnimation(name);
+      // The wormhole animation is now handled by the removePersona function
+      // to allow for the release animation to play
       toast.success(`Removed ${name} from project`);
     }
   };
