@@ -86,7 +86,7 @@ export const AboutTabContent: React.FC<AboutTabContentProps> = ({
       {/* Video Background with gradient overlay */}
       <div className="absolute inset-0 z-0 rounded-lg overflow-hidden">
         <VideoBackground
-          videoUrl="/Videos/Gen-3 Alpha 3612719966, digital face emerges, dreammakerstudio_htt, M 5.mp4"
+          videoUrl={persona.video_url || null}
           isHovering={false}
           continuePlayback={true}
           reverseOnEnd={true}
@@ -101,7 +101,7 @@ export const AboutTabContent: React.FC<AboutTabContentProps> = ({
         style={sectionStyle}
       >
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-2xl font-semibold" style={headingStyle}>Voice Overview</h3>
+          <h3 className="text-2xl font-semibold" style={headingStyle}>Personas Overview</h3>
           {isOwner && (
             isAboutEditing ? (
               <Button 
@@ -250,18 +250,79 @@ export const AboutTabContent: React.FC<AboutTabContentProps> = ({
         )}
       </div>
 
+      {/* New Owner and Stats Section */}
       <div 
-        className="rounded-xl p-6 border border-opacity-20" 
+        className="rounded-xl p-6 border border-opacity-20 relative z-10 mt-8" 
         style={sectionStyle}
       >
-        <h3 className="text-2xl font-semibold mb-4" style={headingStyle}>Perfect For</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {["Professional music production", "Commercial projects", "Cover songs", "Original compositions", "Demo recordings", "Backup vocals"].map(useCase => (
-            <div key={useCase} className="flex items-center space-x-2">
-              <Check className="w-5 h-5" style={iconStyle} />
-              <span style={{ color: colors.text + '90' }}>{useCase}</span>
+        <h3 className="text-2xl font-semibold mb-4" style={headingStyle}>Persona Owner & Statistics</h3>
+        
+        <div className="flex flex-col md:flex-row gap-6">
+          {/* Owner Information */}
+          <div className="flex-1 flex items-center space-x-4">
+            <div className="w-16 h-16 rounded-full overflow-hidden border-2" style={{ borderColor: colors.primary }}>
+              <img 
+                src={persona.creator_avatar_url || persona.avatar_url || '/placeholder.svg'} 
+                alt="Creator" 
+                className="w-full h-full object-cover"
+              />
             </div>
-          ))}
+            <div>
+              <h4 className="font-medium text-lg" style={textStyle}>Created by</h4>
+              <p className="text-xl font-semibold" style={{ color: colors.primary }}>
+                {persona.creator_name || 'Dreamaker AI'}
+              </p>
+              <p className="text-sm opacity-70" style={textStyle}>
+                {new Date(persona.created_at || Date.now()).toLocaleDateString('en-US', { 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}
+              </p>
+            </div>
+          </div>
+          
+          {/* Statistics */}
+          <div className="flex-1">
+            <h4 className="font-medium mb-3" style={textStyle}>Persona Statistics</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card className="border border-opacity-20" style={cardStyle}>
+                <CardContent className="p-4 flex items-center justify-between">
+                  <div>
+                    <h5 className="font-medium" style={textStyle}>Likes</h5>
+                    <p className="text-2xl font-bold" style={{ color: colors.primary }}>
+                      {persona.likes_count || 0}
+                    </p>
+                  </div>
+                  <Star className="w-8 h-8 opacity-20" style={iconStyle} />
+                </CardContent>
+              </Card>
+              
+              <Card className="border border-opacity-20" style={cardStyle}>
+                <CardContent className="p-4 flex items-center justify-between">
+                  <div>
+                    <h5 className="font-medium" style={textStyle}>Users</h5>
+                    <p className="text-2xl font-bold" style={{ color: colors.primary }}>
+                      {persona.user_count || 0}
+                    </p>
+                  </div>
+                  <Mic className="w-8 h-8 opacity-20" style={iconStyle} />
+                </CardContent>
+              </Card>
+              
+              <Card className="border border-opacity-20" style={cardStyle}>
+                <CardContent className="p-4 flex items-center justify-between">
+                  <div>
+                    <h5 className="font-medium" style={textStyle}>Followers</h5>
+                    <p className="text-2xl font-bold" style={{ color: colors.primary }}>
+                      {persona.followers_count || 0}
+                    </p>
+                  </div>
+                  <Music className="w-8 h-8 opacity-20" style={iconStyle} />
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </div>
       </div>
 
