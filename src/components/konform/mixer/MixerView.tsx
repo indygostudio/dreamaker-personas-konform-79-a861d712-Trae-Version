@@ -35,9 +35,10 @@ interface SortableChannelProps {
   onSelect: (id: string, multiSelect: boolean) => void;
   onDelete: () => void;
   onDuplicate: () => void;
+  viewMode?: 'large' | 'normal' | 'compact';
 }
 
-const SortableChannel = ({ channel, isSelected, onSelect, onDelete, onDuplicate }: SortableChannelProps) => {
+const SortableChannel = ({ channel, isSelected, onSelect, onDelete, onDuplicate, viewMode }: SortableChannelProps) => {
   const {
     attributes,
     listeners,
@@ -61,6 +62,7 @@ const SortableChannel = ({ channel, isSelected, onSelect, onDelete, onDuplicate 
         onDelete={onDelete}
         onDuplicate={onDuplicate}
         type={channel.type}
+        viewMode={viewMode}
       />
     </div>
   );
@@ -181,34 +183,6 @@ export const MixerView = () => {
 
   return (
     <div className="h-[calc(100vh-200px)] bg-black/40 rounded-lg p-4 flex flex-col">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <Button
-            variant={mixerViewMode === 'large' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setMixerViewMode('large')}
-            className="text-xs"
-          >
-            Large
-          </Button>
-          <Button
-            variant={mixerViewMode === 'normal' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setMixerViewMode('normal')}
-            className="text-xs"
-          >
-            Normal
-          </Button>
-          <Button
-            variant={mixerViewMode === 'compact' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setMixerViewMode('compact')}
-            className="text-xs"
-          >
-            Compact
-          </Button>
-        </div>
-      </div>
       <div className="mt-auto border-t border-konform-neon-blue/10 pt-4">
         <ScrollArea className="w-full" type="scroll" scrollHideDelay={0}>
           <DndContext 
@@ -217,6 +191,13 @@ export const MixerView = () => {
             onDragEnd={handleDragEnd}
           >
             <div className="flex gap-4 p-2 relative min-w-max">
+              {/* View Mode Buttons - Moved to left side */}
+              <div className="flex items-center justify-between mb-4">
+                {/* Removing the view mode buttons from here as they've been moved to the left side */}
+                <div className="flex items-center gap-2">
+                  {/* Empty div to maintain layout structure */}
+                </div>
+              </div>
               <div className="flex items-end gap-2 bg-gradient-to-b from-konform-neon-orange/5 to-transparent p-4 rounded-lg border border-konform-neon-orange/10">
                 <SortableContext 
                   items={masterChannels.map(c => c.id)}

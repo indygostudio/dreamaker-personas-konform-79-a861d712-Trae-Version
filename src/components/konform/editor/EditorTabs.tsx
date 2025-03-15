@@ -3,12 +3,14 @@ import { useState } from "react";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Laptop2, Settings, Music2, Wand2, Layers, Grid3x3, FileText, Sliders } from "lucide-react";
+import { Laptop2, Settings, Music2, Wand2, Layers, Grid3x3, FileText, Sliders, Mic, Database } from "lucide-react";
 import { KeybaseView } from "../views/KeybaseView";
 import { TrackEditor } from "./TrackEditor";
 import { DrumPadView } from "../DrumPadView";
 import { LyricbaseView } from "../views/LyricbaseView";
 import { MixabaseView } from "../views/MixabaseView";
+import { VoxbaseView } from "../views/VoxbaseView";
+import { SupabaseView } from "../views/SupabaseView";
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, horizontalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -44,6 +46,8 @@ export const EditorTabs = () => {
     { id: 'drumpad', value: 'drumpad', label: 'Drumbase', icon: <Grid3x3 className="h-4 w-4 mr-2" /> },
     { id: 'lyricbase', value: 'lyricbase', label: 'Lyricbase', icon: <FileText className="h-4 w-4 mr-2" /> },
     { id: 'mixabase', value: 'mixabase', label: 'Mixbase', icon: <Sliders className="h-4 w-4 mr-2" /> },
+    { id: 'supabase', value: 'supabase', label: 'Subase', icon: <Database className="h-4 w-4 mr-2" /> },
+    { id: 'voxbase', value: 'voxbase', label: 'Voxbase', icon: <Mic className="h-4 w-4 mr-2" /> },
   ]);
 
   const sensors = useSensors(
@@ -106,6 +110,14 @@ export const EditorTabs = () => {
 
         <TabsContent value="mixabase" className="flex-1 p-0 m-0">
           <MixabaseView />
+        </TabsContent>
+
+        <TabsContent value="supabase" className="flex-1 p-0 m-0">
+          <SupabaseView />
+        </TabsContent>
+
+        <TabsContent value="voxbase" className="flex-1 p-0 m-0">
+          <VoxbaseView />
         </TabsContent>
       </Tabs>
     </div>
