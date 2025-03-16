@@ -35,6 +35,11 @@ export function useFollows(userId: string) {
 
   const followMutation = useMutation({
     mutationFn: async (followingId: string) => {
+      // Check if userId is valid before attempting to follow
+      if (!userId) {
+        throw new Error("You must be logged in to follow users");
+      }
+
       const { error } = await supabase
         .from("user_follows")
         .insert({ follower_id: userId, following_id: followingId });
@@ -48,10 +53,23 @@ export function useFollows(userId: string) {
         description: "Successfully followed user",
       });
     },
+    onError: (error) => {
+      console.error("Follow error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to follow user. Please try again later.",
+        variant: "destructive",
+      });
+    },
   });
 
   const unfollowMutation = useMutation({
     mutationFn: async (followingId: string) => {
+      // Check if userId is valid before attempting to unfollow
+      if (!userId) {
+        throw new Error("You must be logged in to unfollow users");
+      }
+
       const { error } = await supabase
         .from("user_follows")
         .delete()
@@ -65,6 +83,14 @@ export function useFollows(userId: string) {
       toast({
         title: "Success",
         description: "Successfully unfollowed user",
+      });
+    },
+    onError: (error) => {
+      console.error("Unfollow error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to unfollow user. Please try again later.",
+        variant: "destructive",
       });
     },
   });
