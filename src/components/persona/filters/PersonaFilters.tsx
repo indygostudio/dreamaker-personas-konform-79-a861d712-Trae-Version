@@ -39,6 +39,7 @@ export function PersonaFilters({
     { label: "Vocalist", value: "AI_VOCALIST" },
     { label: "Instrumentalist", value: "AI_INSTRUMENTALIST" },
     { label: "Effect", value: "AI_EFFECT" },
+    { label: "Sound", value: "AI_SOUND" },
     { label: "Instrument", value: "AI_INSTRUMENT" },
     { label: "Mixer", value: "AI_MIXER" },
     { label: "Writer", value: "AI_WRITER" }
@@ -68,6 +69,26 @@ export function PersonaFilters({
           { label: "Classical", value: "Classical" },
           { label: "Hip Hop", value: "Hip Hop" },
           { label: "R&B", value: "R&B" },
+        ];
+      case "AI_SOUND":
+        return [
+          { label: "All Sounds", value: null },
+          { label: "Ambient", value: "Ambient" },
+          { label: "Bass", value: "Bass" },
+          { label: "Drums", value: "Drums" },
+          { label: "SFX", value: "SFX" },
+          { label: "Pads", value: "Pads" },
+          { label: "Strings", value: "Strings" },
+          { label: "Voice", value: "Voice" },
+          { label: "Percussion", value: "Percussion" },
+          { label: "Pianos", value: "Pianos" },
+          { label: "ELPiano", value: "ELPiano" },
+          { label: "Synth", value: "Synth" },
+          { label: "Brass", value: "Brass" },
+          { label: "Winds", value: "Winds" },
+          { label: "Harp", value: "Harp" },
+          { label: "Ethnic", value: "Ethnic" },
+          { label: "Pluck", value: "Pluck" },
         ];
       default:
         return [];

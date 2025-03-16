@@ -66,9 +66,23 @@ export function PersonaCard({
   const isInWormhole = wormholeAnimations.has(persona.name);
 
   useEffect(() => {
+    // Clean up previous audio element
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.removeEventListener("ended", () => setIsPlaying(false));
+      audioRef.current = null;
+    }
+    
+    // Create new audio element if URL is available
     if (persona.audio_preview_url) {
       audioRef.current = new Audio(persona.audio_preview_url);
       audioRef.current.addEventListener("ended", () => setIsPlaying(false));
+      
+      // Preload the audio metadata
+      audioRef.current.preload = "metadata";
+      
+      // Log successful audio initialization
+      console.log("Audio initialized with URL:", persona.audio_preview_url);
     }
 
     return () => {
@@ -87,6 +101,7 @@ export function PersonaCard({
       console.error("Error playing audio:", error);
     });
     setIsPlaying(true);
+    setShowTransport(true); // Show transport when hovering plays audio
   };
 
   const handleAudioButtonMouseLeave = () => {
@@ -95,15 +110,33 @@ export function PersonaCard({
     audioRef.current.pause();
     setIsPlaying(false);
   };
+  
+  const handleTransportClose = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    setIsPlaying(false);
+    setShowTransport(false); // Hide transport when closed
+  };
+
+  const [showTransport, setShowTransport] = useState(false);
 
   const handleAudioToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!persona.audio_preview_url || !audioRef.current) {
+    if (!persona.audio_preview_url) {
       toast({
         description: "This persona doesn't have an audio preview yet."
       });
       return;
     }
+    
+    // If audio element doesn't exist, create it
+    if (!audioRef.current) {
+      audioRef.current = new Audio(persona.audio_preview_url);
+      audioRef.current.addEventListener("ended", () => setIsPlaying(false));
+    }
+    
     if (isPlaying) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
@@ -117,6 +150,7 @@ export function PersonaCard({
         });
       });
       setIsPlaying(true);
+      setShowTransport(true); // Show transport when play is clicked
     }
   };
 
@@ -304,15 +338,16 @@ export function PersonaCard({
             </Button>
           )}
           
-          {/* Hidden music player for handling audio through the enhanced player */}
-          {persona.audio_preview_url && (
-            <div className="music-player-container">
+          {/* Transport UI that appears from the bottom when audio is playing */}
+          {persona.audio_preview_url && showTransport && (
+            <div className="fixed bottom-0 left-0 right-0 z-50">
               <MusicPlayer
                 audioUrl={persona.audio_preview_url}
                 isPlaying={isPlaying}
                 onPlayPause={() => setIsPlaying(!isPlaying)}
                 trackTitle={`${persona.name} Preview`}
                 artistName={persona.name}
+                onTransportClose={handleTransportClose}
               />
             </div>
           )}
