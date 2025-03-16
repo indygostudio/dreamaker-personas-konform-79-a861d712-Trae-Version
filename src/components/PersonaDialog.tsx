@@ -54,9 +54,7 @@ export const PersonaDialog = ({
         is_public: values.is_public,
         user_id: user.id, // Use the authenticated user's ID
         artist_profile_id: artistId,
-        audio_preview_url: values.audio_preview_url,
-        instrument: values.type === 'AI_INSTRUMENTALIST' ? values.subtype : null,
-        subtype: values.subtype
+        audio_preview_url: values.audio_preview_url
       };
 
       if (persona?.id) {

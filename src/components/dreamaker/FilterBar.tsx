@@ -8,8 +8,7 @@ import { toast } from "sonner";
 import { useUIStore } from "@/stores/uiStore";
 
 export type MediaType = 'loop' | 'midi' | 'plugin' | 'patch' | 'album';
-export type PersonaType = 'AI_CHARACTER' | 'AI_VOCALIST' | 'AI_INSTRUMENTALIST' | 'AI_EFFECT' | 'AI_SOUND' | 'AI_MIXER' | 'AI_WRITER';
-export type PersonaSubtype = string | null;
+export type PersonaType = 'AI_CHARACTER' | 'AI_VOCALIST' | 'AI_INSTRUMENTALIST' | 'AI_EFFECT' | 'AI_SOUND' | 'AI_MIXER';
 
 interface FilterBarProps {
   searchQuery: string;
@@ -22,8 +21,6 @@ interface FilterBarProps {
   activeTab: string;
   onTypeChange?: (type: string) => void;
   selectedType?: string;
-  onSubtypeChange?: (subtype: string) => void;
-  selectedSubtype?: string;
   onGenreChange?: (genre: string) => void;
   selectedGenre?: string;
   collapsedSections?: {
@@ -48,8 +45,6 @@ export const FilterBar = ({
   activeTab,
   onTypeChange,
   selectedType = "all",
-  onSubtypeChange,
-  selectedSubtype,
   onGenreChange,
   selectedGenre = "all",
   collapsedSections,
@@ -102,7 +97,6 @@ export const FilterBar = ({
       sortBy,
       searchQuery,
       selectedType,
-      selectedSubtype,
       selectedGenre,
     };
 
@@ -141,131 +135,27 @@ export const FilterBar = ({
     }
   };
 
-  const getSubtypeOptions = (type: string) => {
-    switch (type) {
-      case "AI_INSTRUMENTALIST":
-        return [
-          { label: "All Instruments", value: "all" },
-          { label: "Guitar", value: "Guitar" },
-          { label: "Bass", value: "Bass" },
-          { label: "Drums", value: "Drums" },
-          { label: "Piano", value: "Piano" },
-          { label: "Strings", value: "Strings" },
-          { label: "Brass", value: "Brass" },
-          { label: "Wind", value: "Wind" },
-          { label: "Synth", value: "Synth" },
-          { label: "Other", value: "Other" },
-        ];
-      case "AI_VOCALIST":
-        return [
-          { label: "All Styles", value: "all" },
-          { label: "Pop", value: "Pop" },
-          { label: "Rock", value: "Rock" },
-          { label: "Jazz", value: "Jazz" },
-          { label: "Classical", value: "Classical" },
-          { label: "Hip Hop", value: "Hip Hop" },
-          { label: "R&B", value: "R&B" },
-        ];
-      case "AI_CHARACTER":
-        return [
-          { label: "All Traits", value: "all" },
-          { label: "Confident", value: "Confident" },
-          { label: "Shy", value: "Shy" },
-          { label: "Energetic", value: "Energetic" },
-          { label: "Calm", value: "Calm" },
-          { label: "Mysterious", value: "Mysterious" },
-          { label: "Friendly", value: "Friendly" },
-          { label: "Serious", value: "Serious" },
-          { label: "Playful", value: "Playful" },
-        ];
-      case "AI_EFFECT":
-        return [
-          { label: "All Effects", value: "all" },
-          { label: "Reverb", value: "Reverb" },
-          { label: "Delay", value: "Delay" },
-          { label: "Echo", value: "Echo" },
-          { label: "Saturation", value: "Saturation" },
-          { label: "Chorus", value: "Chorus" },
-          { label: "Flanger", value: "Flanger" },
-          { label: "Phaser", value: "Phaser" },
-          { label: "Slicer", value: "Slicer" },
-          { label: "Multi", value: "Multi" },
-          { label: "EQ", value: "EQ" },
-          { label: "Compressor", value: "Compressor" },
-          { label: "Limiter", value: "Limiter" },
-        ];
-      case "AI_SOUND":
-        return [
-          { label: "All Sounds", value: "all" },
-          { label: "Ambient", value: "Ambient" },
-          { label: "Bass", value: "Bass" },
-          { label: "Drums", value: "Drums" },
-          { label: "SFX", value: "SFX" },
-          { label: "Pads", value: "Pads" },
-          { label: "Strings", value: "Strings" },
-          { label: "Voice", value: "Voice" },
-          { label: "Percussion", value: "Percussion" },
-          { label: "Pianos", value: "Pianos" },
-          { label: "ELPiano", value: "ELPiano" },
-          { label: "Synth", value: "Synth" },
-          { label: "Brass", value: "Brass" },
-          { label: "Winds", value: "Winds" },
-          { label: "Harp", value: "Harp" },
-          { label: "Ethnic", value: "Ethnic" },
-          { label: "Pluck", value: "Pluck" },
-        ];
-      default:
-        return [];
-    }
-  };
-
   const renderTypeFilter = () => {
     if (activeTab === 'personas') {
       return (
-        <div className="flex gap-2">
-          <Select value={selectedType} onValueChange={onTypeChange}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Persona Types</SelectLabel>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="AI_CHARACTER">Character</SelectItem>
-                <SelectItem value="AI_VOCALIST">Vocalist</SelectItem>
-                <SelectItem value="AI_INSTRUMENTALIST">Instrumentalist</SelectItem>
-                <SelectItem value="AI_EFFECT">Effect</SelectItem>
-                <SelectItem value="AI_SOUND">Sound</SelectItem>
-                <SelectItem value="AI_MIXER">Mixer</SelectItem>
-                <SelectItem value="AI_WRITER">Writer</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-          
-          {selectedType && selectedType !== "all" && getSubtypeOptions(selectedType).length > 0 && (
-            <Select value={selectedSubtype} onValueChange={onSubtypeChange}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select subtype" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>
-                    {selectedType === "AI_INSTRUMENTALIST" ? "Instruments" : 
-                     selectedType === "AI_VOCALIST" ? "Vocal Styles" : 
-                     selectedType === "AI_CHARACTER" ? "Character Traits" :
-                     selectedType === "AI_EFFECT" ? "Effect Types" :
-                     selectedType === "AI_SOUND" ? "Sound Types" : "Subtypes"}
-                  </SelectLabel>
-                  {getSubtypeOptions(selectedType).map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          )}
-        </div>
+        <Select value={selectedType} onValueChange={onTypeChange}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Persona Types</SelectLabel>
+              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="AI_CHARACTER">Character</SelectItem>
+              <SelectItem value="AI_VOCALIST">Vocalist</SelectItem>
+              <SelectItem value="AI_INSTRUMENTALIST">Instrumentalist</SelectItem>
+              <SelectItem value="AI_EFFECT">Effect</SelectItem>
+              <SelectItem value="AI_SOUND">Sound</SelectItem>
+              <SelectItem value="AI_MIXER">Mixer</SelectItem>
+              <SelectItem value="AI_WRITER">Writer</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
       );
     }
     if (activeTab === 'media') {

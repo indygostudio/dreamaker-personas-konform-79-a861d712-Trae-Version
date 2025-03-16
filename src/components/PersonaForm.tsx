@@ -49,7 +49,6 @@ const formSchema = z.object({
   voice_type: z.string().optional(),
   vocal_style: z.string().optional(),
   artist_category: z.string().optional(),
-  subtype: z.string().optional(),
   is_public: z.boolean().default(false),
   id: z.string().optional(),
 });
@@ -286,24 +285,9 @@ export function PersonaForm({ defaultValues, onSubmit, onCancel, isSubmitting = 
   };
 
   const handlePlayAudio = () => {
-    if (!audioPreviewUrl) {
-      toast.error("No audio preview available");
-      return;
-    }
+    if (!audioPreviewUrl) return;
     
-    // Create a new audio element
     const audio = new Audio(audioPreviewUrl);
-    
-    // Add error handling
-    audio.addEventListener("error", (error) => {
-      console.error("Error loading audio:", error);
-      toast.error("Failed to load audio preview");
-    });
-    
-    // Log the audio URL for debugging
-    console.log("Playing audio from URL:", audioPreviewUrl);
-    
-    // Play the audio with error handling
     audio.play().catch(error => {
       console.error("Error playing audio:", error);
       toast.error("Failed to play audio preview");
