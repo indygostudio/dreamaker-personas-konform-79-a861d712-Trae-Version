@@ -183,14 +183,24 @@ export const MixbaseView = () => {
               <Button
                 variant="outline"
                 size="sm"
-                className="text-xs h-6 w-6 border-konform-neon-blue/30 bg-black/60 hover:bg-black/80 hover:text-konform-neon-blue"
+                className={`text-xs h-6 w-6 border-konform-neon-blue/30 ${track.isMuted ? 'bg-konform-neon-blue text-black' : 'bg-black/60'} hover:bg-konform-neon-blue hover:text-black`}
+                onClick={() => {
+                  setTracks(tracks.map(t =>
+                    t.id === track.id ? { ...t, isMuted: !t.isMuted } : t
+                  ));
+                }}
               >
                 M
               </Button>
               <Button
                 variant="outline"
                 size="sm"
-                className="text-xs h-6 w-6 border-konform-neon-blue/30 bg-black/60 hover:bg-black/80 hover:text-konform-neon-blue"
+                className={`text-xs h-6 w-6 border-konform-neon-blue/30 ${track.isSolo ? 'bg-konform-neon-orange text-black' : 'bg-black/60'} hover:bg-konform-neon-orange hover:text-black`}
+                onClick={() => {
+                  setTracks(tracks.map(t =>
+                    t.id === track.id ? { ...t, isSolo: !t.isSolo } : t
+                  ));
+                }}
               >
                 S
               </Button>

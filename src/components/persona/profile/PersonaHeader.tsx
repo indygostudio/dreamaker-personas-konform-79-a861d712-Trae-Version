@@ -30,6 +30,8 @@ export const PersonaHeader = ({
   const [bannerPosition, setBannerPosition] = useState<MediaPosition>(
     persona.banner_position || { x: 50, y: 50 }
   );
+  const [pressTimer, setPressTimer] = useState<NodeJS.Timeout | null>(null);
+  const [isLongPressed, setIsLongPressed] = useState(false);
   const { user } = useUser();
 
   const handleMouseEnter = () => {
@@ -39,11 +41,29 @@ export const PersonaHeader = ({
 
   const handleMouseLeave = () => {
     setIsHovering(false);
-    onHeaderHover(false);
+    if (!isLongPressed) {
+      onHeaderHover(false);
+    }
+  };
+
+  const handleMouseDown = () => {
+    const timer = setTimeout(() => {
+      setIsLongPressed(true);
+      setIsHeaderExpanded(true);
+    }, 500);
+    setPressTimer(timer);
+  };
+
+  const handleMouseUp = () => {
+    if (pressTimer) {
+      clearTimeout(pressTimer);
+      setPressTimer(null);
+    }
   };
 
   const handleDoubleClick = () => {
-    setIsHeaderExpanded(!isHeaderExpanded);
+    setIsLongPressed(false);
+    setIsHeaderExpanded(false);
   };
 
   return (
@@ -56,6 +76,8 @@ export const PersonaHeader = ({
         className="relative mt-16"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
       >
         <div 
           className={`relative transition-all duration-300 ${isHeaderExpanded ? 'h-[300px]' : 'h-[80px]'}`}

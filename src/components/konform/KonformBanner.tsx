@@ -1,5 +1,5 @@
 
-import { ChevronDown, ChevronUp, Users, Download, Save, Template } from "lucide-react";
+import { ChevronDown, ChevronUp, Users, Download, Save, Template, Edit2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ReactNode, useState } from "react";
 import { Collaborators } from "./daw/sections/Collaborators";
@@ -20,6 +20,54 @@ interface KonformBannerProps {
   rightContent?: ReactNode;
   latestSessionId?: string;
 }
+
+interface ProjectNameInputProps {
+  currentProject: any;
+  onSave: (name: string) => void;
+}
+
+const ProjectNameInput = ({ currentProject, onSave }: ProjectNameInputProps) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [projectName, setProjectName] = useState(currentProject?.name || 'Untitled Project');
+
+  const handleSave = () => {
+    onSave(projectName);
+    setIsEditing(false);
+  };
+
+  return (
+    <div className="flex items-center gap-2">
+      {isEditing ? (
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={projectName}
+            onChange={(e) => setProjectName(e.target.value)}
+            className="bg-black/20 border border-konform-neon-blue/20 rounded px-2 py-1 text-white"
+            onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+            autoFocus
+          />
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleSave}
+            className="text-white/80 hover:text-white"
+          >
+            <Save className="h-4 w-4" />
+          </Button>
+        </div>
+      ) : (
+        <div
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => setIsEditing(true)}
+        >
+          <span className="text-white/80 hover:text-white">{projectName}</span>
+          <Edit2 className="h-4 w-4 text-white/60" />
+        </div>
+      )}
+    </div>
+  );
+};
 
 export const KonformBanner = ({
   title,
@@ -83,6 +131,23 @@ export const KonformBanner = ({
             <h1 className={`text-4xl font-bold text-white transition-all duration-300 ${isCollapsed ? 'text-3xl' : ''}`}>
               {title}
             </h1>
+            {currentProject && !isCollapsed && (
+              <ProjectNameInput
+                currentProject={currentProject}
+                onSave={async (name) => {
+                  try {
+                    await saveProject.mutateAsync({ name });
+                  } catch (error) {
+                    console.error('Error saving project name:', error);
+                    toast({
+                      title: "Failed to Save",
+                      description: "Could not update project name.",
+                      variant: "destructive"
+                    });
+                  }
+                }}
+              />
+            )}
             <p className={`text-gray-400 mt-2 transition-all duration-300 ${isCollapsed ? 'hidden' : ''}`}>
               {description}
             </p>

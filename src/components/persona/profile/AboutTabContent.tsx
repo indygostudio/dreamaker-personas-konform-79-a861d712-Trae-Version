@@ -47,38 +47,44 @@ export const AboutTabContent: React.FC<AboutTabContentProps> = ({
   const { colors } = useColorScheme();
 
   const sectionStyle = {
-    backgroundColor: colors.background,
-    borderColor: colors.primary,
-    color: colors.text
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderColor: '#8B5CF6',
+    boxShadow: '0 0 20px rgba(139, 92, 246, 0.3)',
+    color: '#fff'
   };
 
   const cardStyle = {
-    backgroundColor: `${colors.secondary}`,
-    borderColor: `${colors.primary}`,
-    color: colors.text
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    borderColor: '#8B5CF6',
+    boxShadow: '0 0 15px rgba(139, 92, 246, 0.2)',
+    color: '#fff'
   };
 
   const headingStyle = {
-    color: colors.text
+    color: '#fff',
+    textShadow: '0 0 10px rgba(139, 92, 246, 0.5)'
   };
 
   const buttonStyle = {
-    backgroundColor: colors.primary,
-    color: colors.text
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    borderColor: '#8B5CF6',
+    color: '#fff',
+    boxShadow: '0 0 10px rgba(139, 92, 246, 0.2)'
   };
 
   const textStyle = {
-    color: colors.text
+    color: '#fff'
   };
 
   const iconStyle = {
-    color: colors.primary
+    color: '#8B5CF6'
   };
 
   const inputStyle = {
-    backgroundColor: `${colors.background}`,
-    borderColor: colors.primary,
-    color: colors.text
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    borderColor: '#8B5CF6',
+    color: '#fff',
+    boxShadow: '0 0 10px rgba(139, 92, 246, 0.2)'
   };
 
   return (
@@ -270,7 +276,7 @@ export const AboutTabContent: React.FC<AboutTabContentProps> = ({
             <div>
               <h4 className="font-medium text-lg" style={textStyle}>Created by</h4>
               <p className="text-xl font-semibold" style={{ color: colors.primary }}>
-                {persona.creator_name || 'Dreamaker AI'}
+                {persona.creator_name || persona.owner_name || 'Unknown Creator'}
               </p>
               <p className="text-sm opacity-70" style={textStyle}>
                 {new Date(persona.created_at || Date.now()).toLocaleDateString('en-US', { 
