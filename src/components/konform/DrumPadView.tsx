@@ -6,12 +6,15 @@ import { PresetManager } from "./drumpad/PresetManager";
 import { PersonaSelector } from "./drumpad/PersonaSelector";
 import { useState } from "react";
 import { VideoBackground } from "@/components/persona/VideoBackground";
+import { DrumPadContextMenu } from "./drumpad/DrumPadContextMenu";
 
 export const DrumPadView = () => {
   const { drumPadHeaderCollapsed, setDrumPadHeaderCollapsed } = useHeaderStore();
   const [currentPattern, setCurrentPattern] = useState<any[]>([]);
-  const pads = Array(24).fill(null);
+  const pads = Array(32).fill(null);
   const [hoveredPad, setHoveredPad] = useState<number | null>(null);
+  const [activePad, setActivePad] = useState<number | null>(null);
+  const [copiedPad, setCopiedPad] = useState<any>(null);
 
   const handleLoadPreset = (pattern: any[]) => {
     setCurrentPattern(pattern);
@@ -49,14 +52,39 @@ export const DrumPadView = () => {
             </Button>
           )}
         </div>
-        <div className="grid grid-cols-8 gap-4 max-w-[1200px] mx-auto">
+        <div className="grid grid-cols-8 gap-2.5 max-w-[1200px] mx-auto">
           {pads.map((_, index) => (
-            <button
+            <DrumPadContextMenu
               key={index}
-              className="aspect-square bg-black/40 backdrop-blur-sm border-dreamaker-purple/20 hover:border-dreamaker-purple/90 p-6 rounded-lg transition-all duration-300 flex items-center justify-center group relative overflow-hidden shadow-lg"
+              onMidiLearnClick={() => console.log('MIDI Learn clicked for pad', index)}
+              onCopyClick={() => {
+                console.log('Copy clicked for pad', index);
+                setCopiedPad(currentPattern[index]);
+              }}
+              onPasteClick={() => {
+                if (copiedPad !== null) {
+                  console.log('Paste clicked for pad', index);
+                  const newPattern = [...currentPattern];
+                  newPattern[index] = copiedPad;
+                  setCurrentPattern(newPattern);
+                }
+              }}
+              onClearClick={() => {
+                console.log('Clear clicked for pad', index);
+                const newPattern = [...currentPattern];
+                newPattern[index] = null;
+                setCurrentPattern(newPattern);
+              }}
+              onAssignClick={() => console.log('Assign clicked for pad', index)}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-dreamaker-purple/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-            </button>
+              <button
+                className={`aspect-square bg-black/40 backdrop-blur-sm border border-red-500/30 hover:border-red-500 p-4 rounded-lg transition-all duration-300 flex items-center justify-center group relative overflow-hidden ${activePad === index ? 'active' : ''}`}
+                onClick={() => setActivePad(index)}
+              >
+                <div className={`absolute inset-0 bg-gradient-radial from-red-500/5 via-transparent to-transparent transition-opacity duration-200 ${activePad === index ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} style={{ '--tw-gradient-from': activePad === index ? 'rgba(239, 68, 68, 0.3)' : 'rgba(239, 68, 68, 0.05)' } as any} />
+                <div className={`absolute inset-0 rounded-lg transition-shadow duration-200 ${activePad === index ? 'shadow-[inset_0_0_35px_rgba(239,68,68,0.4)]' : 'shadow-[inset_0_0_15px_rgba(239,68,68,0.2)] group-hover:shadow-[inset_0_0_25px_rgba(239,68,68,0.3)]'}`} />
+              </button>
+            </DrumPadContextMenu>
           ))}
         </div>
       </div>

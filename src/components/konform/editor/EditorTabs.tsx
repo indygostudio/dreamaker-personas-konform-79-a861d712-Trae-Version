@@ -28,7 +28,7 @@ const SortableTab = ({ tab }) => {
     <TabsTrigger 
       ref={setNodeRef}
       value={tab.value}
-      className="data-[state=active]:bg-black data-[state=active]:text-white px-4 py-2 rounded-t-md border-b-2 data-[state=active]:border-[#00D1FF] border-transparent cursor-move"
+      className="data-[state=active]:bg-[#ea384c]/10 data-[state=active]:text-white data-[state=active]:border-[#ea384c]/20 data-[state=active]:shadow-[0_4px_20px_rgba(234,56,76,0.3)] px-4 py-2 rounded-t-md border-b-2 border-transparent cursor-move"
       style={style}
       {...attributes}
       {...listeners}

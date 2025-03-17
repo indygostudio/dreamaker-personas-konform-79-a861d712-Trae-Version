@@ -18,11 +18,12 @@
   }
 }
 
-es.training-mode-enabled {
+.training-mode-enabled {
   box-shadow: 0 0 10px 5px #FF0000, 0 0 20px 10px #FF0000;
   text-shadow: 0 0 5px #FF0000;
-  background: #FF0000 !important;
+  background-color: #FF0000 !important;
   border-color: #FF0000 !important;
-  color: #FFFFFF !important;
+  color: #FF0000 !important;
+  opacity: 1 !important;
 }
 
