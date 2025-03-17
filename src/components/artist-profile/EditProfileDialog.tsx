@@ -8,6 +8,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { AvatarUpload } from "@/components/persona/AvatarUpload";
 import { Switch } from "@/components/ui/switch";
 import { Upload } from "lucide-react";
+import { PersonaType } from "@/types/persona";
+import { ProfileForm } from "./dialog/ProfileForm";
 
 interface EditProfileDialogProps {
   open: boolean;
@@ -18,6 +20,7 @@ interface EditProfileDialogProps {
     avatar_url: string;
     is_public?: boolean;
     banner_url?: string;
+    persona_types?: PersonaType[];
   };
   onSuccess: () => void;
 }
@@ -33,6 +36,7 @@ export const EditProfileDialog = ({
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url || "");
   const [bannerUrl, setBannerUrl] = useState(profile.banner_url || "");
   const [isPublic, setIsPublic] = useState(profile.is_public || false);
+  const [profileType, setProfileType] = useState<PersonaType[]>(profile.persona_types || []);
   const { toast } = useToast();
 
   const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,6 +84,7 @@ export const EditProfileDialog = ({
           avatar_url: avatarUrl,
           banner_url: bannerUrl,
           is_public: isPublic,
+          profile_type: profileType[0] || "musician",
         })
         .eq("id", profile.id);
 
@@ -110,6 +115,32 @@ export const EditProfileDialog = ({
           <DialogTitle className="text-2xl font-bold text-white">Edit Profile</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
+          <ProfileForm
+            username={username}
+            setUsername={setUsername}
+            displayName={username}
+            setDisplayName={setUsername}
+            bio={""}
+            setBio={() => {}}
+            avatarUrl={avatarUrl}
+            setAvatarUrl={setAvatarUrl}
+            bannerUrl={bannerUrl}
+            setBannerUrl={setBannerUrl}
+            videoUrl={""}
+            setVideoUrl={() => {}}
+            isPublic={isPublic}
+            setIsPublic={setIsPublic}
+            profileType={profileType}
+            setProfileType={setProfileType}
+            bannerPosition={{ x: 50, y: 50 }}
+            setBannerPosition={() => {}}
+            darknessFactor={50}
+            onDarknessChange={() => {}}
+            genre={[]}
+            setGenre={() => {}}
+            location={""}
+            setLocation={() => {}}
+          />
           <div className="space-y-4">
             <div className="flex justify-center">
               <AvatarUpload

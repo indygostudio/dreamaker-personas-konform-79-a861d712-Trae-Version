@@ -68,6 +68,7 @@ export const Collaborators = ({ sessionId }: { sessionId: string }) => {
 
       if (updateError) throw updateError;
 
+      // Invalidate all relevant queries to ensure UI is updated everywhere
       await queryClient.invalidateQueries({
         queryKey: ['collaboration_session', sessionId]
       });
@@ -75,6 +76,16 @@ export const Collaborators = ({ sessionId }: { sessionId: string }) => {
       // Invalidate persona queries to refresh the updated type
       await queryClient.invalidateQueries({
         queryKey: ['persona', personaId]
+      });
+      
+      // Invalidate general persona queries
+      await queryClient.invalidateQueries({
+        queryKey: ['personas']
+      });
+      
+      // Invalidate any queries that might be using the persona data
+      await queryClient.invalidateQueries({
+        queryKey: ['artist-personas']
       });
 
       toast({
