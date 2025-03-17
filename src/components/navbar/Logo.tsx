@@ -16,14 +16,26 @@ import { useNavigate } from "react-router-dom";
 
 export const Logo = () => {
   const [userAvatarUrl, setUserAvatarUrl] = useState<string | null>(null);
-  const { signOut } = useAuth();
+  const { session, signOut } = useAuth();
   const navigate = useNavigate();
   
   const handleSignOut = async () => {
     await signOut();
     navigate("/");
-  };
+me  };
   
+  if (!session) {
+    return (
+      <div className="flex items-center gap-2">
+        <Link to="/auth">
+          <button className="w-8 h-8 rounded-full bg-black border border-white/10 flex items-center justify-center transition-all duration-300 hover:shadow-[0_0_15px_rgba(0,186,255,0.5)] hover:border-blue-400">
+            <span className="text-white font-bold text-lg">D</span>
+          </button>
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="flex items-center gap-2">
       <DropdownMenu>

@@ -127,8 +127,9 @@ export const KonformBanner = ({
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm -z-10" />
       
       <div className="container mx-auto px-6 h-full flex flex-col">
-        <div className="flex justify-between items-center">
-          <div className={`flex-1 transition-all duration-300 ${isCollapsed ? 'text-center' : ''}`}>
+        <div className="grid grid-cols-3 items-center">
+          <div className="flex-1" />
+          <div className="text-center">
             <h1 className={`text-4xl font-bold text-white transition-all duration-300 ${isCollapsed ? 'text-3xl' : ''}`}>
               {title}
             </h1>
@@ -153,7 +154,7 @@ export const KonformBanner = ({
               {description}
             </p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex justify-end items-center gap-4">
             <div className={`flex items-center gap-2 ${isCollapsed ? '' : 'transition-opacity duration-300 opacity-100'}`}>
               <Button
                 variant="outline"

@@ -35,7 +35,17 @@ export const DrumbaseView = () => {
 
   return (
     <div className="min-h-[600px] bg-black/40 rounded-lg">
-      <div className="flex justify-end p-4 border-b border-konform-neon-blue/20">
+      <div className="flex items-center justify-between p-4 border-b border-konform-neon-blue/20">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => handlePluginActivation(!isPluginActive)}
+            className={isPluginActive ? "text-konform-neon-blue" : "text-gray-400"}
+          >
+            <Power className="h-4 w-4" />
+          </Button>
+        </div>
         <TrainingToggle />
       </div>
       <div className="p-6">
