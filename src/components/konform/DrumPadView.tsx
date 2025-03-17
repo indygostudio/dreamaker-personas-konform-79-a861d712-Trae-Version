@@ -7,10 +7,12 @@ import { PersonaSelector } from "./drumpad/PersonaSelector";
 import { useState } from "react";
 import { VideoBackground } from "@/components/persona/VideoBackground";
 import { DrumPadContextMenu } from "./drumpad/DrumPadContextMenu";
+import { PresetDisplay } from "./drumpad/PresetDisplay";
 
 export const DrumPadView = () => {
   const { drumPadHeaderCollapsed, setDrumPadHeaderCollapsed } = useHeaderStore();
   const [currentPattern, setCurrentPattern] = useState<any[]>([]);
+  const [currentPreset, setCurrentPreset] = useState({ name: '', patchNumber: 0 });
   const pads = Array(32).fill(null);
   const [hoveredPad, setHoveredPad] = useState<number | null>(null);
   const [activePad, setActivePad] = useState<number | null>(null);
@@ -31,6 +33,11 @@ export const DrumPadView = () => {
   return (
     <div className="flex-1 overflow-y-auto bg-[#131415] flex flex-col">
       <div className="p-6 space-y-6 flex-1">
+        <PresetDisplay
+          presetName={currentPreset.name}
+          patchNumber={currentPreset.patchNumber}
+          onSelectPreset={setCurrentPreset}
+        />
         <div className="flex items-center justify-between mb-4">
           <PresetManager
             currentPattern={currentPattern}
@@ -52,7 +59,7 @@ export const DrumPadView = () => {
             </Button>
           )}
         </div>
-        <div className="grid grid-cols-8 gap-2.5 max-w-[1200px] mx-auto">
+        <div className="grid grid-cols-8 gap-8 max-w-[1800px] mx-auto">
           {pads.map((_, index) => (
             <DrumPadContextMenu
               key={index}
@@ -78,7 +85,7 @@ export const DrumPadView = () => {
               onAssignClick={() => console.log('Assign clicked for pad', index)}
             >
               <button
-                className={`aspect-square bg-black/40 backdrop-blur-sm border border-red-500/30 hover:border-red-500 p-4 rounded-lg transition-all duration-300 flex items-center justify-center group relative overflow-hidden ${activePad === index ? 'active' : ''}`}
+                className={`aspect-square bg-black/40 backdrop-blur-sm border border-red-500/30 hover:border-red-500 p-16 rounded-xl transition-all duration-300 flex items-center justify-center group relative overflow-hidden ${activePad === index ? 'active' : ''}`}
                 onClick={() => setActivePad(index)}
               >
                 <div className={`absolute inset-0 bg-gradient-radial from-red-500/5 via-transparent to-transparent transition-opacity duration-200 ${activePad === index ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} style={{ '--tw-gradient-from': activePad === index ? 'rgba(239, 68, 68, 0.3)' : 'rgba(239, 68, 68, 0.05)' } as any} />

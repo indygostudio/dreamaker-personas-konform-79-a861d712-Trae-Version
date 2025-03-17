@@ -64,11 +64,11 @@ export const DrumbaseView = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-8 gap-2">
+      <div className="grid grid-cols-8 gap-4 p-2">
         {Array(32).fill(null).map((_, index) => (
           <button
             key={index}
-            className={`aspect-square bg-black/40 backdrop-blur-sm border ${activePad === index ? 'border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.5)]' : 'border-gray-800'} rounded-lg transition-all duration-150 hover:border-cyan-500/50 hover:shadow-[0_0_10px_rgba(6,182,212,0.3)]`}
+            className={`aspect-square bg-black/40 backdrop-blur-sm border p-8 ${activePad === index ? 'border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.5)]' : 'border-gray-800'} rounded-lg transition-all duration-150 hover:border-cyan-500/50 hover:shadow-[0_0_10px_rgba(6,182,212,0.3)]`}
             onClick={() => setActivePad(index)}
           >
             <div className={`w-full h-full flex items-center justify-center ${activePad === index ? 'bg-gradient-to-br from-cyan-500/20 to-transparent' : ''}`} />
