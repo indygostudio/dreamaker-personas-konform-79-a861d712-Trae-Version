@@ -71,6 +71,11 @@ export const Collaborators = ({ sessionId }: { sessionId: string }) => {
       await queryClient.invalidateQueries({
         queryKey: ['collaboration_session', sessionId]
       });
+      
+      // Invalidate persona queries to refresh the updated type
+      await queryClient.invalidateQueries({
+        queryKey: ['persona', personaId]
+      });
 
       toast({
         title: "Role Updated",
@@ -118,6 +123,11 @@ export const Collaborators = ({ sessionId }: { sessionId: string }) => {
 
       await queryClient.invalidateQueries({
         queryKey: ['collaboration_session', sessionId]
+      });
+      
+      // Invalidate persona queries to refresh the updated type
+      await queryClient.invalidateQueries({
+        queryKey: ['persona', personaId]
       });
       
       // Also invalidate the percentage splits query

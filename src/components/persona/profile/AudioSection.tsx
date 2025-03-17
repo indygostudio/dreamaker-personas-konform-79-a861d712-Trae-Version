@@ -53,12 +53,25 @@ export const AudioSection = ({ persona, selectedModel, isActive = true }: AudioS
 
   const isOwner = user?.id === persona.user_id;
 
-  // Stop audio when the component is not active
+  // Manage audio playback state
   useEffect(() => {
-    if (!isActive && isPlaying) {
-      setIsPlaying(false);
+    if (!isActive) {
+      // Store current playback position when component becomes inactive
+      const audio = document.querySelector('audio');
+      if (audio && isPlaying) {
+        audio.dataset.lastPosition = audio.currentTime.toString();
+      }
+    } else {
+      // Restore playback state when component becomes active
+      const audio = document.querySelector('audio');
+      if (audio && audio.dataset.lastPosition) {
+        audio.currentTime = parseFloat(audio.dataset.lastPosition);
+        if (isPlaying) {
+          audio.play().catch(console.error);
+        }
+      }
     }
-  }, [isActive, isPlaying, setIsPlaying]);
+  }, [isActive, isPlaying]);
 
   const handleAudioFileSelect = (file: File, isLoop: boolean) => {
     if (isLoop) {

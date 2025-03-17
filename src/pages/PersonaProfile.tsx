@@ -169,13 +169,21 @@ export default function PersonaProfile({
     setIsHeaderExpanded(isHovered);
   };
 
-  // Handle tab changes to stop audio playback when leaving audio tab
+  // Handle tab changes to manage audio playback
   useEffect(() => {
+    // Only manage audio when switching away from the audio section
     if (activeTab !== "media" || activeMediaTab !== "audio") {
-      // Add any code to stop audio playback here if needed
+      // Store the current playback state
       const audio = document.querySelector('audio');
       if (audio) {
-        audio.pause();
+        // Instead of stopping, just store the current time
+        audio.dataset.lastPosition = audio.currentTime.toString();
+      }
+    } else {
+      // Restore playback state when returning to audio section
+      const audio = document.querySelector('audio');
+      if (audio && audio.dataset.lastPosition) {
+        audio.currentTime = parseFloat(audio.dataset.lastPosition);
       }
     }
   }, [activeTab, activeMediaTab]);
