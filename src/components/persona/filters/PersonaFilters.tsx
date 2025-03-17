@@ -51,13 +51,15 @@ export function PersonaFilters({
           { label: "All Instruments", value: null },
           { label: "Guitar", value: "Guitar" },
           { label: "Bass", value: "Bass" },
-          { label: "Drums", value: "Drums" },
-          { label: "Piano", value: "Piano" },
-          { label: "Strings", value: "Strings" },
           { label: "Brass", value: "Brass" },
           { label: "Wind", value: "Wind" },
+          { label: "Drums", value: "Drums" },
+          { label: "Piano", value: "Piano" },
+          { label: "Mallet", value: "Mallet" },
+          { label: "Bell", value: "Bell" },
+          { label: "Strings", value: "Strings" },
           { label: "Synth", value: "Synth" },
-          { label: "Other", value: "Other" },
+          { label: "Other", value: "Other" }
         ];
       case "AI_VOCALIST":
         return [

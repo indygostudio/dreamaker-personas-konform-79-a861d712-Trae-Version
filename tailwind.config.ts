@@ -32,6 +32,20 @@ export default {
             orange: "#FF7B00",
             "blue-glow": "#00F0FF20",
             "orange-glow": "#FF7B0020",
+          },
+          button: {
+            primary: {
+              default: "#0EA5E9",
+              hover: "#00F0FF",
+              active: "#0284C7",
+              disabled: "#1E2329"
+            },
+            secondary: {
+              default: "#2D3748",
+              hover: "#4A5568",
+              active: "#1A202C",
+              disabled: "#1E2329"
+            }
           }
         },
         dreamaker: {
@@ -39,7 +53,21 @@ export default {
           purple: "#9747FF",
           "purple-light": "#B47EFF",
           gray: "#1E1E1E",
-          "purple-dark": "#3e3055"
+          "purple-dark": "#3e3055",
+          button: {
+            primary: {
+              default: "#9747FF",
+              hover: "#B47EFF",
+              active: "#7B3FD5",
+              disabled: "#3e3055"
+            },
+            secondary: {
+              default: "#1E1E1E",
+              hover: "#2D2D2D",
+              active: "#0D0D0D",
+              disabled: "#1A1A1A"
+            }
+          }
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
