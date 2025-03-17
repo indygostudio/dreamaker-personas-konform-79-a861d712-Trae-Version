@@ -15,6 +15,7 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, horizontalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useToast } from "@/hooks/use-toast";
+import { GuitarbaseView } from "../views/GuitarbaseView";
 
 const SortableTab = ({ tab }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: tab.id });
@@ -46,6 +47,7 @@ export const EditorTabs = () => {
     { id: 'trackEditor', value: 'trackEditor', label: 'Songbase', icon: <Wand2 className="h-4 w-4 mr-2" /> },
     { id: 'sampler', value: 'sampler', label: 'Keybase', icon: <Layers className="h-4 w-4 mr-2" /> },
     { id: 'drumpad', value: 'drumpad', label: 'Drumbase', icon: <Grid3x3 className="h-4 w-4 mr-2" /> },
+    { id: 'guitarbase', value: 'guitarbase', label: 'Guitarbase', icon: <Music2 className="h-4 w-4 mr-2" /> },
     { id: 'lyricbase', value: 'lyricbase', label: 'Lyricbase', icon: <FileText className="h-4 w-4 mr-2" /> },
     { id: 'mixabase', value: 'mixabase', label: 'Mixbase', icon: <Sliders className="h-4 w-4 mr-2" /> },
     { id: 'supabase', value: 'supabase', label: 'Subase', icon: <Database className="h-4 w-4 mr-2" /> },
@@ -154,6 +156,10 @@ export const EditorTabs = () => {
 
         <TabsContent value="drumpad" className="flex-1 p-0 m-0">
           <DrumPadView />
+        </TabsContent>
+
+        <TabsContent value="guitarbase" className="flex-1 p-0 m-0">
+          <GuitarbaseView />
         </TabsContent>
 
         <TabsContent value="lyricbase" className="flex-1 p-0 m-0">
