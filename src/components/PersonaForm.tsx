@@ -146,7 +146,7 @@ export function PersonaForm({ defaultValues, onSubmit, onCancel, isSubmitting = 
         formData.append('bucket', 'audio-previews');
         formData.append('title', 'Audio Preview');
         
-        const supabaseUrl = process.env.SUPABASE_URL || 'https://eybrmzbvvckdlvlckfms.supabase.co';
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://eybrmzbvvckdlvlckfms.supabase.co';
         const { data: { session } } = await supabase.auth.getSession();
         
         if (!session?.access_token) {

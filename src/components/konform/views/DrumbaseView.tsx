@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { Power } from "lucide-react";
+import { TrainingToggle } from "./TrainingToggle";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { scanPlugins } from "@/lib/audio/pluginScanner";
@@ -33,7 +34,11 @@ export const DrumbaseView = () => {
   };
 
   return (
-    <div className="min-h-[600px] bg-black/40 rounded-lg p-6">
+    <div className="min-h-[600px] bg-black/40 rounded-lg">
+      <div className="flex justify-end p-4 border-b border-konform-neon-blue/20">
+        <TrainingToggle />
+      </div>
+      <div className="p-6">
       <div className="flex items-center justify-end">
         <div className="flex items-center gap-4">
           <Button

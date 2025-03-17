@@ -1,34 +1,23 @@
-import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { KonformProduct } from "@/pages/KonformProduct";
 import { useHeaderStore } from "@/components/konform/store/headerStore";
 import { KonformTabs } from "@/components/konform/KonformTabs";
+import { useAuth } from "@/hooks/use-auth";
 const Konform = () => {
-  const [session, setSession] = useState(null);
+  const { session } = useAuth();
   const {
     konformHeaderCollapsed,
     setKonformHeaderCollapsed
   } = useHeaderStore();
-  useEffect(() => {
-    supabase.auth.getSession().then(({
-      data: {
-        session
-      }
-    }) => {
-      setSession(session);
-    });
-    const {
-      data: {
-        subscription
-      }
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      setSession(session);
-    });
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+
+  if (session === null) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-black to-konform-bg flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-dreamaker-purple border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
   if (!session) {
     return <KonformProduct />;
   }

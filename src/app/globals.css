@@ -6,3 +6,23 @@
   user-select: none;
 }
 
+@keyframes pulse-red-glow {
+  0% {
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+  }
+}
+
+es.training-mode-enabled {
+  box-shadow: 0 0 10px 5px #FF0000, 0 0 20px 10px #FF0000;
+  text-shadow: 0 0 5px #FF0000;
+  background: #FF0000 !important;
+  border-color: #FF0000 !important;
+  color: #FFFFFF !important;
+}
+

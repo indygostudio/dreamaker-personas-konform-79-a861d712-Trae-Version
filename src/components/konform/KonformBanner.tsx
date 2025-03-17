@@ -1,5 +1,5 @@
 
-import { ChevronDown, ChevronUp, Users, Download, Save, Template, Edit2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Users, Download, Save, Template, Edit2, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ReactNode, useState } from "react";
 import { Collaborators } from "./daw/sections/Collaborators";
@@ -11,6 +11,7 @@ import { useBannerSectionsStore } from "./store/bannerSectionsStore";
 import { useKonformProject } from "@/hooks/useKonformProject";
 import { downloadProject, createProjectTemplate } from "@/utils/projectUtils";
 import { useToast } from "@/hooks/use-toast";
+import { useTrainingModeStore } from "./store/trainingModeStore";
 
 interface KonformBannerProps {
   title: string;
@@ -153,7 +154,23 @@ export const KonformBanner = ({
             </p>
           </div>
           <div className="flex items-center gap-4">
-            <div className={`transition-opacity duration-300 ${isCollapsed ? 'opacity-0 hidden' : 'opacity-100'}`}>
+            <div className={`flex items-center gap-2 ${isCollapsed ? '' : 'transition-opacity duration-300 opacity-100'}`}>
+              <Button
+                variant="outline"
+                size="sm"
+                className={`bg-black/20 border-white/20 hover:bg-black/40 text-white rounded-full transition-all duration-300 ${useTrainingModeStore.getState().isTrainingEnabled ? 'border-konform-neon-blue training-mode-enabled' : ''}`}
+                onClick={() => {
+                  const { isTrainingEnabled, setTrainingEnabled } = useTrainingModeStore.getState();
+                  setTrainingEnabled(!isTrainingEnabled);
+                  toast({
+                    title: isTrainingEnabled ? "Training Mode Disabled" : "Training Mode Enabled",
+                    description: isTrainingEnabled ? "AI training features are now disabled" : "AI training features are now enabled",
+                  });
+                }}
+              >
+                <Brain className="w-4 h-4 mr-2" />
+                Training Mode
+              </Button>
               {rightContent}
             </div>
             <Button
@@ -178,6 +195,22 @@ export const KonformBanner = ({
               {/* Project Actions */}
               {currentProject && (
                 <div className="flex items-center justify-end gap-3 mb-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={`bg-black/20 border-white/20 hover:bg-black/40 text-white rounded-full transition-all duration-300 ${useTrainingModeStore.getState().isTrainingEnabled ? 'border-konform-neon-blue training-mode-enabled' : ''}`}
+                    onClick={() => {
+                      const { isTrainingEnabled, setTrainingEnabled } = useTrainingModeStore.getState();
+                      setTrainingEnabled(!isTrainingEnabled);
+                      toast({
+                        title: isTrainingEnabled ? "Training Mode Disabled" : "Training Mode Enabled",
+                        description: isTrainingEnabled ? "AI training features are now disabled" : "AI training features are now enabled",
+                      });
+                    }}
+                  >
+                    <Brain className="w-4 h-4 mr-2" />
+                    Training Mode
+                  </Button>
                   <Button
                     variant="outline"
                     size="sm"
