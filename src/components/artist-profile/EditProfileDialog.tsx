@@ -337,58 +337,6 @@ export const EditProfileDialog = ({
                 onCheckedChange={setIsPublic}
               />
             </div>
-          <div className="space-y-4">
-            <div className="flex justify-center">
-              <AvatarUpload
-                value={avatarUrl}
-                onChange={setAvatarUrl}
-                name={username}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="banner" className="text-white">Banner Image</Label>
-              <div className="relative">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleBannerUpload}
-                  className="hidden"
-                  id="banner-upload"
-                />
-                <Label
-                  htmlFor="banner-upload"
-                  className="flex items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-dreamaker-purple/50 bg-black/30"
-                >
-                  {bannerUrl ? (
-                    <img src={bannerUrl} alt="Banner" className="w-full h-full object-cover rounded-lg" />
-                  ) : (
-                    <div className="flex flex-col items-center">
-                      <Upload className="w-8 h-8 mb-2 text-gray-400" />
-                      <span className="text-sm text-gray-400">Upload Banner</span>
-                    </div>
-                  )}
-                </Label>
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="username" className="text-white">Username</Label>
-              <Input
-                id="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="bg-black/50 border-dreamaker-purple/30 text-white placeholder-gray-400"
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="visibility" className="text-white">Public Profile</Label>
-              <Switch
-                id="visibility"
-                checked={isPublic}
-                onCheckedChange={setIsPublic}
-              />
-            </div>
           </div>
           <div className="flex justify-end gap-4">
             <Button
