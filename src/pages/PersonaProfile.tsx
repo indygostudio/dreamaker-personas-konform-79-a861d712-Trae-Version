@@ -29,7 +29,6 @@ import { ImageGallerySection } from "@/components/persona/profile/ImageGallerySe
 import { PromptLibrarySection } from "@/components/persona/profile/PromptLibrarySection";
 import { ColorSchemeProvider } from "@/contexts/ColorSchemeContext";
 import { AboutTabContent } from "@/components/persona/profile/AboutTabContent";
-import { useAdminMode } from "@/contexts/AdminModeContext";
 
 interface PersonaFormProps {
   persona?: Persona;
@@ -165,8 +164,7 @@ export default function PersonaProfile({
     updateMutation.mutate(aboutForm);
   };
 
-  const { isAdmin, isAdminMode } = useAdminMode();
-  const isOwner = user?.id === persona?.user_id || (isAdmin && isAdminMode);
+  const isOwner = user?.id === persona?.user_id;
 
   const handleHeaderHover = (isHovered: boolean) => {
     setIsHeaderExpanded(isHovered);
