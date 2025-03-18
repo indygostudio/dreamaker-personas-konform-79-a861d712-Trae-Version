@@ -55,21 +55,32 @@ export const EffectView = () => {
   const scanForPlugins = async () => {
     setIsScanning(true);
     try {
-      // Common VST/AU plugin directories
-      const directories = [
+      // Common VST/AU plugin directories based on OS
+      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+      const directories = isMac ? [
         '/Library/Audio/Plug-Ins/VST',
         '/Library/Audio/Plug-Ins/Components',
+        '~/Library/Audio/Plug-Ins/VST',
+        '~/Library/Audio/Plug-Ins/Components'
+      ] : [
         'C:\\Program Files\\Common Files\\VST3',
         'C:\\Program Files\\Common Files\\VST2',
+        'C:\\Program Files\\VSTPlugins'
       ];
-
-      // Mock plugin scan for demonstration
+      
+      // In a real implementation, we would scan these directories
+      // For now, use mock data but with better error handling
       const mockPlugins: Plugin[] = [
         { name: 'Reverb Pro', type: 'vst', path: '/plugins/reverb-pro.vst' },
         { name: 'EQ Master', type: 'vst', path: '/plugins/eq-master.vst' },
         { name: 'Compressor AU', type: 'au', path: '/plugins/compressor.component' },
         { name: 'Delay Suite', type: 'vst', path: '/plugins/delay-suite.vst' },
       ];
+
+      // Simulate potential scanning issues
+      if (Math.random() < 0.05) {
+        throw new Error("Permission denied when accessing plugin directories");
+      }
 
       setPlugins(mockPlugins);
       toast({

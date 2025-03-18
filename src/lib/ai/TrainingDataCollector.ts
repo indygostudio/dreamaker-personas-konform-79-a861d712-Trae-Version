@@ -1,6 +1,29 @@
+import { supabase } from "@/integrations/supabase/client";
+
+// Standardized interfaces for training data collection
+interface BaseTrainingData {
+  metadata?: Record<string, any>;
+  timestamp?: string;
+  userId?: string;
+}
+
+interface InteractionData extends BaseTrainingData {
+  action: string;
+  context: string;
+}
+
+interface CreativeData extends BaseTrainingData {
+  type: string;
+  content: Record<string, any>;
+}
+
+interface WorkflowData extends BaseTrainingData {
+  step: string;
+  context: string;
+}
+
 import { User } from '@/types/user';
 import { TrainingData } from '@/types/training';
-import { supabase } from '@/lib/supabaseClient';
 
 export class TrainingDataCollector {
   private static instance: TrainingDataCollector;

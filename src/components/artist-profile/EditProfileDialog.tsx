@@ -274,8 +274,12 @@ export const EditProfileDialog = ({
   // Handle type change
   const handleTypeChange = (type: PersonaType) => {
     if (profileType.includes(type)) {
-      setProfileType(profileType.filter(t => t !== type));
+      // Don't allow removing the last type
+      if (profileType.length > 1) {
+        setProfileType(profileType.filter(t => t !== type));
+      }
     } else {
+      // Replace the current type instead of adding to array since we only use the first one
       setProfileType([type]);
       // Reset subtype when type changes
       setSelectedSubtype(null);

@@ -26,8 +26,11 @@ interface AdminModeProviderProps {
 // List of admin user IDs
 // In a production environment, this would be fetched from the database
 const ADMIN_USER_IDS = [
-  // Add admin user IDs here
+  // Admin user IDs
   "YOUR_USER_ID", // Replace this with your actual user ID when you sign in
+  "IRKO_USER_ID", // IRKO's user ID
+  "ROSS_HOGARTH_USER_ID", // Ross Hogarth's user ID
+  // Add any additional admin user IDs here
 ];
 
 export const AdminModeProvider: React.FC<AdminModeProviderProps> = ({ children }) => {

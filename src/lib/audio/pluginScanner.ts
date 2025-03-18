@@ -30,14 +30,27 @@ export const scanPlugins = async (): Promise<Plugin[]> => {
       .select('*')
       .eq('enabled', true);
     
-    if (foldersError) throw foldersError;
+    if (foldersError) {
+      console.error('Error fetching scan folders:', foldersError);
+      throw new Error(`Failed to fetch scan folders: ${foldersError.message}`);
+    }
+
+    if (!scanFolders || scanFolders.length === 0) {
+      console.warn('No scan folders configured or enabled');
+      return [];
+    }
 
     // Start native scan
-    const paths = scanFolders?.map(folder => folder.path) || [];
-    nativeBridge.sendMessage({
-      type: 'scan_plugins',
-      paths
-    });
+    const paths = scanFolders.map(folder => folder.path);
+    try {
+      nativeBridge.sendMessage({
+        type: 'scan_plugins',
+        paths
+      });
+    } catch (bridgeError) {
+      console.error('Native bridge error:', bridgeError);
+      throw new Error('Failed to communicate with native plugin scanner');
+    }
 
     // Get cached plugin info from database
     const { data: cachedPlugins, error } = await supabase
@@ -45,7 +58,10 @@ export const scanPlugins = async (): Promise<Plugin[]> => {
       .select('*')
       .order('name');
     
-    if (error) throw error;
+    if (error) {
+      console.error('Error fetching plugin info:', error);
+      throw new Error(`Failed to fetch plugin information: ${error.message}`);
+    }
 
     return (cachedPlugins || []).map(plugin => ({
       id: plugin.id,

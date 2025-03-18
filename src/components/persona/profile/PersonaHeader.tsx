@@ -10,6 +10,7 @@ import { FollowButton } from "./header/FollowButton";
 import { EditButton } from "./header/EditButton";
 import { HeaderInfo } from "./header/HeaderInfo";
 import { PositionContextMenu } from "./header/PositionContextMenu";
+import { useAdminMode } from "@/contexts/AdminModeContext";
 
 interface PersonaHeaderProps {
   persona: Persona;
@@ -33,6 +34,7 @@ export const PersonaHeader = ({
   const [pressTimer, setPressTimer] = useState<NodeJS.Timeout | null>(null);
   const [isLongPressed, setIsLongPressed] = useState(false);
   const { user } = useUser();
+  const { isAdmin, isAdminMode } = useAdminMode();
 
   const handleMouseEnter = () => {
     setIsHovering(true);
@@ -117,7 +119,7 @@ export const PersonaHeader = ({
                 isHeaderExpanded={isHeaderExpanded}
               />
               
-              {user?.id === persona.user_id && (
+              {(user?.id === persona.user_id || (isAdmin && isAdminMode)) && (
                 <EditButton 
                   onEditClick={onEditClick}
                   isHeaderExpanded={isHeaderExpanded}

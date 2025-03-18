@@ -10,6 +10,7 @@ import type { Persona } from "@/types/persona";
 import { useColorScheme } from "@/contexts/ColorSchemeContext";
 import { UseMutationResult } from "@tanstack/react-query";
 import { VideoBackground } from "@/components/persona/VideoBackground";
+import { useAdminMode } from "@/contexts/AdminModeContext";
 
 interface AboutTabContentProps {
   persona: Persona;
