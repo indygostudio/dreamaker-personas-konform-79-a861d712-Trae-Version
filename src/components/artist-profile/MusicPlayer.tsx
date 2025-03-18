@@ -25,12 +25,8 @@ export const MusicPlayer = ({
 }: MusicPlayerProps) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isAudioReady, setIsAudioReady] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
-  const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const autoHideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  
-  // If no audioUrl is provided or player is hidden, don't render the player
-  if (!audioUrl || !isVisible) {
+  // If no audioUrl is provided, don't render the player
+  if (!audioUrl) {
     return null;
   }
   
@@ -67,10 +63,11 @@ export const MusicPlayer = ({
     };
     
     setupAudio();
-    setIsVisible(true); // Show player when new audio is loaded
-    
     return () => {
-      closeTransport();
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.removeEventListener('ended', onPlayPause);
+      }
     };
   }, [audioUrl, onPlayPause]);
   
@@ -107,8 +104,7 @@ export const MusicPlayer = ({
       if (isPlaying) {
         try {
           await audioRef.current?.play();
-          // Reset auto-hide timer when playback starts
-          startAutoHideTimer();
+          // Play audio
         } catch (error) {
           console.error('Error playing audio:', error);
           onPlayPause(); // Toggle back to paused state on error
@@ -121,95 +117,6 @@ export const MusicPlayer = ({
     playAudio();
   }, [isPlaying, isAudioReady, onPlayPause, trimStart]);
   
-  // Set up auto-hide functionality
-  useEffect(() => {
-    // Add event listeners for user activity
-    const resetInactivityTimer = () => {
-      if (inactivityTimerRef.current) {
-        clearTimeout(inactivityTimerRef.current);
-      }
-      
-      // Only start the inactivity timer if audio is playing
-      if (isPlaying) {
-        startAutoHideTimer();
-      }
-    };
-    
-    // Listen for user interactions to reset the timer
-    window.addEventListener('mousemove', resetInactivityTimer);
-    window.addEventListener('mousedown', resetInactivityTimer);
-    window.addEventListener('keypress', resetInactivityTimer);
-    window.addEventListener('touchstart', resetInactivityTimer);
-    
-    // Start the initial timer if playing
-    if (isPlaying) {
-      startAutoHideTimer();
-    }
-    
-    return () => {
-      // Clean up event listeners
-      window.removeEventListener('mousemove', resetInactivityTimer);
-      window.removeEventListener('mousedown', resetInactivityTimer);
-      window.removeEventListener('keypress', resetInactivityTimer);
-      window.removeEventListener('touchstart', resetInactivityTimer);
-      
-      // Clear any existing timers
-      if (inactivityTimerRef.current) {
-        clearTimeout(inactivityTimerRef.current);
-      }
-      if (autoHideTimeoutRef.current) {
-        clearTimeout(autoHideTimeoutRef.current);
-      }
-    };
-  }, [isPlaying]);
-  
-  // Function to start the auto-hide timer
-  const startAutoHideTimer = () => {
-    // Clear any existing timer
-    if (inactivityTimerRef.current) {
-      clearTimeout(inactivityTimerRef.current);
-    }
-    
-    // Set a new timer - hide after 10 seconds of inactivity
-    inactivityTimerRef.current = setTimeout(() => {
-      // Only auto-hide if still playing
-      if (isPlaying && audioRef.current) {
-        setIsVisible(false);
-        // Notify parent component that transport is closed
-        if (onTransportClose) {
-          onTransportClose();
-        }
-      }
-    }, 10000); // 10 seconds
-  };
-  
-  // Function to close the transport - stop playback, release audio, etc.
-  const closeTransport = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      audioRef.current.removeEventListener('ended', onPlayPause);
-      audioRef.current.src = ''; // Release the audio file
-      setIsAudioReady(false);
-    }
-    
-    // Hide the player
-    setIsVisible(false);
-    
-    // Notify parent component that transport is closed
-    if (onTransportClose) {
-      onTransportClose();
-    }
-    
-    // Clear any timers
-    if (inactivityTimerRef.current) {
-      clearTimeout(inactivityTimerRef.current);
-    }
-    if (autoHideTimeoutRef.current) {
-      clearTimeout(autoHideTimeoutRef.current);
-    }
-  };
-  
   // Only render EnhancedMusicPlayer if audioUrl exists and player is visible
   return (
     <EnhancedMusicPlayer
@@ -220,7 +127,6 @@ export const MusicPlayer = ({
       artistName={artistName}
       audioRef={audioRef}
       isAudioReady={isAudioReady}
-      closeTransport={closeTransport}
       trimStart={trimStart}
       trimEnd={trimEnd}
     />

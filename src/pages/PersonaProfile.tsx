@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { PersonaHeader } from "@/components/persona/profile/PersonaHeader";
 import { transformPersonaData } from "@/lib/utils/personaTransform";
 import { PersonaDialog } from "@/components/PersonaDialog";
+import { EditProfileDialog } from "@/components/artist-profile/EditProfileDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MediaCollectionsSection } from "@/components/persona/profile/MediaCollectionsSection";
 import { PersonaSection } from "@/components/persona/profile/PersonaSection";
@@ -18,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useUser } from "@/hooks/useUser";
-import type { Persona } from "@/types/persona";
+import type { Persona, PersonaType } from "@/types/persona";
 import { MindMap } from "@/components/persona/profile/MindMap";
 import { AudioSection } from "@/components/persona/profile/AudioSection";
 import { VideoSection } from "@/components/persona/profile/VideoSection";
@@ -387,10 +388,22 @@ export default function PersonaProfile({
         </div>
       </ColorSchemeProvider>
 
-      <PersonaDialog open={isEditing} onOpenChange={setIsEditing} persona={persona} onSuccess={() => {
-      setIsEditing(false);
-      refetch();
-    }} />
+      <EditProfileDialog 
+        open={isEditing} 
+        onOpenChange={setIsEditing} 
+        profile={{
+          id: persona.id,
+          username: persona.name,
+          avatar_url: persona.avatar_url || "",
+          banner_url: persona.banner_url || "",
+          is_public: persona.is_public,
+          persona_types: [persona.type as PersonaType]
+        }} 
+        onSuccess={() => {
+          setIsEditing(false);
+          refetch();
+        }} 
+      />
     </div>
   );
 }

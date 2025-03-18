@@ -41,6 +41,7 @@ export const PersonaDialog = ({
       const personaData = {
         name: values.name,
         type: values.type,
+        subtype: values.subtype || null,
         description: values.description,
         style: values.style,
         avatar_url: values.avatar_url,
@@ -118,7 +119,7 @@ export const PersonaDialog = ({
                 defaultValues={persona ? {
                   id: persona.id, // Add id when editing existing persona
                   name: persona.name || "",
-                  type: persona.type || "AI_VOCALIST",
+                  type: "AI_VOCALIST",
                   description: persona.description || "",
                   style: persona.style || "",
                   avatar_url: persona.avatar_url || "",

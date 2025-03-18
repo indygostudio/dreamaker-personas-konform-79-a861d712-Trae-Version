@@ -122,6 +122,7 @@ export function ArtistProfileDialog({
           darkness_factor: formData.darkness_factor,
           video_url: formData.video_url,
           banner_url: formData.banner_url,
+          card_image_url: formData.banner_url,
           avatar_url: formData.avatar_url,
           genre: formData.genre,
           location: formData.location,

@@ -46,30 +46,91 @@ export function PersonaFilters({
 
   const getSubtypeOptions = (type: Persona['type'] | null) => {
     switch (type) {
-      case "AI_INSTRUMENTALIST":
+      case "AI_CHARACTER":
         return [
-          { label: "All Instruments", value: null },
-          { label: "Guitar", value: "Guitar" },
-          { label: "Bass", value: "Bass" },
-          { label: "Brass", value: "Brass" },
-          { label: "Wind", value: "Wind" },
-          { label: "Drums", value: "Drums" },
-          { label: "Piano", value: "Piano" },
-          { label: "Mallet", value: "Mallet" },
-          { label: "Bell", value: "Bell" },
-          { label: "Strings", value: "Strings" },
-          { label: "Synth", value: "Synth" },
-          { label: "Other", value: "Other" }
+          { label: "All Characters", value: null },
+          { label: "Ordinary Human", value: "Ordinary Human" },
+          { label: "Superhuman", value: "Superhuman" },
+          { label: "Mutants", value: "Mutants" },
+          { label: "Cyborgs", value: "Cyborgs" },
+          { label: "Clones", value: "Clones" },
+          { label: "Psychics", value: "Psychics" },
+          { label: "Gods & Deities", value: "Gods & Deities" },
+          { label: "Angels & Demons", value: "Angels & Demons" },
+          { label: "Ghosts & Spirits", value: "Ghosts & Spirits" },
+          { label: "Vampires", value: "Vampires" },
+          { label: "Werewolves", value: "Werewolves" },
+          { label: "Witches & Warlocks", value: "Witches & Warlocks" },
+          { label: "Fairies & Elves", value: "Fairies & Elves" },
+          { label: "Zombies", value: "Zombies" },
+          { label: "Classic Monsters", value: "Classic Monsters" },
+          { label: "Dragons", value: "Dragons" },
+          { label: "Kaiju", value: "Kaiju" },
+          { label: "Cryptids", value: "Cryptids" },
+          { label: "Shape-shifters", value: "Shape-shifters" },
+          { label: "Aliens", value: "Aliens" },
+          { label: "Artificial Intelligence (AI)", value: "Artificial Intelligence (AI)" },
+          { label: "Androids & Robots", value: "Androids & Robots" },
+          { label: "Extraterrestrial Parasites", value: "Extraterrestrial Parasites" },
+          { label: "Demi-Humans", value: "Demi-Humans" },
+          { label: "Elementals", value: "Elementals" },
+          { label: "Golems", value: "Golems" },
+          { label: "Chimeras", value: "Chimeras" },
+          { label: "Cosmic & Abstract Entities", value: "Cosmic & Abstract Entities" },
+          { label: "Celestial Beings", value: "Celestial Beings" }
         ];
       case "AI_VOCALIST":
         return [
-          { label: "All Styles", value: null },
-          { label: "Pop", value: "Pop" },
-          { label: "Rock", value: "Rock" },
-          { label: "Jazz", value: "Jazz" },
-          { label: "Classical", value: "Classical" },
-          { label: "Hip Hop", value: "Hip Hop" },
-          { label: "R&B", value: "R&B" },
+          { label: "All Voice Types", value: null },
+          { label: "Bass", value: "Bass" },
+          { label: "Baritone", value: "Baritone" },
+          { label: "Tenor", value: "Tenor" },
+          { label: "Countertenor", value: "Countertenor" },
+          { label: "Contralto", value: "Contralto" },
+          { label: "Mezzo-Soprano", value: "Mezzo-Soprano" },
+          { label: "Soprano", value: "Soprano" },
+          { label: "Raspy", value: "Raspy" },
+          { label: "Breathy", value: "Breathy" },
+          { label: "Nasal", value: "Nasal" },
+          { label: "Operatic", value: "Operatic" },
+          { label: "Falsetto", value: "Falsetto" },
+          { label: "Growling/Screaming", value: "Growling/Screaming" },
+          { label: "Narrator/Storyteller", value: "Narrator/Storyteller" },
+          { label: "Whispery/ASMR", value: "Whispery/ASMR" },
+          { label: "Theatrical/Animated", value: "Theatrical/Animated" },
+          { label: "Dramatic/Soulful", value: "Dramatic/Soulful" },
+          { label: "Chanting/Gospel", value: "Chanting/Gospel" },
+          { label: "Throat Singing", value: "Throat Singing" },
+          { label: "Yodeling", value: "Yodeling" },
+          { label: "Beatboxing", value: "Beatboxing" },
+          { label: "Robotic/Auto-Tuned", value: "Robotic/Auto-Tuned" },
+          { label: "Demonic/Distorted", value: "Demonic/Distorted" }
+        ];
+      case "AI_INSTRUMENTALIST":
+        return [
+          { label: "All Instruments", value: null },
+          { label: "Drums", value: "Drums" },
+          { label: "Guitar", value: "Guitar" },
+          { label: "Bass", value: "Bass" },
+          { label: "Keyboard", value: "Keyboard" },
+          { label: "Wind", value: "Wind" },
+          { label: "Brass", value: "Brass" },
+          { label: "Plucked", value: "Plucked" },
+          { label: "Strings", value: "Strings" }
+        ];
+      case "AI_EFFECT":
+        return [
+          { label: "All Effects", value: null },
+          { label: "Reverb", value: "Reverb" },
+          { label: "Delay", value: "Delay" },
+          { label: "Echo", value: "Echo" },
+          { label: "Saturation", value: "Saturation" },
+          { label: "Modulation", value: "Modulation" },
+          { label: "Chorus", value: "Chorus" },
+          { label: "Flanger", value: "Flanger" },
+          { label: "Phaser", value: "Phaser" },
+          { label: "Harmonizer", value: "Harmonizer" },
+          { label: "Distortion", value: "Distortion" }
         ];
       case "AI_SOUND":
         return [

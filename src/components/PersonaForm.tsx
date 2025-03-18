@@ -30,6 +30,7 @@ const formSchema = z.object({
     "AI_EFFECT",
     "AI_SOUND"
   ] as const),
+  subtype: z.string().nullable().optional(),
   description: z.string().optional(),
   avatar_url: z.string().optional(),
   avatar_position: z.object({
