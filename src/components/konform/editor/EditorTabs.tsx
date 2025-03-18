@@ -12,7 +12,7 @@ import { MixabaseView } from "../views/MixabaseView";
 import { VoxbaseView } from "../views/VoxbaseView";
 import { SupabaseView } from "../views/SupabaseView";
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, horizontalListSortingStrategy } from '@dnd-kit/sortable';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useToast } from "@/hooks/use-toast";
 import { GuitarbaseView } from "../views/GuitarbaseView";
@@ -29,7 +29,7 @@ const SortableTab = ({ tab }) => {
     <TabsTrigger 
       ref={setNodeRef}
       value={tab.value}
-      className="data-[state=active]:bg-[#ea384c]/10 data-[state=active]:text-white data-[state=active]:border-[#ea384c]/20 data-[state=active]:shadow-[0_4px_20px_rgba(234,56,76,0.3)] px-4 py-2 rounded-t-md border-b-2 border-transparent cursor-move"
+      className="data-[state=active]:bg-[#ea384c]/10 data-[state=active]:text-white data-[state=active]:border-[#ea384c]/20 data-[state=active]:shadow-[0_4px_20px_rgba(234,56,76,0.3)] px-4 py-2 rounded-md border-l-2 border-transparent cursor-move w-full flex items-center"
       style={style}
       {...attributes}
       {...listeners}
@@ -113,18 +113,18 @@ export const EditorTabs = () => {
   };
 
   return (
-    <div className="w-full h-[calc(100vh-120px)] bg-black/40 rounded-lg flex flex-col">
-      <Tabs defaultValue="trackEditor" value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-        <div className="flex justify-between items-center px-4 pt-2 bg-transparent border-b border-konform-neon-blue/20">
+    <div className="w-full h-[calc(100vh-120px)] bg-black/40 rounded-lg flex">
+      <Tabs defaultValue="trackEditor" value={activeTab} onValueChange={setActiveTab} className="flex-1 flex">
+        <div className="w-48 flex flex-col justify-start items-stretch px-2 pt-2 bg-transparent border-r border-konform-neon-blue/20">
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
           >
-            <TabsList className="flex justify-start items-center gap-2 bg-transparent">
+            <TabsList className="flex flex-col justify-start items-stretch gap-2 bg-transparent">
               <SortableContext 
                 items={tabs.map(tab => tab.id)}
-                strategy={horizontalListSortingStrategy}
+                strategy={verticalListSortingStrategy}
               >
                 {tabs.map((tab) => (
                   <SortableTab key={tab.id} tab={tab} />
@@ -136,11 +136,12 @@ export const EditorTabs = () => {
           <Button 
             variant="outline" 
             size="sm" 
-            className="ml-2 bg-black/20 border-white/20 hover:bg-black/40 text-white rounded-full"
+            className="mt-2 bg-black/20 border-white/20 hover:bg-black/40 text-white rounded-full w-full"
             onClick={saveTabsOrder}
             title="Save current tab arrangement"
           >
-            <Save className="w-4 h-4" />
+            <Save className="w-4 h-4 mr-2" />
+            Save Order
           </Button>
         </div>
 

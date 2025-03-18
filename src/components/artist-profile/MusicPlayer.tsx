@@ -127,6 +127,7 @@ export const MusicPlayer = ({
       artistName={artistName}
       audioRef={audioRef}
       isAudioReady={isAudioReady}
+      closeTransport={onTransportClose}
       trimStart={trimStart}
       trimEnd={trimEnd}
     />

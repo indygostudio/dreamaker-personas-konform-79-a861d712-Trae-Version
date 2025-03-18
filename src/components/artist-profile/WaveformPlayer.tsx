@@ -44,7 +44,7 @@ export const WaveformPlayer = ({
   const isSyncingRef = useRef(false);
 
   useEffect(() => {
-    if (!waveformRef.current || !audioUrl) return;
+    if (!waveformRef.current || !audioUrl || !waveformRef.current.offsetParent) return;
 
     const initWavesurfer = async () => {
       if (wavesurfer.current) {

@@ -11,6 +11,9 @@ import { Upload, X } from "lucide-react";
 import { PersonaType } from "@/types/persona";
 import { ProfileForm } from "./dialog/ProfileForm";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { BannerUpload } from "./dialog/BannerUpload";
+import type { BannerPosition } from "@/types/types";
 
 interface EditProfileDialogProps {
   open: boolean;
@@ -33,13 +36,69 @@ export const EditProfileDialog = ({
   onSuccess,
 }: EditProfileDialogProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [username, setUsername] = useState(profile.username || "");
-  const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url || "");
-  const [bannerUrl, setBannerUrl] = useState(profile.banner_url || "");
-  const [isPublic, setIsPublic] = useState(profile.is_public || false);
-  const [profileType, setProfileType] = useState<PersonaType[]>(profile.persona_types || []);
+  const [username, setUsername] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const [bannerUrl, setBannerUrl] = useState("");
+  const [isPublic, setIsPublic] = useState(false);
+  const [profileType, setProfileType] = useState<PersonaType[]>([]);
   const [selectedSubtype, setSelectedSubtype] = useState<string | null>(null);
   const { toast } = useToast();
+  
+  // Initialize additional state variables needed for ProfileForm
+  const [displayName, setDisplayName] = useState("");
+  const [bio, setBio] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
+  const [bannerPosition, setBannerPosition] = useState<BannerPosition>({ x: 50, y: 50 });
+  const [darknessFactor, setDarknessFactor] = useState(0);
+  const [genre, setGenre] = useState<string[]>([]);
+  const [location, setLocation] = useState("");
+  
+  // Update state when profile changes or dialog opens
+  useEffect(() => {
+    if (profile && open) {
+      setUsername(profile.username || "");
+      setAvatarUrl(profile.avatar_url || "");
+      setBannerUrl(profile.banner_url || "");
+      setIsPublic(profile.is_public || false);
+      setProfileType(profile.persona_types || []);
+    }
+  }, [profile, open]);
+  
+  // Load profile data when component mounts or dialog opens
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      if (!profile?.id || !open) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", profile.id)
+          .single();
+          
+        if (error) throw error;
+        
+        if (data) {
+          setDisplayName(data.display_name || "");
+          setBio(data.bio || "");
+          setVideoUrl(data.video_url || "");
+          setBannerPosition(data.banner_position || { x: 50, y: 50 });
+          setDarknessFactor(data.darkness_factor || 0);
+          setGenre(data.genres || []);
+          setLocation(data.location || "");
+        }
+      } catch (error) {
+        console.error("Error fetching profile data:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load profile data",
+          variant: "destructive"
+        });
+      }
+    };
+    
+    fetchProfileData();
+  }, [profile?.id, open, toast]);
 
   const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -83,11 +142,18 @@ export const EditProfileDialog = ({
         .from("profiles")
         .update({
           username,
+          display_name: displayName,
           avatar_url: avatarUrl,
           banner_url: bannerUrl,
+          banner_position: bannerPosition,
+          darkness_factor: darknessFactor,
+          bio: bio,
+          video_url: videoUrl,
           is_public: isPublic,
           profile_type: profileType[0] || "musician",
-          subtype: selectedSubtype
+          subtype: selectedSubtype,
+          genres: genre,
+          location: location
         })
         .eq("id", profile.id);
 
@@ -218,7 +284,7 @@ export const EditProfileDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] bg-black/90 border border-dreamaker-purple/20 text-white overflow-y-auto max-h-[85vh]">
+      <DialogContent className="sm:max-w-[500px] bg-black border border-dreamaker-purple/20 text-white overflow-y-auto max-h-[85vh]">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-white">Edit Profile</DialogTitle>
           <DialogDescription className="text-gray-400">
@@ -234,110 +300,58 @@ export const EditProfileDialog = ({
           </Button>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6 text-white">
-          <div className="space-y-4 w-full">
-            <div className="flex justify-center">
-              <AvatarUpload
-                value={avatarUrl}
-                onChange={setAvatarUrl}
-                name={username}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="banner" className="text-white">Banner Image</Label>
-              <div className="relative">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleBannerUpload}
-                  className="hidden"
-                  id="banner-upload"
-                />
-                <Label
-                  htmlFor="banner-upload"
-                  className="flex items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-dreamaker-purple/50 bg-black/30"
-                >
-                  {bannerUrl ? (
-                    <img src={bannerUrl} alt="Banner" className="w-full h-full object-cover rounded-lg" />
-                  ) : (
-                    <div className="flex flex-col items-center">
-                      <Upload className="w-8 h-8 mb-2 text-gray-400" />
-                      <span className="text-sm text-gray-400">Upload Banner</span>
-                    </div>
-                  )}
-                </Label>
-              </div>
-            </div>
-
+          <ProfileForm
+            username={username}
+            setUsername={setUsername}
+            displayName={displayName}
+            setDisplayName={setDisplayName}
+            bio={bio}
+            setBio={setBio}
+            avatarUrl={avatarUrl}
+            setAvatarUrl={setAvatarUrl}
+            bannerUrl={bannerUrl}
+            setBannerUrl={setBannerUrl}
+            videoUrl={videoUrl}
+            setVideoUrl={setVideoUrl}
+            isPublic={isPublic}
+            setIsPublic={setIsPublic}
+            profileType={profileType}
+            setProfileType={setProfileType}
+            bannerPosition={bannerPosition}
+            setBannerPosition={setBannerPosition}
+            darknessFactor={darknessFactor}
+            onDarknessChange={setDarknessFactor}
+            genre={genre}
+            setGenre={setGenre}
+            location={location}
+            setLocation={setLocation}
+          />
+          
+          {profileType.length > 0 && getSubtypeOptions(profileType[0]).length > 0 && (
             <div>
-              <Label htmlFor="username" className="text-white">Username</Label>
-              <Input
-                id="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="bg-black/50 border-dreamaker-purple/30 text-white placeholder-gray-400"
-              />
+              <Label htmlFor="subtype" className="text-white">Subtype</Label>
+              <Select
+                value={selectedSubtype || ""}
+                onValueChange={(value) => setSelectedSubtype(value || null)}
+              >
+                <SelectTrigger className="bg-black/50 border-dreamaker-purple/30 text-white">
+                  <SelectValue placeholder="Select a subtype" />
+                </SelectTrigger>
+                <SelectContent className="bg-black/90 border-dreamaker-purple/20 text-white">
+                  {getSubtypeOptions(profileType[0]).map((option) => (
+                    <SelectItem 
+                      key={option.label} 
+                      value={option.value || ""}
+                      className="text-white hover:bg-dreamaker-purple/20"
+                    >
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-
-            <div>
-              <Label htmlFor="userType" className="text-white">Profile Type</Label>
-              <div className="grid grid-cols-4 gap-2 w-full">
-                {[
-                  { type: "AI_VOCALIST", label: "Vocalist" },
-                  { type: "AI_INSTRUMENTALIST", label: "Instrumentalist" },
-                  { type: "AI_WRITER", label: "Writer" },
-                  { type: "AI_CHARACTER", label: "Character" },
-                  { type: "AI_MIXER", label: "Mixer" },
-                  { type: "AI_EFFECT", label: "Effect" },
-                  { type: "AI_SOUND", label: "Sound" }
-                ].map(({ type, label }) => (
-                  <Button
-                    key={type}
-                    type="button"
-                    variant={profileType.includes(type as PersonaType) ? "default" : "outline"}
-                    onClick={() => handleTypeChange(type as PersonaType)}
-                    className="w-full"
-                  >
-                    {label}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            {profileType.length > 0 && getSubtypeOptions(profileType[0]).length > 0 && (
-              <div>
-                <Label htmlFor="subtype" className="text-white">Subtype</Label>
-                <Select
-                  value={selectedSubtype || ""}
-                  onValueChange={(value) => setSelectedSubtype(value || null)}
-                >
-                  <SelectTrigger className="bg-black/50 border-dreamaker-purple/30 text-white">
-                    <SelectValue placeholder="Select a subtype" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-black/90 border-dreamaker-purple/20 text-white">
-                    {getSubtypeOptions(profileType[0]).map((option) => (
-                      <SelectItem 
-                        key={option.label} 
-                        value={option.value || ""}
-                        className="text-white hover:bg-dreamaker-purple/20"
-                      >
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-
-            <div className="flex items-center justify-between">
-              <Label htmlFor="visibility" className="text-white">Public Profile</Label>
-              <Switch
-                id="visibility"
-                checked={isPublic}
-                onCheckedChange={setIsPublic}
-              />
-            </div>
-          </div>
+          )}
+          
           <div className="flex justify-end gap-4">
             <Button
               type="button"
