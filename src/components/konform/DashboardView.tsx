@@ -8,6 +8,7 @@ import { SubscriptionDialog } from "@/components/SubscriptionDialog";
 import { useNavigate } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { ContributionDashboard } from "@/components/features/ContributionDashboard";
 
 interface CollaboratingPersona {
   id: string;
@@ -17,7 +18,7 @@ interface CollaboratingPersona {
 }
 
 export const DashboardView = () => {
-  const [userSubscription, setUserSubscription] = useState<string>('free');
+  const [userSubscription, setUserSubscription] = useState<string>('unsigned');
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [collaboratingPersonas, setCollaboratingPersonas] = useState<CollaboratingPersona[]>([]);
   const [currentSession, setCurrentSession] = useState<string | null>(null);
@@ -77,7 +78,7 @@ export const DashboardView = () => {
   };
 
   const handleStartCollaboration = async () => {
-    if (userSubscription === 'free') {
+    if (userSubscription === 'unsigned') {
       setShowUpgrade(true);
       return;
     }
@@ -161,7 +162,7 @@ export const DashboardView = () => {
             <Button
               onClick={handleStartCollaboration}
               className="bg-dreamaker-purple hover:bg-dreamaker-purple-light"
-              disabled={userSubscription === 'free'}
+              disabled={userSubscription === 'unsigned'}
             >
               Start Collaboration
             </Button>
@@ -200,11 +201,37 @@ export const DashboardView = () => {
           )}
         </div>
 
+        {/* Hivemind Contribution Dashboard */}
+        <div className="bg-black/40 rounded-lg p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-bold">Hivemind Contribution Dashboard</h2>
+            {userSubscription === 'unsigned' && (
+              <div className="flex items-center gap-2">
+                <Lock className="text-dreamaker-purple" />
+                <span className="text-sm text-gray-400">Contributor features locked</span>
+              </div>
+            )}
+          </div>
+          {userSubscription !== 'unsigned' ? (
+            <ContributionDashboard />
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-400 mb-4">Upgrade your subscription to participate in the Hivemind cooperative and earn royalties from your contributions.</p>
+              <Button
+                className="bg-dreamaker-purple hover:bg-dreamaker-purple-light"
+                onClick={() => setShowUpgrade(true)}
+              >
+                Upgrade Now
+              </Button>
+            </div>
+          )}
+        </div>
+        
         {/* Pro Features */}
         <div className="bg-black/40 rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold">Pro Features</h2>
-            {userSubscription === 'free' && (
+            {userSubscription === 'unsigned' && (
               <div className="flex items-center gap-2">
                 <Lock className="text-dreamaker-purple" />
                 <span className="text-sm text-gray-400">Pro features locked</span>
@@ -215,7 +242,7 @@ export const DashboardView = () => {
             <Button
               onClick={handleStartCollaboration}
               className="bg-dreamaker-purple hover:bg-dreamaker-purple-light"
-              disabled={userSubscription === 'free'}
+              disabled={userSubscription === 'unsigned'}
             >
               Access Pro Feature
             </Button>

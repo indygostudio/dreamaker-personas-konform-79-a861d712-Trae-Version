@@ -47,9 +47,10 @@ export const MediaCard = ({
   
   const isLocked = (current: SubscriptionTier, required: SubscriptionTier) => {
     const tiers: Record<SubscriptionTier, number> = {
-      'free': 0,
-      'pro': 1,
-      'enterprise': 2
+      'unsigned': 0,
+      'indie': 1,
+      'pro': 2,
+      'label': 3
     };
     return tiers[current] < tiers[required];
   };

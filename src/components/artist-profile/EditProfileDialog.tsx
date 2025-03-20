@@ -288,22 +288,14 @@ export const EditProfileDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] bg-black border border-dreamaker-purple/20 text-white overflow-y-auto max-h-[85vh]">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-white">Edit Profile</DialogTitle>
+      <DialogContent className="p-0 gap-0 max-w-screen-lg w-[95vw] h-[90vh] overflow-hidden bg-black/95 border-dreamaker-purple/20">
+        <DialogHeader className="p-6 pb-0">
+          <DialogTitle>Edit Profile</DialogTitle>
           <DialogDescription className="text-gray-400">
-            Update your profile information and preferences
+            Update your profile information and media
           </DialogDescription>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onOpenChange(false)}
-            className="absolute right-4 top-4 text-gray-400 hover:text-white"
-          >
-            <X className="h-4 w-4" />
-          </Button>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-6 text-white">
+        <form onSubmit={handleSubmit} className="p-6">
           <ProfileForm
             username={username}
             setUsername={setUsername}

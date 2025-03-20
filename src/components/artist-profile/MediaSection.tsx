@@ -10,22 +10,22 @@ interface MediaSectionProps {
 export const MediaSection = ({ profile }: MediaSectionProps) => {
   // Function to check if a subscription tier is valid
   const isValidSubscriptionTier = (tier: string): tier is SubscriptionTier => {
-    return ['free', 'label', 'enterprise'].includes(tier as SubscriptionTier);
+    return ['unsigned', 'indie', 'pro', 'label'].includes(tier as SubscriptionTier);
   };
 
   // When comparing subscription tiers
   const checkAccess = (userTier: string) => {
-    // Convert to valid SubscriptionTier or default to 'free'
+    // Convert to valid SubscriptionTier or default to 'unsigned'
     const validTier: SubscriptionTier = isValidSubscriptionTier(userTier) 
       ? userTier as SubscriptionTier 
-      : 'free';
+      : 'unsigned';
       
-    return validTier === 'enterprise';
+    return validTier === 'label';
   };
 
   // When assigning a subscription tier
   const setUserSubscription = (tier: string): SubscriptionTier => {
-    return isValidSubscriptionTier(tier) ? tier as SubscriptionTier : 'free';
+    return isValidSubscriptionTier(tier) ? tier as SubscriptionTier : 'unsigned';
   };
 
   return (

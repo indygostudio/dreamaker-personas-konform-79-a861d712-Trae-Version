@@ -61,35 +61,45 @@ export const PricingPlans = ({
     }
   };
   const plans: PricingPlan[] = [{
-    name: "Basic Plan",
-    price: billingInterval === 'monthly' ? '$9.99' : '$99.99',
+    name: "Unsigned Tier",
+    price: billingInterval === 'monthly' ? '$30' : '$300',
     interval: billingInterval === 'monthly' ? '/month' : '/year',
-    description: "Enjoy an extensive library of Artists, featuring a range of content, including recently released titles.",
+    description: "For emerging hobbyists and experimental creators. 500 monthly credits for basic text-to-music generation with standard presets.",
     priceId: "price_1Qhnh7B1FpKQEw9IpghDAPOG",
     color: 'border-purple-500/20 group-hover:border-purple-500/60',
     bgColor: 'from-purple-900/40 to-black/40',
     video: '/Videos/Wormhole.gif',
     icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6"><path d="M5 20V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16l-3-2-2 2-2-2-2 2-2-2-3 2Z" /></svg>
   }, {
-    name: "Standard Plan",
-    price: billingInterval === 'monthly' ? '$29.99' : '$299.99',
+    name: "Indie Tier",
+    price: billingInterval === 'monthly' ? '$120' : '$1,200',
     interval: billingInterval === 'monthly' ? '/month' : '/year',
-    description: "Access to a wider selection of features, including most new releases and exclusive content 5000 Tokens",
+    description: "For independent artists refining their sound. 2,000 monthly credits with expanded customization options and semi-commercial licensing.",
     priceId: "price_1Qhnh7B1FpKQEw9IpghDAPOG",
     color: 'border-blue-500/20 group-hover:border-blue-500/60',
     bgColor: 'from-blue-900/40 to-black/40',
     video: '/Videos/Wormhole.gif',
     icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" /></svg>
   }, {
-    name: "Premium Plan",
-    price: billingInterval === 'monthly' ? '$59.99' : '$599.99',
+    name: "Pro Tier",
+    price: billingInterval === 'monthly' ? '$600' : '$6,000',
     interval: billingInterval === 'monthly' ? '/month' : '/year',
-    description: "Access to a widest selection of features, including all new releases and Collabs and 10,000 Tokens.",
+    description: "For professional musicians and producers. 10,000 monthly credits with full suite of advanced production tools and commercial licensing.",
     priceId: "price_1Qhnh7B1FpKQEw9IpghDAPOG",
     color: 'border-emerald-500/20 group-hover:border-emerald-500/60',
     bgColor: 'from-emerald-900/40 to-black/40',
     video: '/Videos/Wormhole.gif',
     icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6"><path d="M2 12h20" /><path d="M12 2v20" /><path d="m4.93 4.93 14.14 14.14" /><path d="m19.07 4.93-14.14 14.14" /></svg>
+  }, {
+    name: "Label Tier",
+    price: billingInterval === 'monthly' ? '$1,000' : '$10,000',
+    interval: billingInterval === 'monthly' ? '/month' : '/year',
+    description: "For record labels with full commercial needs. Unlimited credits with enterprise-grade tools and dedicated account management.",
+    priceId: "price_1Qhnh7B1FpKQEw9IpghDAPOG",
+    color: 'border-pink-500/20 group-hover:border-pink-500/60',
+    bgColor: 'from-pink-900/40 to-black/40',
+    video: '/Videos/Wormhole.gif',
+    icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
   }];
   return <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {plans.map((plan, index) => <div key={index} className="group transform transition-all duration-500 hover:-translate-y-1" onMouseEnter={() => setHoveredIndex(index)} onMouseLeave={() => setHoveredIndex(null)}>

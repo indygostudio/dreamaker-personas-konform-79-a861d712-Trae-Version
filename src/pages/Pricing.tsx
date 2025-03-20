@@ -76,9 +76,10 @@ export const Pricing = () => {
                 <thead>
                   <tr className="border-b border-white/10">
                     <th className="py-4 px-6 text-left text-gray-400">Features</th>
-                    <th className="py-4 px-6 text-center text-white">Basic</th>
-                    <th className="py-4 px-6 text-center text-white">Standard</th>
-                    <th className="py-4 px-6 text-center text-white">Premium</th>
+                    <th className="py-4 px-6 text-center text-white">Unsigned</th>
+                    <th className="py-4 px-6 text-center text-white">Indie</th>
+                    <th className="py-4 px-6 text-center text-white">Pro</th>
+                    <th className="py-4 px-6 text-center text-white">Label</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -89,10 +90,11 @@ export const Pricing = () => {
                     <td className="py-4 px-6 text-center text-gray-400">✓</td>
                   </tr>
                   <tr className="border-b border-white/5">
-                    <td className="py-4 px-6 text-gray-300">Monthly Tokens</td>
-                    <td className="py-4 px-6 text-center text-gray-400">1,000</td>
-                    <td className="py-4 px-6 text-center text-gray-400">5,000</td>
+                    <td className="py-4 px-6 text-gray-300">Monthly Credits</td>
+                    <td className="py-4 px-6 text-center text-gray-400">500</td>
+                    <td className="py-4 px-6 text-center text-gray-400">2,000</td>
                     <td className="py-4 px-6 text-center text-gray-400">10,000</td>
+                    <td className="py-4 px-6 text-center text-gray-400">Unlimited</td>
                   </tr>
                   <tr className="border-b border-white/5">
                     <td className="py-4 px-6 text-gray-300">Custom Voice Models</td>
@@ -132,8 +134,8 @@ export const Pricing = () => {
                 <p className="text-gray-400">Yes, you can upgrade or downgrade your plan at any time. Changes will be reflected in your next billing cycle.</p>
               </div>
               <div className="bg-black/50 backdrop-blur-sm border border-white/10 rounded-lg p-6">
-                <h3 className="text-xl font-bold mb-3 text-white">What happens when I run out of tokens?</h3>
-                <p className="text-gray-400">You can purchase additional tokens or wait for your monthly renewal. Unused tokens roll over for up to 3 months.</p>
+                <h3 className="text-xl font-bold mb-3 text-white">What happens when I run out of credits?</h3>
+                <p className="text-gray-400">You can purchase additional credits or wait for your monthly renewal. Unused credits roll over for up to 3 months.</p>
               </div>
               <div className="bg-black/50 backdrop-blur-sm border border-white/10 rounded-lg p-6">
                 <h3 className="text-xl font-bold mb-3 text-white">Is there a free trial available?</h3>
