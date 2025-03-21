@@ -199,18 +199,25 @@ export const PercentageSplits = ({ sessionId }: PercentageSplitsProps) => {
     }
   });
 
-  // Group personas by type
-  const personasByType = PERSONA_TYPE_ORDER.reduce((acc, type) => {
-    acc[type] = personasWithSplits.filter(p => p.type === type);
+  // Group personas by creator
+  const personasByCreator = personasWithSplits.reduce((acc, persona) => {
+    const creatorName = persona.creator_name || 'Unknown Creator';
+    if (!acc[creatorName]) {
+      acc[creatorName] = [];
+    }
+    acc[creatorName].push(persona);
     return acc;
-  }, {} as Record<PersonaType, PersonaWithSplit[]>);
+  }, {} as Record<string, PersonaWithSplit[]>);
 
-  // Calculate total percentage for each type
-  const typePercentages = PERSONA_TYPE_ORDER.reduce((acc, type) => {
-    const personas = personasByType[type];
-    acc[type] = personas.reduce((sum, p) => sum + p.percentage, 0);
+  // Get sorted list of creators
+  const creatorNames = Object.keys(personasByCreator).sort();
+
+  // Calculate total percentage for each creator
+  const creatorPercentages = creatorNames.reduce((acc, creator) => {
+    const personas = personasByCreator[creator];
+    acc[creator] = personas.reduce((sum, p) => sum + p.percentage, 0);
     return acc;
-  }, {} as Record<PersonaType, number>);
+  }, {} as Record<string, number>);
 
   if (isLoading) {
     return (
@@ -277,15 +284,15 @@ export const PercentageSplits = ({ sessionId }: PercentageSplitsProps) => {
           <div className="space-y-6">
             {/* Summary view with progress bars */}
             <div className="space-y-3">
-              <h3 className="text-sm font-medium text-gray-200">Summary by Role</h3>
-              {PERSONA_TYPE_ORDER.map(type => {
-                const percentage = typePercentages[type];
+              <h3 className="text-sm font-medium text-gray-200">Summary by Creator</h3>
+              {creatorNames.map(creator => {
+                const percentage = creatorPercentages[creator];
                 if (percentage <= 0) return null;
                 
                 return (
-                  <div key={type}>
+                  <div key={creator}>
                     <div className="flex justify-between text-sm mb-1">
-                      <span className="text-gray-400">{PERSONA_TYPE_LABELS[type]}s</span>
+                      <span className="text-gray-400">{creator}</span>
                       <span className="text-white">{percentage.toFixed(1)}%</span>
                     </div>
                     <Progress value={percentage} className="h-2" />
@@ -303,11 +310,11 @@ export const PercentageSplits = ({ sessionId }: PercentageSplitsProps) => {
               <Tabs defaultValue="all" className="w-full">
                 <TabsList className="bg-black/30">
                   <TabsTrigger value="all">All</TabsTrigger>
-                  {PERSONA_TYPE_ORDER.map(type => {
-                    if (personasByType[type].length === 0) return null;
+                  {creatorNames.map(creator => {
+                    if (personasByCreator[creator].length === 0) return null;
                     return (
-                      <TabsTrigger key={type} value={type}>
-                        {PERSONA_TYPE_LABELS[type]}s
+                      <TabsTrigger key={creator} value={creator}>
+                        {creator}
                       </TabsTrigger>
                     );
                   })}
@@ -324,7 +331,9 @@ export const PercentageSplits = ({ sessionId }: PercentageSplitsProps) => {
                         <div className="flex justify-between items-center mb-1">
                           <div>
                             <p className="text-sm font-medium text-white truncate">{persona.name}</p>
-                            <p className="text-xs text-gray-400">{PERSONA_TYPE_LABELS[persona.type]}</p>
+                            <p className="text-xs text-gray-400">
+                              {PERSONA_TYPE_LABELS[persona.type]} • {persona.creator_name || 'Unknown Creator'}
+                            </p>
                           </div>
                           <span className="text-sm text-white">{persona.percentage.toFixed(1)}%</span>
                         </div>
@@ -341,12 +350,12 @@ export const PercentageSplits = ({ sessionId }: PercentageSplitsProps) => {
                   ))}
                 </TabsContent>
                 
-                {PERSONA_TYPE_ORDER.map(type => {
-                  if (personasByType[type].length === 0) return null;
+                {creatorNames.map(creator => {
+                  if (personasByCreator[creator].length === 0) return null;
                   
                   return (
-                    <TabsContent key={type} value={type} className="mt-4 space-y-4">
-                      {personasByType[type].map(persona => (
+                    <TabsContent key={creator} value={creator} className="mt-4 space-y-4">
+                      {personasByCreator[creator].map(persona => (
                         <div key={persona.id} className="flex items-center gap-4">
                           <Avatar className="h-10 w-10">
                             <AvatarImage src={persona.avatar_url} />
@@ -354,7 +363,10 @@ export const PercentageSplits = ({ sessionId }: PercentageSplitsProps) => {
                           </Avatar>
                           <div className="flex-1 min-w-0">
                             <div className="flex justify-between items-center mb-1">
-                              <p className="text-sm font-medium text-white truncate">{persona.name}</p>
+                              <div>
+                                <p className="text-sm font-medium text-white truncate">{persona.name}</p>
+                                <p className="text-xs text-gray-400">{PERSONA_TYPE_LABELS[persona.type]}</p>
+                              </div>
                               <span className="text-sm text-white">{persona.percentage.toFixed(1)}%</span>
                             </div>
                             <Slider

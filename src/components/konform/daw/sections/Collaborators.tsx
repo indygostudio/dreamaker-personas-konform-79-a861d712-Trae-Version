@@ -13,15 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/hooks/useUser";
 import { useSelectedPersonasStore } from "@/stores/selectedPersonasStore";
 
-const PERSONA_TYPES: PersonaType[] = [
-  "AI_CHARACTER",
-  "AI_VOCALIST",
-  "AI_INSTRUMENTALIST",
-  "AI_EFFECT",
-  "AI_SOUND",
-  "AI_MIXER",
-  "AI_WRITER"
-];
+// No longer need PERSONA_TYPES constant since we're displaying creator info instead
 
 export const Collaborators = ({ sessionId }: { sessionId: string }) => {
   const navigate = useNavigate();
@@ -59,48 +51,7 @@ export const Collaborators = ({ sessionId }: { sessionId: string }) => {
     }
   });
 
-  const handleRoleChange = async (personaId: string, newType: PersonaType) => {
-    try {
-      const { error: updateError } = await supabase
-        .from('personas')
-        .update({ type: newType })
-        .eq('id', personaId);
-
-      if (updateError) throw updateError;
-
-      // Invalidate all relevant queries to ensure UI is updated everywhere
-      await queryClient.invalidateQueries({
-        queryKey: ['collaboration_session', sessionId]
-      });
-      
-      // Invalidate persona queries to refresh the updated type
-      await queryClient.invalidateQueries({
-        queryKey: ['persona', personaId]
-      });
-      
-      // Invalidate general persona queries
-      await queryClient.invalidateQueries({
-        queryKey: ['personas']
-      });
-      
-      // Invalidate any queries that might be using the persona data
-      await queryClient.invalidateQueries({
-        queryKey: ['artist-personas']
-      });
-
-      toast({
-        title: "Role Updated",
-        description: "Collaborator role has been updated successfully",
-      });
-    } catch (error) {
-      console.error('Error updating role:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update collaborator role",
-        variant: "destructive",
-      });
-    }
-  };
+  // No longer need handleRoleChange since we're displaying creator info instead of type dropdown
 
   const handlePersonaSelect = (persona: any) => {
     addPersona({
@@ -245,25 +196,12 @@ export const Collaborators = ({ sessionId }: { sessionId: string }) => {
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <p className="text-white text-lg font-medium mb-2 truncate">{persona.name}</p>
-                    <Select 
-                      defaultValue={persona.type}
-                      onValueChange={(value) => handleRoleChange(persona.id, value as PersonaType)}
-                    >
-                      <SelectTrigger className="w-full bg-black/20">
-                        <SelectValue placeholder="Select role" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {PERSONA_TYPES.map((type) => (
-                          <SelectItem 
-                            key={type} 
-                            value={type}
-                            className="text-sm"
-                          >
-                            {type.replace('AI_', '')}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="text-sm text-gray-300 flex items-center gap-1">
+                      <span className="text-gray-400">Creator:</span> 
+                      <span className="truncate">
+                        {persona.creator_name || "Mike Bailey"}
+                      </span>
+                    </div>
                   </div>
                 </div>
               ))}

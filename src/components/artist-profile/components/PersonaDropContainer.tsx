@@ -103,13 +103,57 @@ export const PersonaDropContainer = ({
     }
   };
 
-  const handleAddToProject = () => {
+  const handleAddToProject = async () => {
     if (selectedPersonas.length === 0) {
       toast.error("Please select at least one persona to add to project");
       return;
     }
-    navigate("/konform?tab=project");
-    toast.success("Personas added to project");
+    
+    try {
+      // Get latest collaboration session or create one if it doesn't exist
+      const { data: existingSession } = await supabase
+        .from('collaboration_sessions')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (existingSession) {
+        // Update existing collaboration session with all selected personas
+        const updatedPersonas = [...(existingSession.personas || [])];
+        
+        // Add all selected persona IDs to the session if they don't already exist
+        for (const persona of selectedPersonas) {
+          if (persona.id && !updatedPersonas.includes(persona.id)) {
+            updatedPersonas.push(persona.id);
+          }
+        }
+        
+        await supabase
+          .from('collaboration_sessions')
+          .update({ personas: updatedPersonas })
+          .eq('id', existingSession.id);
+      } else {
+        // Create a new collaboration session
+        await supabase
+          .from('collaboration_sessions')
+          .insert({
+            user_id: userId,
+            personas: selectedPersonas.map(p => p.id).filter(Boolean),
+            name: `Session ${new Date().toLocaleDateString()}`
+          });
+      }
+
+      // Invalidate queries to refresh UI
+      onRefetchCollaborations();
+      
+      navigate("/konform?tab=project");
+      toast.success("Personas added to project successfully");
+    } catch (error) {
+      console.error("Error adding personas to project:", error);
+      toast.error("Failed to add personas to project. Please try again.");
+    }
   };
 
   const handleDrop = (e: React.DragEvent) => {
