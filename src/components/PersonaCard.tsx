@@ -157,25 +157,58 @@ export function PersonaCard({
       });
       return;
     }
-    try {
-      const {
-        error
-      } = await supabase.from('artist_favorites').upsert({
-        user_id: user.id,
-        artist_id: persona.id
-      });
-      if (error) throw error;
-      toast({
-        title: "Success",
-        description: "Added to favorites"
-      });
+ down    try {
+      // Check if the persona is already in follows
+      const { data: existingFollow } = await supabase
+        .from('persona_follows')
+        .select('*')
+        .eq('follower_id', user.id)
+        .eq('persona_id', persona.id)
+        .maybeSingle();
+      
+      if (existingFollow) {
+        // Toggle favorite status if already following
+        const { error } = await supabase
+          .from('persona_follows')
+          .update({ is_favorite: !existingFollow.is_favorite })
+          .eq('follower_id', user.id)
+          .eq('persona_id', persona.id);
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Success",
+          description: existingFollow.is_favorite ? "Removed from favorites" : "Added to favorites"
+        });
+      } else {
+        // Create new follow with favorite
+        const { error } = await supabase
+          .from('persona_follows')
+          .insert({
+            follower_id: user.id,
+            persona_id: persona.id,
+            is_favorite: true
+          });
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Success",
+          description: "Added to favorites"
+        });
+      }
+      
+      // Invalidate both personas and favorite-personas queries
       queryClient.invalidateQueries({
         queryKey: ['personas']
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['favorite-personas']
       });
     } catch (error) {
       toast({
         title: "Error",
-        description: "Could not add to favorites",
+        description: "Could not update favorites",
         variant: "destructive"
       });
     }

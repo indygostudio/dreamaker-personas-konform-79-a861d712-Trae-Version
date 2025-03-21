@@ -398,11 +398,11 @@ export default function PersonaProfile({
           banner_url: persona.banner_url || "",
           is_public: persona.is_public,
           persona_types: [persona.type as PersonaType]
-        }} 
+        }}
         onSuccess={() => {
-          setIsEditing(false);
           refetch();
-        }} 
+          setIsEditing(false);
+        }}
       />
     </div>
   );

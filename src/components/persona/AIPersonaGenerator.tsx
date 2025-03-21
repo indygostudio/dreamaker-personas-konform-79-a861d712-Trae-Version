@@ -13,25 +13,34 @@ interface AIPersonaGeneratorProps {
   onSuccess: () => void;
 }
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { personaGeneratorSchema, type PersonaGeneratorValues } from "@/lib/validations/persona";
+
 export const AIPersonaGenerator = ({ onSuccess }: AIPersonaGeneratorProps) => {
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    gender: "",
-    emotionalProfile: "",
-    lyricalPreferences: "",
-    influences: "",
-    language: "",
-    voiceType: "",
-    musicGenres: "",
-    artistImageUrl: "",
-    voiceSampleUrl: "",
+  const form = useForm<PersonaGeneratorValues>({
+    resolver: zodResolver(personaGeneratorSchema),
+    defaultValues: {
+      name: "",
+      description: "",
+      gender: "",
+      emotionalProfile: "",
+      lyricalPreferences: "",
+      influences: "",
+      language: "",
+      voiceType: "",
+      musicGenres: "",
+      artistImageUrl: "",
+      voiceSampleUrl: "",
+    },
   });
+  
+  const { formState: { errors } } = form;
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const handleInputChange = (field: keyof PersonaGeneratorValues, value: string) => {
+    form.setValue(field, value);
   };
 
   const handleFileUpload = async (file: File, type: 'image' | 'audio') => {
@@ -70,14 +79,13 @@ export const AIPersonaGenerator = ({ onSuccess }: AIPersonaGeneratorProps) => {
   };
 
   const handleGenerate = async () => {
-    if (!formData.name || !formData.description) {
-      toast({
-        title: "Missing input",
-        description: "Please provide at least a name and description for the AI to work with.",
-        variant: "destructive",
-      });
-      return;
-    }
+    try {
+      const values = await form.trigger();
+      if (!values) {
+        return;
+      }
+      
+      const formData = form.getValues();
 
     setIsLoading(true);
     try {

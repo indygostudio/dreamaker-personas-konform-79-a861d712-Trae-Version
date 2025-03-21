@@ -111,7 +111,7 @@ export const PersonaDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="p-0 gap-0 max-w-screen-lg w-[95vw] h-[90vh] overflow-hidden bg-black/95 border-dreamaker-purple/20">
+      <DialogContent className="p-0 gap-0 max-w-screen-lg w-[95vw] h-[90vh] overflow-hidden bg-[#1A1F2C]/95 border-dreamaker-purple/20">
         <ResizablePanelGroup direction="horizontal">
           <ResizablePanel defaultSize={100} minSize={30} maxSize={100}>
             <ScrollArea className="h-full w-full p-6">

@@ -19,42 +19,11 @@ import { Progress } from "@/components/ui/progress";
 import { DeleteConfirmationDialog } from "@/components/persona/card/dialogs/DeleteConfirmationDialog";
 import { usePersonaDelete } from "@/components/persona/hooks/usePersonaDelete";
 
-const formSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  type: z.enum([
-    "AI_VOCALIST",
-    "AI_WRITER",
-    "AI_INSTRUMENTALIST",
-    "AI_CHARACTER",
-    "AI_MIXER",
-    "AI_EFFECT",
-    "AI_SOUND"
-  ] as const),
-  subtype: z.string().nullable().optional(),
-  description: z.string().optional(),
-  avatar_url: z.string().optional(),
-  avatar_position: z.object({
-    x: z.number(),
-    y: z.number()
-  }).default({ x: 50, y: 50 }),
-  banner_url: z.string().optional(),
-  banner_position: z.object({
-    x: z.number(),
-    y: z.number()
-  }).default({ x: 50, y: 50 }),
-  video_url: z.string().optional(),
-  audio_preview_url: z.string().optional(),
-  banner_darkness: z.number().min(0).max(100).default(50),
-  age: z.string().optional(),
-  style: z.string().optional(),
-  voice_type: z.string().optional(),
-  vocal_style: z.string().optional(),
-  artist_category: z.string().optional(),
-  is_public: z.boolean().default(false),
-  id: z.string().optional(),
-});
+import { personaFormSchema, type PersonaFormValues } from "@/lib/validations/persona";
 
-export type PersonaFormValues = z.infer<typeof formSchema>;
+const formSchema = personaFormSchema;
+
+
 
 interface PersonaFormProps {
   defaultValues: PersonaFormValues;
