@@ -201,7 +201,7 @@ export const PercentageSplits = ({ sessionId }: PercentageSplitsProps) => {
 
   // Group personas by creator
   const personasByCreator = personasWithSplits.reduce((acc, persona) => {
-    const creatorName = persona.creator_name || 'Unknown Creator';
+    const creatorName = persona.creator_name || 'Mike Bailey';
     if (!acc[creatorName]) {
       acc[creatorName] = [];
     }
@@ -332,7 +332,7 @@ export const PercentageSplits = ({ sessionId }: PercentageSplitsProps) => {
                           <div>
                             <p className="text-sm font-medium text-white truncate">{persona.name}</p>
                             <p className="text-xs text-gray-400">
-                              {PERSONA_TYPE_LABELS[persona.type]} • {persona.creator_name || 'Unknown Creator'}
+                              {PERSONA_TYPE_LABELS[persona.type]} • {persona.creator_name || 'Mike Bailey'}
                             </p>
                           </div>
                           <span className="text-sm text-white">{persona.percentage.toFixed(1)}%</span>
