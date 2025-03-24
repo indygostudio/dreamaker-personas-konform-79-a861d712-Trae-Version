@@ -1,5 +1,5 @@
 
-import { ChevronDown, ChevronUp, Users, Download, Save, Template, Edit2, Brain } from "lucide-react";
+import { ChevronDown, ChevronUp, Users, Download, Save, Template, Edit2, Brain, Plus, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ReactNode, useState } from "react";
 import { Collaborators } from "./daw/sections/Collaborators";
@@ -9,6 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useBannerSectionsStore } from "./store/bannerSectionsStore";
 import { useKonformProject } from "@/hooks/useKonformProject";
+import { useAutoSave } from "@/hooks/useAutoSave";
+import { ProjectMenu } from "./ProjectMenu";
 import { downloadProject, createProjectTemplate } from "@/utils/projectUtils";
 import { useToast } from "@/hooks/use-toast";
 import { useTrainingModeStore } from "./store/trainingModeStore";
@@ -79,7 +81,9 @@ export const KonformBanner = ({
   latestSessionId,
 }: KonformBannerProps) => {
   const { toast } = useToast();
-  const { currentProject } = useKonformProject();
+  const { currentProject, saveProject, setCurrentProject } = useKonformProject();
+  const { isAutoSaveEnabled } = useAutoSave();
+  const [showProjectMenu, setShowProjectMenu] = useState(false);
   const { 
     collaboratorsCollapsed, 
     percentageSplitsCollapsed,
@@ -128,7 +132,32 @@ export const KonformBanner = ({
       
       <div className="container mx-auto px-6 h-full flex flex-col">
         <div className="grid grid-cols-3 items-center">
-          <div className="flex-1" />
+          <div className="flex-1">
+            <div className="relative">
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-white/80 hover:text-white flex items-center gap-2"
+                  onClick={() => setShowProjectMenu(!showProjectMenu)}
+                >
+                  <span className="text-lg font-semibold">{currentProject?.name || 'Untitled Project'}</span>
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+                {isAutoSaveEnabled && (
+                  <div className="flex items-center gap-1 text-xs text-konform-neon-blue/60">
+                    <Clock className="h-3 w-3" />
+                    <span>Auto-Save On</span>
+                  </div>
+                )}
+              </div>
+              {showProjectMenu && (
+                <div className="absolute top-full left-0 mt-2 z-[200]">
+                  <ProjectMenu onClose={() => setShowProjectMenu(false)} />
+                </div>
+              )}
+            </div>
+          </div>
           <div className="text-center">
             <h1 className={`text-4xl font-bold text-white transition-all duration-300 ${isCollapsed ? 'text-3xl' : ''}`}>
               {title}
