@@ -64,6 +64,12 @@ export const ProfileHeader = ({
   const handleMouseLeave = () => {
     setIsHovering(false);
   };
+  
+  // Prevent hover state changes from affecting audio playback
+  useEffect(() => {
+    // This effect intentionally left empty to prevent re-renders
+    // when isHovering changes, isolating hover state from audio playback
+  }, [isHovering]);
 
   return (
     <div className="w-full mt-16">

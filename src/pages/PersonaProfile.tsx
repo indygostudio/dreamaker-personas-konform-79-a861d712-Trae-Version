@@ -169,16 +169,8 @@ export default function PersonaProfile({
     setIsHeaderExpanded(isHovered);
   };
 
-  // Handle tab changes to stop audio playback when leaving audio tab
-  useEffect(() => {
-    if (activeTab !== "media" || activeMediaTab !== "audio") {
-      // Add any code to stop audio playback here if needed
-      const audio = document.querySelector('audio');
-      if (audio) {
-        audio.pause();
-      }
-    }
-  }, [activeTab, activeMediaTab]);
+  // We're allowing audio to continue playing when changing tabs
+  // No need to stop audio playback when leaving the audio tab
 
   if (error) {
     return <div className="min-h-screen bg-dreamaker-bg flex items-center justify-center">

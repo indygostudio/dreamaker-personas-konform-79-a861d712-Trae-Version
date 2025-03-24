@@ -211,8 +211,8 @@ export function ArtistProfileDialog({
             Update your profile information and media
           </DialogDescription>
         </DialogHeader>
-        
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+
+        <Tabs defaultValue="basic" className="w-full">
           <TabsList className="bg-black/60 w-full grid grid-cols-3 mb-4">
             <TabsTrigger value="basic" className="flex items-center gap-2">
               <User className="h-4 w-4" />
@@ -227,8 +227,9 @@ export function ArtistProfileDialog({
               <span>Media</span>
             </TabsTrigger>
           </TabsList>
-          
+
           <form onSubmit={handleSubmit} className="space-y-6">
+
             <TabsContent value="basic" className="mt-0">
               <BasicInfoSection
                 displayName={formData.display_name}

@@ -105,26 +105,30 @@ export const VideoBackground = ({
     if (videoUrl && videoRef.current) {
       const video = videoRef.current;
       
-      if (isHovering && !autoPlay) {
-        // Only play on hover if not set to autoPlay
-        const playTimer = setTimeout(() => {
-          if (reverseOnEnd && lastPlaybackRate !== 0) {
-            // Resume in the same direction
-            video.playbackRate = lastPlaybackRate;
-          }
-          video.play()
-            .then(() => setIsPlaying(true))
-            .catch(err => console.log("Hover play error:", err));
-        }, 50);
-        
-        return () => clearTimeout(playTimer);
-      } else if (!isHovering && !continuePlayback) {
-        // Always pause when mouse leaves unless explicitly set to continue
-        video.pause();
-        setIsPlaying(false);
-        
-        // Reset to beginning when mouse leaves
-        video.currentTime = 0;
+      // Only apply hover effects if continuePlayback is false
+      // This prevents the hover state from affecting video playback when continuePlayback is true
+      if (!continuePlayback) {
+        if (isHovering && !autoPlay) {
+          // Only play on hover if not set to autoPlay
+          const playTimer = setTimeout(() => {
+            if (reverseOnEnd && lastPlaybackRate !== 0) {
+              // Resume in the same direction
+              video.playbackRate = lastPlaybackRate;
+            }
+            video.play()
+              .then(() => setIsPlaying(true))
+              .catch(err => console.log("Hover play error:", err));
+          }, 50);
+          
+          return () => clearTimeout(playTimer);
+        } else if (!isHovering) {
+          // Always pause when mouse leaves unless explicitly set to continue
+          video.pause();
+          setIsPlaying(false);
+          
+          // Reset to beginning when mouse leaves
+          video.currentTime = 0;
+        }
       }
     }
   }, [videoUrl, isHovering, continuePlayback, reverseOnEnd, lastPlaybackRate, autoPlay]);

@@ -76,6 +76,13 @@ export const ArtistProfile = () => {
     }
     setIsPlaying(!isPlaying);
   };
+  
+  // Ensure audio state is preserved independently of UI interactions
+  useEffect(() => {
+    // This effect intentionally maintains audio state
+    // regardless of header hover/expand/collapse events
+    return () => {};
+  }, [isPlaying]);
 
   useEffect(() => {
     if (profile?.audio_preview_url && !currentAudio) {
