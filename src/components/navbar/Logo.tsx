@@ -10,9 +10,14 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Settings, User, LogOut } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "@/hooks/useUser";
+import { supabase } from "@/integrations/supabase/client";
+import { ArtistProfileDialog } from "@/components/artist-profile/ArtistProfileDialog";
+import type { Profile } from "@/types/types";
+import { useQuery } from "@tanstack/react-query";
 
 export const Logo = () => {
   const [userAvatarUrl, setUserAvatarUrl] = useState<string | null>(null);

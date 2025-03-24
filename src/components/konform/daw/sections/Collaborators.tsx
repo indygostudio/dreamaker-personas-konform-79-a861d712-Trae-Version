@@ -44,7 +44,7 @@ export const Collaborators = ({ sessionId }: { sessionId: string }) => {
       if (sessionData?.personas?.length) {
         const { data: personasData, error: personasError } = await supabase
           .from('personas')
-          .select('*')
+          .select('*, profiles(display_name)')
           .in('id', sessionData.personas);
 
         if (personasError) throw personasError;
@@ -59,32 +59,7 @@ export const Collaborators = ({ sessionId }: { sessionId: string }) => {
     }
   });
 
-  const handleRoleChange = async (personaId: string, newType: PersonaType) => {
-    try {
-      const { error: updateError } = await supabase
-        .from('personas')
-        .update({ type: newType })
-        .eq('id', personaId);
-
-      if (updateError) throw updateError;
-
-      await queryClient.invalidateQueries({
-        queryKey: ['collaboration_session', sessionId]
-      });
-
-      toast({
-        title: "Role Updated",
-        description: "Collaborator role has been updated successfully",
-      });
-    } catch (error) {
-      console.error('Error updating role:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update collaborator role",
-        variant: "destructive",
-      });
-    }
-  };
+  // Removed handleRoleChange as we no longer need persona type selection
 
   const handlePersonaSelect = (persona: any) => {
     addPersona({
@@ -224,25 +199,9 @@ export const Collaborators = ({ sessionId }: { sessionId: string }) => {
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <p className="text-white text-lg font-medium mb-2 truncate">{persona.name}</p>
-                    <Select 
-                      defaultValue={persona.type}
-                      onValueChange={(value) => handleRoleChange(persona.id, value as PersonaType)}
-                    >
-                      <SelectTrigger className="w-full bg-black/20">
-                        <SelectValue placeholder="Select role" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {PERSONA_TYPES.map((type) => (
-                          <SelectItem 
-                            key={type} 
-                            value={type}
-                            className="text-sm"
-                          >
-                            {type.replace('AI_', '')}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="text-gray-400 text-sm">
+                      {persona.artist_profile_name || 'Unknown Artist'}
+                    </div>
                   </div>
                 </div>
               ))}

@@ -65,10 +65,10 @@ export const ProfileHeader = ({
     setIsHovering(false);
   };
   
-  // Prevent hover state changes from affecting audio playback
+  // Handle hover state for video playback
   useEffect(() => {
-    // This effect intentionally left empty to prevent re-renders
-    // when isHovering changes, isolating hover state from audio playback
+    // Allow hover state to control video playback
+    // The VideoBackground component will handle the actual playback logic
   }, [isHovering]);
 
   return (

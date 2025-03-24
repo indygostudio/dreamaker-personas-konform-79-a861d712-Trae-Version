@@ -84,7 +84,7 @@ export const PercentageSplits = ({ sessionId }: PercentageSplitsProps) => {
     }
   });
 
-  // Initialize personas with splits
+  // Initialize personas with splits based on ownership
   useEffect(() => {
     if (session?.personas) {
       // Check if we have existing percentage splits stored
@@ -92,16 +92,34 @@ export const PercentageSplits = ({ sessionId }: PercentageSplitsProps) => {
       const isAutoSplitSaved = session.style_blend_settings?.auto_split ?? true;
       setIsAutoSplit(isAutoSplitSaved);
       
+      // Group personas by owner/creator
+      const personasByOwner = session.personas.reduce((acc: any, persona: any) => {
+        const ownerId = persona.user_id;
+        if (!acc[ownerId]) {
+          acc[ownerId] = [];
+        }
+        acc[ownerId].push(persona);
+        return acc;
+      }, {});
+
+      // Calculate base percentage per owner
+      const ownerCount = Object.keys(personasByOwner).length;
+      const basePercentagePerOwner = 100 / ownerCount;
+
       // Map personas with their percentage splits
       const withSplits = session.personas.map((persona: any) => {
         // If we have an existing split for this persona, use it
-        // Otherwise calculate an equal split
-        const defaultSplit = 100 / session.personas.length;
-        const percentage = existingSplits[persona.id] || defaultSplit;
+        // Otherwise calculate split based on ownership
+        const existingSplit = existingSplits[persona.id];
+        if (existingSplit) return { ...persona, percentage: existingSplit };
+        
+        const ownerPersonas = personasByOwner[persona.user_id];
+        const ownerPercentage = basePercentagePerOwner;
+        const personaPercentage = ownerPercentage / ownerPersonas.length;
         
         return {
           ...persona,
-          percentage
+          percentage: personaPercentage
         };
       });
       
@@ -109,52 +127,74 @@ export const PercentageSplits = ({ sessionId }: PercentageSplitsProps) => {
     }
   }, [session]);
 
-  // Update a persona's percentage split
+  // Update a persona's percentage split while respecting ownership groups
   const handlePercentageChange = (personaId: string, value: number[]) => {
     if (isAutoSplit) return; // Don't allow manual changes in auto mode
     
     const newPercentage = value[0];
     
     setPersonasWithSplits(prev => {
-      const updated = prev.map(p => {
+      // Find the persona being updated and its owner
+      const targetPersona = prev.find(p => p.id === personaId);
+      if (!targetPersona) return prev;
+      
+      // Group personas by owner
+      const personasByOwner = prev.reduce((acc, p) => {
+        const ownerId = p.user_id;
+        if (!acc[ownerId]) acc[ownerId] = [];
+        acc[ownerId].push(p);
+        return acc;
+      }, {} as Record<string, PersonaWithSplit[]>);
+      
+      // Calculate current total percentage for the owner's group
+      const ownerPersonas = personasByOwner[targetPersona.user_id];
+      const ownerTotal = ownerPersonas.reduce((sum, p) => sum + p.percentage, 0);
+      const diff = newPercentage - targetPersona.percentage;
+      
+      // Adjust percentages within the owner's group
+      const adjustedOwnerPersonas = ownerPersonas.map(p => {
         if (p.id === personaId) {
           return { ...p, percentage: newPercentage };
         }
-        return p;
+        // Distribute the difference proportionally among other personas of the same owner
+        const adjustmentFactor = p.percentage / (ownerTotal - targetPersona.percentage);
+        return {
+          ...p,
+          percentage: Math.max(0, p.percentage - (diff * adjustmentFactor))
+        };
       });
       
-      // Calculate how much we need to adjust other percentages
-      const totalPercentage = updated.reduce((sum, p) => sum + p.percentage, 0);
-      const diff = totalPercentage - 100;
-      
-      if (Math.abs(diff) > 0.1) {
-        // Distribute the difference among other personas proportionally
-        const otherPersonas = updated.filter(p => p.id !== personaId);
-        const otherTotal = otherPersonas.reduce((sum, p) => sum + p.percentage, 0);
-        
-        if (otherTotal > 0) {
-          return updated.map(p => {
-            if (p.id !== personaId) {
-              const adjustmentFactor = p.percentage / otherTotal;
-              return {
-                ...p,
-                percentage: Math.max(0, p.percentage - (diff * adjustmentFactor))
-              };
-            }
-            return p;
-          });
-        }
-      }
-      
-      return updated;
+      // Update the main personas array while keeping other owners' percentages unchanged
+      return prev.map(p => {
+        const adjustedPersona = adjustedOwnerPersonas.find(ap => ap.id === p.id);
+        return adjustedPersona || p;
+      });
     });
   };
 
-  // Reset to equal splits
+  // Reset to ownership-based splits
   const handleResetSplits = () => {
-    const equalSplit = 100 / personasWithSplits.length;
-    setPersonasWithSplits(prev => 
-      prev.map(p => ({ ...p, percentage: equalSplit }))
+    // Group personas by owner
+    const personasByOwner = personasWithSplits.reduce((acc, persona) => {
+      const ownerId = persona.user_id;
+      if (!acc[ownerId]) {
+        acc[ownerId] = [];
+      }
+      acc[ownerId].push(persona);
+      return acc;
+    }, {} as Record<string, PersonaWithSplit[]>);
+
+    // Calculate base percentage per owner
+    const ownerCount = Object.keys(personasByOwner).length;
+    const basePercentagePerOwner = 100 / ownerCount;
+
+    // Update percentages based on ownership
+    setPersonasWithSplits(prev =>
+      prev.map(persona => {
+        const ownerPersonas = personasByOwner[persona.user_id];
+        const personaPercentage = basePercentagePerOwner / ownerPersonas.length;
+        return { ...persona, percentage: personaPercentage };
+      })
     );
   };
 
