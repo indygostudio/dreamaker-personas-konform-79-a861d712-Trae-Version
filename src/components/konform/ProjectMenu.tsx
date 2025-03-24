@@ -6,7 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { useKonformProject } from '@/hooks/useKonformProject';
 import { useProjectSettingsStore } from './store/projectSettingsStore';
-import { ChevronDown, Save, Download, Upload, Plus, Clock, Settings } from 'lucide-react';
+import { ChevronDown, Save, Download, Upload, Plus, Clock, Settings, Share2 } from 'lucide-react';
 import { KonformProject } from '@/types/project';
 
 interface ProjectMenuProps {
@@ -70,6 +70,31 @@ export const ProjectMenu = ({ onClose }: ProjectMenuProps) => {
         variant: "destructive"
       });
     }
+  };
+
+  const handleSaveAsProject = async () => {
+    if (!currentProject) return;
+    setIsCreatingNew(true);
+    setNewProjectName(currentProject.name + " (Copy)");
+  };
+
+  const copyToClipboard = () => {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url)
+      .then(() => {
+        toast({
+          title: "Success",
+          description: "Project link copied to clipboard",
+        });
+      })
+      .catch((error) => {
+        console.error("Failed to copy link:", error);
+        toast({
+          title: "Error",
+          description: "Failed to copy link to clipboard",
+          variant: "destructive"
+        });
+      });
   };
 
   const handleExportProject = () => {
@@ -152,15 +177,35 @@ export const ProjectMenu = ({ onClose }: ProjectMenuProps) => {
               
               <div className="space-y-2">
                 {currentProject && (
-                  <Button
-                    variant="default"
-                    size="sm"
-                    className="w-full justify-start text-white bg-konform-neon-blue/80 hover:bg-konform-neon-blue"
-                    onClick={handleSaveProject}
-                  >
-                    <Save className="h-4 w-4 mr-2" />
-                    Save Project
-                  </Button>
+                  <>
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="w-full justify-start text-white bg-konform-neon-blue/80 hover:bg-konform-neon-blue"
+                      onClick={handleSaveProject}
+                    >
+                      <Save className="h-4 w-4 mr-2" />
+                      Save Project
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full justify-start text-white/80 hover:text-white hover:bg-white/10"
+                      onClick={handleSaveAsProject}
+                    >
+                      <Save className="h-4 w-4 mr-2" />
+                      Save As...
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full justify-start text-white/80 hover:text-white hover:bg-white/10"
+                      onClick={copyToClipboard}
+                    >
+                      <Share2 className="h-4 w-4 mr-2" />
+                      Share Project
+                    </Button>
+                  </>
                 )}
                 
                 <Button

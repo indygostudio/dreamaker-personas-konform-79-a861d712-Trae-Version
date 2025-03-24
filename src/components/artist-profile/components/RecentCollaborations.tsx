@@ -177,7 +177,8 @@ export const RecentCollaborations = ({
               No recent collaborations
             </div>
           )}
-      </div>
+        </div>
+      </DndContext>
     </div>
   );
 };

@@ -67,9 +67,18 @@ export const ProfileHeader = ({
   
   // Handle hover state for video playback
   useEffect(() => {
-    // Allow hover state to control video playback
-    // The VideoBackground component will handle the actual playback logic
-  }, [isHovering]);
+    // Ensure hover state is properly managed for video playback
+    if (persona?.video_url) {
+      setIsHovering(true);
+    }
+  }, [persona?.video_url]);
+
+  // Reset hover state when component unmounts
+  useEffect(() => {
+    return () => {
+      setIsHovering(false);
+    };
+  }, []);
 
   return (
     <div className="w-full mt-16">

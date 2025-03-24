@@ -34,36 +34,38 @@ export const VideoBackground = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const playAttemptedRef = useRef(false);
 
-  // Handle autoplay when video is loaded
+  // Handle autoplay and initial video loading
   useEffect(() => {
-    if (videoUrl && videoRef.current && autoPlay && !playAttemptedRef.current) {
-      playAttemptedRef.current = true;
+    if (videoUrl && videoRef.current) {
       const video = videoRef.current;
       
-      // If video is loaded enough to play
-      if (video.readyState >= 2) {
-        video.play()
-          .then(() => setIsPlaying(true))
-          .catch(err => {
-            console.log("Autoplay prevented, waiting for user interaction");
-            setIsPlaying(false);
-          });
-      } else {
-        // Wait for it to load enough data
-        const handleCanPlay = () => {
+      const handleCanPlay = () => {
+        if ((autoPlay || isHovering) && !playAttemptedRef.current) {
+          playAttemptedRef.current = true;
           video.play()
             .then(() => setIsPlaying(true))
-            .catch(err => console.log("Delayed autoplay error:", err));
-          video.removeEventListener('canplay', handleCanPlay);
-        };
+            .catch(err => {
+              console.log("Video playback error:", err);
+              setIsPlaying(false);
+            });
+        }
+      };
+
+      if (video.readyState >= 2) {
+        handleCanPlay();
+      } else {
         video.addEventListener('canplay', handleCanPlay);
-        
         return () => {
           video.removeEventListener('canplay', handleCanPlay);
         };
       }
     }
-  }, [videoUrl, videoRef, autoPlay, isVideoLoaded]);
+  }, [videoUrl, videoRef, autoPlay, isHovering, isVideoLoaded]);
+
+  // Reset playAttempted when video URL changes
+  useEffect(() => {
+    playAttemptedRef.current = false;
+  }, [videoUrl]);
 
   // Handle playback direction changes
   useEffect(() => {

@@ -197,19 +197,9 @@ export function ArtistProfileDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-black/90 border-dreamaker-purple/20 text-white max-w-5xl w-[90vw] max-h-[85vh] overflow-auto">
-        <DialogHeader className="relative">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onOpenChange(false)}
-            className="absolute right-0 top-0 text-gray-400 hover:text-white"
-          >
-            <X className="h-4 w-4" />
-          </Button>
+        <DialogHeader>
           <DialogTitle>Edit Profile</DialogTitle>
-          <DialogDescription className="text-gray-400">
-            Update your profile information and media
-          </DialogDescription>
+          <DialogDescription>Update your profile information and media</DialogDescription>
         </DialogHeader>
 
         <Tabs defaultValue="basic" className="w-full">
