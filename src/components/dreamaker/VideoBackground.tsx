@@ -160,7 +160,7 @@ export const VideoBackground = ({
           preload={priority ? "auto" : "metadata"} // Use 'auto' for priority loading
           muted
           playsInline
-          loop
+          loop={true}
           autoPlay={autoPlay}
         >
           <source src={videoUrl} type="video/mp4" />

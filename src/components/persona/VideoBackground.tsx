@@ -169,7 +169,7 @@ export const VideoBackground = ({
           src={videoUrl}
           crossOrigin="anonymous"
           muted
-          loop={!reverseOnEnd}
+          loop={true}
           playsInline
           autoPlay={autoPlay}
           preload={priority ? "auto" : "metadata"} // Use 'auto' for priority loading
