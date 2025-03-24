@@ -114,6 +114,50 @@ export const Collaborators = ({ sessionId }: { sessionId: string }) => {
     }
   };
 
+  const handleRemoveCollaborator = async (personaId: string) => {
+    try {
+      if (!session?.personas) return;
+      
+      // Remove the persona from the session
+      const updatedPersonas = session.personas.filter(p => p.id !== personaId);
+      const { error } = await supabase
+        .from('collaboration_sessions')
+        .update({
+          personas: updatedPersonas.map(p => p.id),
+          style_blend_settings: {
+            ...session.style_blend_settings,
+            percentage_splits: Object.fromEntries(
+              Object.entries(session.style_blend_settings?.percentage_splits || {})
+                .filter(([key]) => key !== personaId)
+            )
+          }
+        })
+        .eq('id', sessionId);
+
+      if (error) throw error;
+
+      await queryClient.invalidateQueries({
+        queryKey: ['collaboration_session', sessionId]
+      });
+      
+      await queryClient.invalidateQueries({
+        queryKey: ['collaboration_session_splits', sessionId]
+      });
+
+      toast({
+        title: "Collaborator Removed",
+        description: "The collaborator has been removed from the session",
+      });
+    } catch (error) {
+      console.error('Error removing collaborator:', error);
+      toast({
+        title: "Error",
+        description: "Failed to remove collaborator",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleAddCollaborators = () => {
     if (user?.id) {
       navigate(`/artists/${user.id}`, {
@@ -187,7 +231,7 @@ export const Collaborators = ({ sessionId }: { sessionId: string }) => {
               {session.personas.map((persona: any) => (
                 <div 
                   key={persona.id} 
-                  className="flex items-center gap-4 p-4 rounded-lg bg-black/20 hover:bg-black/30 transition-colors w-[300px] shrink-0 cursor-pointer"
+                  className="flex items-center gap-4 p-4 rounded-lg bg-black/20 hover:bg-black/30 transition-colors w-[300px] shrink-0 cursor-pointer relative group"
                   onClick={() => handlePersonaSelect(persona)}
                 >
                   <Avatar 
@@ -197,12 +241,26 @@ export const Collaborators = ({ sessionId }: { sessionId: string }) => {
                     <AvatarImage src={persona.avatar_url} className="object-cover" />
                     <AvatarFallback className="text-xl">{persona.name?.[0]}</AvatarFallback>
                   </Avatar>
-                  <div className="flex-1 min-w-0">
+                  <div 
+                    className="flex-1 min-w-0 cursor-pointer" 
+                    onClick={() => handlePersonaSelect(persona)}
+                  >
                     <p className="text-white text-lg font-medium mb-2 truncate">{persona.name}</p>
                     <div className="text-gray-400 text-sm">
                       {persona.artist_profile_name || 'Unknown Artist'}
                     </div>
                   </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveCollaborator(persona.id);
+                    }}
+                  >
+                    <X className="h-4 w-4 text-gray-400 hover:text-white" />
+                  </Button>
                 </div>
               ))}
             </div>
