@@ -144,12 +144,7 @@ export const KonformBanner = ({
                   <span className="text-lg font-semibold">{currentProject?.name || 'Untitled Project'}</span>
                   <ChevronDown className="h-4 w-4" />
                 </Button>
-                {isAutoSaveEnabled && (
-                  <div className="flex items-center gap-1 text-xs text-konform-neon-blue/60">
-                    <Clock className="h-3 w-3" />
-                    <span>Auto-Save On</span>
-                  </div>
-                )}
+                {/* Auto-save functionality remains enabled but indicator is hidden */}
               </div>
               {showProjectMenu && (
                 <div className="absolute top-full left-0 mt-2 z-[200]">

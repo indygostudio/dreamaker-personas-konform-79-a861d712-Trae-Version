@@ -12,7 +12,7 @@ import { MixabaseView } from "../views/MixabaseView";
 import { VoxbaseView } from "../views/VoxbaseView";
 import { SupabaseView } from "../views/SupabaseView";
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, horizontalListSortingStrategy } from '@dnd-kit/sortable';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useToast } from "@/hooks/use-toast";
 import { GuitarbaseView } from "../views/GuitarbaseView";
@@ -29,7 +29,7 @@ const SortableTab = ({ tab }) => {
     <TabsTrigger 
       ref={setNodeRef}
       value={tab.value}
-      className="data-[state=active]:bg-[#ea384c]/10 data-[state=active]:text-white data-[state=active]:border-[#ea384c]/20 data-[state=active]:shadow-[0_4px_20px_rgba(234,56,76,0.3)] px-4 py-2 rounded-t-md border-b-2 border-transparent cursor-move"
+      className="data-[state=active]:bg-[#ea384c]/10 data-[state=active]:text-white data-[state=active]:border-[#ea384c]/20 data-[state=active]:shadow-[0_4px_20px_rgba(234,56,76,0.3)] px-4 py-2 rounded-l-md border-l-2 border-transparent cursor-move w-full text-left"
       style={style}
       {...attributes}
       {...listeners}
@@ -113,18 +113,18 @@ export const EditorTabs = () => {
   };
 
   return (
-    <div className="w-full h-[calc(100vh-120px)] bg-black/40 rounded-lg flex flex-col">
-      <Tabs defaultValue="trackEditor" value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-        <div className="flex justify-between items-center px-4 pt-2 bg-transparent border-b border-konform-neon-blue/20">
+    <div className="w-full h-[calc(100vh-120px)] bg-black/40 rounded-lg">
+      <Tabs defaultValue="trackEditor" value={activeTab} onValueChange={setActiveTab} className="flex h-full">
+        <div className="flex flex-col justify-between h-full px-4 pt-2 bg-transparent border-r border-konform-neon-blue/20 w-48">
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
           >
-            <TabsList className="flex justify-start items-center gap-2 bg-transparent">
+            <TabsList className="flex flex-col justify-start items-start gap-2 bg-transparent">
               <SortableContext 
                 items={tabs.map(tab => tab.id)}
-                strategy={horizontalListSortingStrategy}
+                strategy={verticalListSortingStrategy}
               >
                 {tabs.map((tab) => (
                   <SortableTab key={tab.id} tab={tab} />
@@ -136,47 +136,49 @@ export const EditorTabs = () => {
           <Button 
             variant="outline" 
             size="sm" 
-            className="ml-2 bg-black/20 border-white/20 hover:bg-black/40 text-white rounded-full"
+            className="mb-4 bg-black/20 border-white/20 hover:bg-black/40 text-white rounded-full w-full"
             onClick={saveTabsOrder}
             title="Save current tab arrangement"
           >
-            <Save className="w-4 h-4" />
+            <Save className="w-4 h-4 mr-2" /> Save Order
           </Button>
         </div>
 
-        <TabsContent value="trackEditor" className="flex-1 p-0 m-0">
-          <TrackEditor />
-        </TabsContent>
+        <div className="flex-1 h-full">
+          <TabsContent value="trackEditor" className="h-full p-0 m-0">
+            <TrackEditor />
+          </TabsContent>
 
-        <TabsContent value="sampler" className="flex-1 p-0 m-0">
-          <div className="h-full bg-black/20 p-2">
-            <KeybaseView />
-          </div>
-        </TabsContent>
+          <TabsContent value="sampler" className="h-full p-0 m-0">
+            <div className="h-full bg-black/20 p-2">
+              <KeybaseView />
+            </div>
+          </TabsContent>
 
-        <TabsContent value="drumpad" className="flex-1 p-0 m-0">
-          <DrumPadView />
-        </TabsContent>
+          <TabsContent value="drumpad" className="h-full p-0 m-0">
+            <DrumPadView />
+          </TabsContent>
 
-        <TabsContent value="guitarbase" className="flex-1 p-0 m-0">
-          <GuitarbaseView />
-        </TabsContent>
+          <TabsContent value="guitarbase" className="h-full p-0 m-0">
+            <GuitarbaseView />
+          </TabsContent>
 
-        <TabsContent value="lyricbase" className="flex-1 p-0 m-0">
-          <LyricbaseView />
-        </TabsContent>
+          <TabsContent value="lyricbase" className="h-full p-0 m-0">
+            <LyricbaseView />
+          </TabsContent>
 
-        <TabsContent value="mixabase" className="flex-1 p-0 m-0">
-          <MixabaseView />
-        </TabsContent>
+          <TabsContent value="mixabase" className="h-full p-0 m-0">
+            <MixabaseView />
+          </TabsContent>
 
-        <TabsContent value="supabase" className="flex-1 p-0 m-0">
-          <SupabaseView />
-        </TabsContent>
+          <TabsContent value="supabase" className="h-full p-0 m-0">
+            <SupabaseView />
+          </TabsContent>
 
-        <TabsContent value="voxbase" className="flex-1 p-0 m-0">
-          <VoxbaseView />
-        </TabsContent>
+          <TabsContent value="voxbase" className="h-full p-0 m-0">
+            <VoxbaseView />
+          </TabsContent>
+        </div>
       </Tabs>
     </div>
   );
