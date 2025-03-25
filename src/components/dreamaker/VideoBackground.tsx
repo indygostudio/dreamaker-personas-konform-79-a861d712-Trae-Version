@@ -116,13 +116,14 @@ export const VideoBackground = ({
       }, 50);
       
       return () => clearTimeout(playTimer);
-    } else if (!continuePlayback) {
+    } else {
+      // Always pause when mouse leaves, regardless of continuePlayback setting
       video.pause();
       setIsPlaying(false);
       
       // Don't reset to first frame - maintain position for next hover
     }
-  }, [isHovering, videoUrl, continuePlayback, autoPlay]);
+  }, [isHovering, videoUrl, autoPlay]);
   
   // Ensure video pauses when component unmounts
   useEffect(() => {

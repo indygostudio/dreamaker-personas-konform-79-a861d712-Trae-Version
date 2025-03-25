@@ -1,9 +1,10 @@
 
+import { useState, useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { ChannelStrip } from "./controls/ChannelStrip";
-import { useState } from "react";
+import { MixerHeader } from "./MixerHeader";
 import { 
   DndContext, 
   closestCenter,
@@ -21,6 +22,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import type { Persona } from "@/types/persona";
 import { useViewModeStore } from '@/stores/viewModeStore';
+import { useToast } from "@/hooks/use-toast";
 
 interface Channel {
   id: string;
@@ -183,6 +185,15 @@ export const MixerView = () => {
 
   return (
     <div className="h-[calc(100vh-200px)] bg-black/40 rounded-lg p-4 flex flex-col">
+      <div className="mb-4">
+        <MixerHeader 
+          currentMixer={currentMixer}
+          mixerPersonas={mixerPersonas}
+          onMixerChange={handleMixerChange}
+          currentMixerState={getCurrentMixerState()}
+          onLoadPreset={handleLoadPreset}
+        />
+      </div>
       <div className="mt-auto border-t border-konform-neon-blue/10 pt-4">
         <ScrollArea className="w-full" type="scroll" scrollHideDelay={0}>
           <DndContext 

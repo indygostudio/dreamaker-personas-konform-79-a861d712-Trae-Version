@@ -107,33 +107,31 @@ export const VideoBackground = ({
     if (videoUrl && videoRef.current) {
       const video = videoRef.current;
       
-      // Only apply hover effects if continuePlayback is false
-      // This prevents the hover state from affecting video playback when continuePlayback is true
-      if (!continuePlayback) {
-        if (isHovering && !autoPlay) {
-          // Only play on hover if not set to autoPlay
-          const playTimer = setTimeout(() => {
-            if (reverseOnEnd && lastPlaybackRate !== 0) {
-              // Resume in the same direction
-              video.playbackRate = lastPlaybackRate;
-            }
-            video.play()
-              .then(() => setIsPlaying(true))
-              .catch(err => console.log("Hover play error:", err));
-          }, 50);
-          
-          return () => clearTimeout(playTimer);
-        } else if (!isHovering) {
-          // Always pause when mouse leaves unless explicitly set to continue
-          video.pause();
-          setIsPlaying(false);
-          
-          // Reset to beginning when mouse leaves
-          video.currentTime = 0;
-        }
+      // Always apply hover effects regardless of continuePlayback setting
+      // This ensures videos always play on hover and pause when not hovered
+      if (isHovering) {
+        // Play on hover
+        const playTimer = setTimeout(() => {
+          if (reverseOnEnd && lastPlaybackRate !== 0) {
+            // Resume in the same direction
+            video.playbackRate = lastPlaybackRate;
+          }
+          video.play()
+            .then(() => setIsPlaying(true))
+            .catch(err => console.log("Hover play error:", err));
+        }, 50);
+        
+        return () => clearTimeout(playTimer);
+      } else {
+        // Always pause when mouse leaves
+        video.pause();
+        setIsPlaying(false);
+        
+        // Don't reset position - maintain current position for smoother experience
+        // when hovering again
       }
     }
-  }, [videoUrl, isHovering, continuePlayback, reverseOnEnd, lastPlaybackRate, autoPlay]);
+  }, [videoUrl, isHovering, reverseOnEnd, lastPlaybackRate]);
 
   if (!videoUrl && !fallbackImage) {
     console.log('No video or fallback image provided');

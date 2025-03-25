@@ -15,6 +15,7 @@ export const MixbaseView = () => {
     name: 'Master',
     volume: 80,
     isMuted: false,
+    isSolo: false,
     mode: 'master',
     clips: [],
   }, {
@@ -22,6 +23,7 @@ export const MixbaseView = () => {
     name: 'Bus 1',
     volume: 75,
     isMuted: false,
+    isSolo: false,
     mode: 'bus',
     clips: [],
   }, {
@@ -29,6 +31,7 @@ export const MixbaseView = () => {
     name: 'Bus 2',
     volume: 75,
     isMuted: false,
+    isSolo: false,
     mode: 'bus',
     clips: [],
   }, {
@@ -36,6 +39,7 @@ export const MixbaseView = () => {
     name: 'Track 1',
     volume: 75,
     isMuted: false,
+    isSolo: false,
     mode: 'ai-audio',
     clips: [],
   }]);
@@ -55,6 +59,7 @@ export const MixbaseView = () => {
       name: `Track ${audioTracks.length + 1}`,
       volume: 75,
       isMuted: false,
+      isSolo: false,
       mode: 'ai-audio',
       clips: [],
     };
@@ -75,6 +80,7 @@ export const MixbaseView = () => {
       ...trackToDuplicate,
       id: Math.max(...tracks.map(t => t.id)) + 1,
       name: `${trackToDuplicate.name} (Copy)`,
+      isSolo: trackToDuplicate.isSolo || false,
       clips: []
     };
 
@@ -110,111 +116,170 @@ export const MixbaseView = () => {
 
   // Render a mixer channel with the new UI based on the image
   const renderMixerChannel = (track: Track, index: number) => {
+    // Calculate volume percentage for display (0-200%)
+    const volumePercentage = Math.round((track.volume / 100) * 200);
+    
+    // Calculate dB value (simplified conversion for display)
+    const dbValue = track.volume > 0 ? Math.round((track.volume - 75) / 25 * 12) : -48;
+    const dbDisplay = dbValue > 0 ? `+${dbValue}` : dbValue;
+    
     return (
       <div key={track.id} className={`flex-shrink-0 ${viewMode === 'large' ? 'w-96' : viewMode === 'normal' ? 'w-64' : 'w-48'}`}>
-        <div className="bg-black/80 rounded-lg border border-konform-neon-blue/30 overflow-hidden">
-          {/* Channel Header */}
-          <div className="p-2 border-b border-konform-neon-blue/20 flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <span className="text-konform-neon-blue text-xs">CH {index}</span>
-            </div>
-            <div className="flex space-x-1">
-              <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/></svg>
-              </Button>
-              <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-              </Button>
-              <Button variant="ghost" size="icon" className="h-6 w-6 text-konform-neon-blue hover:text-konform-neon-orange">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 20V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v14"/><path d="M2 20h20"/><path d="M14 12v.01"/></svg>
-              </Button>
-            </div>
-          </div>
-          
-          {/* Plugin Section */}
-          <div className="p-2 border-b border-konform-neon-blue/20">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-konform-neon-blue">Plugin</span>
-              <Button variant="ghost" size="icon" className="h-5 w-5 text-konform-neon-blue hover:text-konform-neon-orange">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-              </Button>
-            </div>
-            <Button variant="outline" size="sm" className="w-full text-xs h-8 border-konform-neon-blue/30 text-white bg-black/60 hover:bg-black/80 hover:text-konform-neon-blue">
-              Add Plugin
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><path d="m6 9 6 6 6-6"/></svg>
+        <div className="bg-[#2a9cb2] rounded-lg border border-gray-700 overflow-hidden flex flex-col h-full">
+          {/* Presence Button */}
+          <div className="bg-[#2a9cb2] p-1 border-b border-gray-700 flex justify-center">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="w-full text-xs h-8 border-gray-700 text-yellow-300 bg-[#1e3e45] hover:bg-[#1e3e45]/80"
+            >
+              Presence
             </Button>
           </div>
           
-          {/* Output Section */}
-          <div className="p-2 border-b border-konform-neon-blue/20">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-konform-neon-blue">Output</span>
-              <span className="text-xs text-konform-neon-orange">Φ</span>
-            </div>
-            <Button variant="outline" size="sm" className="w-full text-xs h-8 border-konform-neon-blue/30 text-white bg-black/60 hover:bg-black/80 hover:text-konform-neon-blue">
-              Select...
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><path d="m6 9 6 6 6-6"/></svg>
+          {/* Master Label */}
+          <div className="bg-[#1e3e45] p-1 border-b border-gray-700 flex justify-center">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="w-full text-xs h-8 border-gray-700 text-yellow-300 bg-[#1e3e45] hover:bg-[#1e3e45]/80 font-bold"
+            >
+              {track.mode === 'master' ? 'MASTER' : track.mode === 'bus' ? `BUS ${index}` : 'TRACK'}
             </Button>
           </div>
           
-          {/* Volume Slider */}
-          <div className="p-2 flex flex-col items-center">
-            <div className="w-full flex justify-between text-xs text-gray-400 mb-1">
-              <span>+12</span>
-            </div>
-            <div className="h-48 w-full flex justify-center mb-2">
-              <Slider
-                orientation="vertical"
-                value={[track.volume]}
-                onValueChange={([value]) => {
-                  setTracks(tracks.map(t =>
-                    t.id === track.id ? { ...t, volume: value } : t
-                  ));
-                }}
-                max={100}
-                step={1}
-                className="h-full"
+          {/* Level Meter */}
+          <div className="bg-black p-1 border-b border-gray-700 flex justify-center h-12">
+            <div className="w-full bg-black relative h-full flex items-center justify-center">
+              <div 
+                className="absolute left-0 bottom-0 h-full bg-[#2a9cb2] transition-all duration-150" 
+                style={{ width: '4px', height: `${track.volume}%` }}
               />
+              <div className="z-10 w-full h-1 bg-[#2a9cb2]/30 absolute" style={{ top: '50%' }} />
             </div>
-            <div className="w-full flex justify-between text-xs text-gray-400 mb-1">
-              <span>-48</span>
+          </div>
+          
+          {/* Level and Percentage */}
+          <div className="bg-[#2a9cb2] p-1 border-b border-gray-700 flex justify-between items-center">
+            <div className="text-white text-xs font-medium">L5</div>
+            <div className="text-white text-xs font-medium">{volumePercentage}%</div>
+          </div>
+          
+          {/* Mute/Solo Buttons */}
+          <div className="grid grid-cols-2 border-b border-gray-700">
+            <Button
+              variant="outline"
+              size="sm"
+              className={`rounded-none h-10 text-sm font-bold ${track.isMuted ? 'bg-red-500 text-white' : 'bg-[#1e3e45] text-white'} hover:bg-red-500 hover:text-white border-gray-700`}
+              onClick={() => {
+                setTracks(tracks.map(t =>
+                  t.id === track.id ? { ...t, isMuted: !t.isMuted } : t
+                ));
+              }}
+            >
+              M
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className={`rounded-none h-10 text-sm font-bold ${track.isSolo ? 'bg-[#2a9cb2] text-white' : 'bg-[#1e3e45] text-white'} hover:bg-[#2a9cb2] hover:text-white border-gray-700`}
+              onClick={() => {
+                setTracks(tracks.map(t =>
+                  t.id === track.id ? { ...t, isSolo: !t.isSolo } : t
+                ));
+              }}
+            >
+              S
+            </Button>
+          </div>
+          
+          {/* Mute/Solo Status Indicators */}
+          <div className="grid grid-cols-2 border-b border-gray-700">
+            <div className={`flex items-center justify-center h-10 ${track.isMuted ? 'bg-red-500' : 'bg-[#1e3e45]'}`}>
+              <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center">
+                {track.isMuted && <div className="w-4 h-4 rounded-full bg-red-500" />}
+              </div>
             </div>
-            <div className="flex w-full justify-center space-x-2 mt-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className={`text-xs h-6 w-6 border-konform-neon-blue/30 ${track.isMuted ? 'bg-konform-neon-blue text-black' : 'bg-black/60'} hover:bg-konform-neon-blue hover:text-black`}
-                onClick={() => {
-                  setTracks(tracks.map(t =>
-                    t.id === track.id ? { ...t, isMuted: !t.isMuted } : t
-                  ));
-                }}
-              >
-                M
+            <div className={`flex items-center justify-center h-10 ${track.isSolo ? 'bg-[#2a9cb2]' : 'bg-[#1e3e45]'}`}>
+              <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center">
+                {track.isSolo && <div className="w-4 h-4 rounded-full bg-[#2a9cb2] border-2 border-white" />}
+              </div>
+            </div>
+          </div>
+          
+          {/* dB Label */}
+          <div className="bg-[#2a9cb2] p-1 border-b border-gray-700 flex justify-center">
+            <div className="text-white text-sm font-medium">{dbDisplay}dB</div>
+          </div>
+          
+          {/* Volume Meter */}
+          <div className="flex-1 bg-[#1e3e45] p-2 flex">
+            <div className="w-10 bg-black rounded-sm mr-2 relative">
+              {/* Meter scale lines */}
+              {[-72, -48, -36, -24, -12, -6, 0, 6, 10].map((level, i) => (
+                <div 
+                  key={i} 
+                  className="absolute w-full h-px bg-gray-600" 
+                  style={{ 
+                    bottom: `${((level + 72) / 82) * 100}%`,
+                    left: 0
+                  }}
+                />
+              ))}
+              
+              {/* Level indicator */}
+              <div 
+                className={`absolute bottom-0 left-0 w-full transition-all duration-150 ${track.isMuted ? 'bg-red-500/50' : 'bg-[#2a9cb2]'}`}
+                style={{ height: `${track.volume}%` }}
+              />
+              
+              {/* Level markers */}
+              <div className="absolute left-0 w-full flex flex-col justify-between h-full text-[8px] text-gray-400 pointer-events-none">
+                <div className="text-right pr-1">10</div>
+                <div className="text-right pr-1">6</div>
+                <div className="text-right pr-1">0</div>
+                <div className="text-right pr-1">-6</div>
+                <div className="text-right pr-1">-12</div>
+                <div className="text-right pr-1">-24</div>
+                <div className="text-right pr-1">-36</div>
+                <div className="text-right pr-1">-48</div>
+                <div className="text-right pr-1">-72</div>
+              </div>
+            </div>
+            
+            {/* Volume Slider */}
+            <div className="flex-1 flex flex-col items-center">
+              <div className="h-full w-full flex justify-center">
+                <Slider
+                  orientation="vertical"
+                  value={[track.volume]}
+                  onValueChange={([value]) => {
+                    setTracks(tracks.map(t =>
+                      t.id === track.id ? { ...t, volume: value } : t
+                    ));
+                  }}
+                  max={100}
+                  step={1}
+                  className="h-full"
+                />
+              </div>
+            </div>
+          </div>
+          
+          {/* Track Number and Controls */}
+          <div className="bg-[#2a9cb2] p-1 border-t border-gray-700 flex justify-between items-center">
+            <div className="text-white text-sm font-bold">{index}</div>
+            <div className="flex space-x-1">
+              <Button variant="ghost" size="icon" className="h-6 w-6 text-white hover:text-yellow-300">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className={`text-xs h-6 w-6 border-konform-neon-blue/30 ${track.isSolo ? 'bg-konform-neon-orange text-black' : 'bg-black/60'} hover:bg-konform-neon-orange hover:text-black`}
-                onClick={() => {
-                  setTracks(tracks.map(t =>
-                    t.id === track.id ? { ...t, isSolo: !t.isSolo } : t
-                  ));
-                }}
-              >
-                S
-              </Button>
-            </div>
-            <div className="text-xs text-konform-neon-blue mt-2">
-              0.0 dB
             </div>
           </div>
           
           {/* Track Name */}
-          <div className="p-2 border-t border-konform-neon-blue/20 flex justify-center">
-            <Button variant="ghost" className="text-xs text-white hover:text-konform-neon-blue">
+          <div className="bg-[#2a9cb2] p-1 flex justify-center">
+            <Button variant="ghost" className="text-xs text-white hover:text-yellow-300 font-medium">
               {track.name}
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><path d="M12 19c-4.3 0-7.8-3.4-7.8-7.7 0-2 .8-3.8 2-5.1.5-.5 1.3-.5 1.8 0l.5.5c.3.3.3.8 0 1.1-.8.9-1.2 2-1.2 3.4 0 2.8 2.2 5 5 5s5-2.2 5-5c0-1.4-.4-2.6-1.2-3.4-.3-.3-.3-.8 0-1.1l.5-.5c.5-.5 1.3-.5 1.8 0 1.2 1.3 2 3.1 2 5.1-.3 4.3-3.8 7.7-8.2 7.7z"/><path d="M12 5v8"/></svg>
             </Button>
           </div>
         </div>

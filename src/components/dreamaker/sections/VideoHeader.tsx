@@ -7,12 +7,13 @@ export const VideoHeader = () => {
       <div className="absolute inset-0 z-0">
         <video
           className="absolute inset-0 w-full h-full object-cover filter invert"
-          src="/Videos/KONFORM_BG_04.mp4"
           muted
           loop
           playsInline
           autoPlay
-        />
+        >
+          <source src="/Videos/ROTATING EYE.mp4" type="video/mp4" />
+        </video>
         <div className="absolute inset-0 bg-black/50" />
       </div>
       

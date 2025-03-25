@@ -2,14 +2,23 @@ import { Button } from "@/components/ui/button";
 import { RefreshCw, UserRound } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
+import { MixerPresetButton } from "./MixerPresetButton";
 
 interface MixerHeaderProps {
   currentMixer: any;
   mixerPersonas: any[];
   onMixerChange: (mixerId: string) => void;
+  currentMixerState?: any;
+  onLoadPreset?: (mixerState: any) => void;
 }
 
-export const MixerHeader = ({ currentMixer, mixerPersonas, onMixerChange }: MixerHeaderProps) => {
+export const MixerHeader = ({ 
+  currentMixer, 
+  mixerPersonas, 
+  onMixerChange,
+  currentMixerState = {},
+  onLoadPreset = () => {}
+}: MixerHeaderProps) => {
   const navigate = useNavigate();
 
   const navigateToMixerPersonas = () => {
@@ -35,6 +44,10 @@ export const MixerHeader = ({ currentMixer, mixerPersonas, onMixerChange }: Mixe
       </div>
       
       <div className="flex items-center gap-4">
+        <MixerPresetButton 
+          currentMixerState={currentMixerState}
+          onLoadPreset={onLoadPreset}
+        />
         {currentMixer ? (
           <div 
             className="flex items-center gap-3 p-3 bg-[#00FF00]/5 rounded-lg border border-[#00FF00]/20 cursor-pointer hover:bg-[#00FF00]/10 transition-colors"
