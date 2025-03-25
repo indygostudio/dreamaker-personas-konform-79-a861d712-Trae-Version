@@ -17,7 +17,7 @@ export const Hero = () => {
 
   const heroSections = [
     {
-      video: "/Videos/DREAMAKER_01.mp4",
+      video: "/Videos/ROTATING EYE.mp4",
       title: "DREAMAKER",
       description: "Experience the future of music creation with our AI-powered tools and virtual artists",
       sectionId: "dreamaker-section"

@@ -19,7 +19,7 @@ export const HeroSection = () => {
       <div className="absolute inset-0 z-0 overflow-hidden">
         <video
           className="absolute inset-0 w-full h-full object-cover"
-          src="/Videos/DREAMAKER_01.mp4"
+          src="/Videos/ROTATING EYE.mp4"
           muted
           loop
           playsInline
