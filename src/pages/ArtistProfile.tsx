@@ -79,22 +79,59 @@ export const ArtistProfile = () => {
   
   // Ensure audio state is preserved independently of UI interactions
   useEffect(() => {
-    // This effect intentionally maintains audio state
-    // regardless of header hover/expand/collapse events
     if (currentAudio && isPlaying) {
-      // Make sure audio continues playing even when UI elements change
-      currentAudio.play().catch(err => console.error('Error ensuring audio playback:', err));
+      const playPromise = currentAudio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(err => {
+          console.error('Error ensuring audio playback:', err);
+          // Only update state if the error is not due to user interaction
+          if (err.name !== 'NotAllowedError') {
+            setIsPlaying(false);
+          }
+        });
+      }
     }
-    return () => {};
+    // Keep audio state independent of UI changes
+    const handleVisibilityChange = () => {
+      if (document.hidden && currentAudio && isPlaying) {
+        currentAudio.play().catch(() => {});
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [isPlaying, currentAudio]);
 
   useEffect(() => {
     if (profile?.audio_preview_url && !currentAudio) {
       const audio = new Audio(profile.audio_preview_url);
-      audio.addEventListener('ended', () => setIsPlaying(false));
+      
+      const handleEnded = () => setIsPlaying(false);
+      const handleError = (error: Event) => {
+        console.error('Audio playback error:', error);
+        setIsPlaying(false);
+      };
+      
+      audio.addEventListener('ended', handleEnded);
+      audio.addEventListener('error', handleError);
+      
+      // Enable continuous playback
+      audio.addEventListener('pause', () => {
+        if (isPlaying) {
+          audio.play().catch(() => {});
+        }
+      });
+      
       setCurrentAudio(audio);
+      
+      return () => {
+        audio.removeEventListener('ended', handleEnded);
+        audio.removeEventListener('error', handleError);
+      };
     }
-  }, [profile?.audio_preview_url, currentAudio]);
+  }, [profile?.audio_preview_url, currentAudio, isPlaying]);
 
   const { data: personas } = useQuery({
     queryKey: ["artist-personas", id],

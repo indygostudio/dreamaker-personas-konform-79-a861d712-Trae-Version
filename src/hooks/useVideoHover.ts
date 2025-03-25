@@ -71,8 +71,19 @@ export const useVideoHover = (options: UseVideoHoverOptions = {}) => {
     if (!video) return
 
     if (isHovering) {
-      lastPlaybackRateRef.current = video.playbackRate
-      video.play().catch(console.error)
+      // Add a small delay to prevent flickering on rapid hover changes
+      const playTimer = setTimeout(() => {
+        lastPlaybackRateRef.current = video.playbackRate
+        video.play()
+          .then(() => {
+            // Successfully started playing
+          })
+          .catch(err => {
+            console.error('Error playing video:', err)
+          })
+      }, 50)
+
+      return () => clearTimeout(playTimer)
     } else {
       video.pause()
       // Don't reset currentTime to 0 when mouse leaves

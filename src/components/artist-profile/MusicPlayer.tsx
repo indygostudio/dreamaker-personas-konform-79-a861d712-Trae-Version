@@ -30,7 +30,7 @@ export const MusicPlayer = ({
     return null;
   }
   
-  // Initialize or update audio element
+  // Initialize or update audio element with robust error handling and continuous playback
   useEffect(() => {
     if (!audioUrl) return;
     
@@ -39,18 +39,32 @@ export const MusicPlayer = ({
       if (!audioRef.current) {
         const audio = new Audio(audioUrl);
         
+        // Set up audio context for better playback control
+        audio.preload = 'auto';
+        
         audio.addEventListener('ended', () => {
-          console.log('Audio ended, calling onPlayPause');
           onPlayPause();
         });
         
         audio.addEventListener('canplaythrough', () => {
           setIsAudioReady(true);
+          // Attempt to resume playback if it was playing
+          if (isPlaying) {
+            audio.play().catch(() => {});
+          }
         });
         
         audio.addEventListener('error', (e) => {
           console.error('Audio element error:', e);
           setIsAudioReady(false);
+          onPlayPause(); // Ensure UI state reflects playback state
+        });
+        
+        // Handle unexpected pauses
+        audio.addEventListener('pause', () => {
+          if (isPlaying && !audio.ended) {
+            audio.play().catch(() => {});
+          }
         });
         
         audioRef.current = audio;
@@ -63,16 +77,16 @@ export const MusicPlayer = ({
     };
     
     setupAudio();
-    // Initialize audio when new audio is loaded
     
     // Cleanup only when component is unmounted
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.src = '';
+        audioRef.current = null;
       }
     };
-  }, [audioUrl, onPlayPause]);
+  }, [audioUrl, onPlayPause, isPlaying]);
   
   // Handle trim end point for playback
   useEffect(() => {

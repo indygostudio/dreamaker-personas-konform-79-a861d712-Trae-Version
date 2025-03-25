@@ -106,6 +106,11 @@ export const VideoBackground = ({
     if (isHovering) {
       // Use a slight delay to prevent rapid toggling
       const playTimer = setTimeout(() => {
+        if (isReversed) {
+          video.playbackRate = -1;
+        } else {
+          video.playbackRate = 1;
+        }
         video.play()
           .then(() => setIsPlaying(true))
           .catch(err => {
@@ -116,8 +121,8 @@ export const VideoBackground = ({
       }, 50);
       
       return () => clearTimeout(playTimer);
-    } else {
-      // Always pause when mouse leaves, regardless of continuePlayback setting
+    } else if (!continuePlayback) {
+      // Pause when mouse leaves if continuePlayback is false
       video.pause();
       setIsPlaying(false);
       

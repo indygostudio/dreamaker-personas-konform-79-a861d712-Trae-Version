@@ -19,11 +19,15 @@
 }
 
 .training-mode-enabled {
-  box-shadow: 0 0 10px 5px #FF0000, 0 0 20px 10px #FF0000;
-  text-shadow: 0 0 5px #FF0000;
-  background-color: rgba(255, 0, 0, 0.2) !important;
-  border-color: #FF0000 !important;
+  box-shadow: 0 0 15px 5px rgba(255, 0, 0, 0.8), 0 0 30px 10px rgba(255, 0, 0, 0.6), inset 0 0 10px rgba(255, 0, 0, 0.4);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+  background-color: rgb(255, 0, 0) !important;
+  border-color: #FF6666 !important;
   color: white !important;
   opacity: 1 !important;
+  animation: pulse-red-glow 2s ease-in-out infinite;
+  font-weight: 600;
+  transform: scale(1.05);
+  transition: all 0.3s ease-in-out;
 }
 
