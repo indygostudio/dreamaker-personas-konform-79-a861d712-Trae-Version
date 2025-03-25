@@ -13,6 +13,8 @@ import { EditorTabs } from "./editor/EditorTabs";
 import { LyricsView } from "./lyrics/LyricsView";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { VideoTab } from "./video/VideoTab";
+
 
 
 export const KonformTabs = () => {
@@ -131,19 +133,8 @@ export const KonformTabs = () => {
               <EditorTabs />
             </TabsContent>
             <TabsContent value="video">
-              <div className="min-h-[calc(100vh-180px)] bg-black/40 rounded-lg relative">
-                {/* Empty container for future video content */}
-                <div className="absolute top-4 right-4">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="bg-black/20 border-white/20 hover:bg-black/40 text-white rounded-full"
-                    onClick={saveVideoTabState}
-                    title="Save current video settings"
-                  >
-                    <Save className="w-4 h-4" />
-                  </Button>
-                </div>
+              <div className="min-h-[calc(100vh-180px)] bg-black/40 rounded-lg relative p-6">
+                <VideoTab />
               </div>
             </TabsContent>
             <TabsContent value="settings">

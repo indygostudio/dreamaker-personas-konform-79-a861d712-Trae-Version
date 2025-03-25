@@ -226,22 +226,19 @@ export function PersonaFilters({
         <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="bg-dreamaker-purple text-white pointer-events-auto">
-                {selectedType ? personaTypes.find(t => t.value === selectedType)?.label : "All Types"}
+              <Button variant="outline" className="bg-dreamaker-purple/50 text-white pointer-events-auto">
+                {selectedSubtype ? getSubtypeOptions(selectedType).find(s => s.value === selectedSubtype)?.label : "All Subtypes"}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-dreamaker-gray border border-dreamaker-purple pointer-events-auto" style={{ zIndex: 40 }}>
-              {personaTypes.map((type) => (
+              {getSubtypeOptions(selectedType).map((subtype) => (
                 <DropdownMenuItem
-                  key={type.label}
-                  onClick={() => {
-                    setSelectedType(type.value);
-                    setSelectedSubtype(null);
-                  }}
+                  key={subtype.label}
+                  onClick={() => setSelectedSubtype(subtype.value)}
                   className="text-white hover:bg-dreamaker-purple/50"
                 >
-                  {type.label}
-                </DropdownMenuItem>
+                  {subtype.label}
+                </DropdownMenuItem
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
@@ -249,19 +246,22 @@ export function PersonaFilters({
           {selectedType && getSubtypeOptions(selectedType).length > 0 && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="bg-dreamaker-purple/50 text-white pointer-events-auto">
-                  {selectedSubtype || "All Subtypes"}
+                <Button variant="outline" className="bg-dreamaker-purple text-white pointer-events-auto">
+                  {selectedType ? personaTypes.find(t => t.value === selectedType)?.label : "All Types"}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="bg-dreamaker-gray border border-dreamaker-purple pointer-events-auto" style={{ zIndex: 40 }}>
-                {getSubtypeOptions(selectedType).map((subtype) => (
+                {personaTypes.map((type) => (
                   <DropdownMenuItem
-                    key={subtype.label}
-                    onClick={() => setSelectedSubtype(subtype.value)}
+                    key={type.label}
+                    onClick={() => {
+                      setSelectedType(type.value);
+                      setSelectedSubtype(null);
+                    }}
                     className="text-white hover:bg-dreamaker-purple/50"
                   >
-                    {subtype.label}
-                  </DropdownMenuItem>
+                    {type.label}
+                  </DropdownMenuItem
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
