@@ -81,8 +81,12 @@ export const ArtistProfile = () => {
   useEffect(() => {
     // This effect intentionally maintains audio state
     // regardless of header hover/expand/collapse events
+    if (currentAudio && isPlaying) {
+      // Make sure audio continues playing even when UI elements change
+      currentAudio.play().catch(err => console.error('Error ensuring audio playback:', err));
+    }
     return () => {};
-  }, [isPlaying]);
+  }, [isPlaying, currentAudio]);
 
   useEffect(() => {
     if (profile?.audio_preview_url && !currentAudio) {

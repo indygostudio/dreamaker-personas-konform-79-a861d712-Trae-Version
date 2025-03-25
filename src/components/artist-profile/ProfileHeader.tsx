@@ -59,10 +59,12 @@ export const ProfileHeader = ({
 
   const handleMouseEnter = () => {
     setIsHovering(true);
+    // Only affects video playback, not audio
   };
 
   const handleMouseLeave = () => {
     setIsHovering(false);
+    // Only affects video playback, not audio
   };
   
   // Handle hover state for video playback

@@ -14,6 +14,7 @@ import { LyricsView } from "./lyrics/LyricsView";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { VideoTab } from "./video/VideoTab";
+import { useDAWState } from "@/hooks/use-daw-state";
 
 
 
@@ -25,6 +26,9 @@ export const KonformTabs = () => {
     konformHeaderCollapsed,
     setKonformHeaderCollapsed
   } = useHeaderStore();
+  
+  // Import DAW state to manage audio playback
+  const { isPlaying } = useDAWState();
   
   // Get the tab from URL query parameters or default to "editor"
   const urlTab = searchParams.get('tab');
@@ -95,7 +99,11 @@ export const KonformTabs = () => {
         title="KONFORM" 
         description="Advanced Audio Production Suite" 
         isCollapsed={konformHeaderCollapsed} 
-        onCollapsedChange={setKonformHeaderCollapsed}
+        onCollapsedChange={(collapsed) => {
+          // Update header collapsed state without affecting audio playback
+          setKonformHeaderCollapsed(collapsed);
+          // No need to stop audio playback when header is toggled
+        }}
         latestSessionId={latestSession?.id}
       />
       

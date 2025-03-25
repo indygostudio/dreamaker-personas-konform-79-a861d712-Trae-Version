@@ -107,8 +107,8 @@ export const VideoBackground = ({
     if (videoUrl && videoRef.current) {
       const video = videoRef.current;
       
-      // Always apply hover effects regardless of continuePlayback setting
-      // This ensures videos always play on hover and pause when not hovered
+      // Only control video playback, not audio
+      // This ensures videos play on hover without affecting audio transport
       if (isHovering) {
         // Play on hover
         const playTimer = setTimeout(() => {
@@ -122,8 +122,9 @@ export const VideoBackground = ({
         }, 50);
         
         return () => clearTimeout(playTimer);
-      } else {
-        // Always pause when mouse leaves
+      } else if (!continuePlayback) {
+        // Only pause video when mouse leaves if continuePlayback is false
+        // This allows videos to keep playing when audio is playing
         video.pause();
         setIsPlaying(false);
         
@@ -131,7 +132,7 @@ export const VideoBackground = ({
         // when hovering again
       }
     }
-  }, [videoUrl, isHovering, reverseOnEnd, lastPlaybackRate]);
+  }, [videoUrl, isHovering, reverseOnEnd, lastPlaybackRate, continuePlayback]);
 
   if (!videoUrl && !fallbackImage) {
     console.log('No video or fallback image provided');

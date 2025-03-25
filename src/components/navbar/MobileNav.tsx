@@ -1,6 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { CollabClubLink } from "./CollabClubLink";
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -44,6 +45,7 @@ export const MobileNav = ({ isOpen, session, onClose, onSignOut }: MobileNavProp
         >
           Konform
         </Link>
+        {session && <CollabClubLink />}
 
         {session ? (
           <Button

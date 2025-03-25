@@ -1,5 +1,6 @@
 
 import { Link, useLocation } from "react-router-dom";
+import { CollabClubLink } from "./CollabClubLink";
 interface DesktopNavProps {
   session: any;
 }
@@ -21,6 +22,7 @@ export const DesktopNav = ({
             ${location.pathname.includes("konform") ? "bg-[#0EA5E9]/10 text-white border-[#0EA5E9]/20 shadow-[0_4px_20px_rgba(14,165,233,0.3)] transform -translate-y-0.5" : "bg-black/20 text-white/80 border-white/10 hover:bg-[#0EA5E9]/10 hover:text-white hover:border-[#0EA5E9]/20 hover:shadow-[0_4px_20px_rgba(14,165,233,0.3)] hover:-translate-y-0.5"}`}>
           Konform
         </Link>
+        {session && <CollabClubLink />}
       </div>
     </div>;
 };
