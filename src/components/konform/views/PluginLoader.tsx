@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Power, Maximize2 } from "lucide-react";
+import { useState, useRef } from "react";
+import { Power, Maximize2, Minimize2, ZoomIn, ZoomOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { scanPlugins, Plugin } from "@/lib/audio/pluginScanner";
@@ -12,6 +12,8 @@ import {
   DialogClose
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Resizable } from "re-resizable";
+import { cn } from "@/lib/utils";
 
 interface PluginLoaderProps {
   title: string;
@@ -23,6 +25,9 @@ export const PluginLoader = ({ title, queryKey, filterFn }: PluginLoaderProps) =
   const [selectedPlugin, setSelectedPlugin] = useState<string>();
   const [isPluginActive, setIsPluginActive] = useState(false);
   const [isPluginUIOpen, setIsPluginUIOpen] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const resizableRef = useRef(null);
 
   const { data: plugins, isLoading } = useQuery({
     queryKey: [queryKey],
@@ -115,15 +120,69 @@ export const PluginLoader = ({ title, queryKey, filterFn }: PluginLoaderProps) =
 
       {/* Plugin UI Dialog */}
       <Dialog open={isPluginUIOpen} onOpenChange={setIsPluginUIOpen}>
-        <DialogContent className="bg-[#1A1F2C] border-cyan-500/30 max-w-4xl mx-auto draggable-dialog">
+        <DialogContent className={cn(
+          "bg-[#1A1F2C] border-cyan-500/30 mx-auto draggable-dialog",
+          isFullscreen ? "max-w-[95vw] max-h-[90vh]" : "max-w-4xl"
+        )}>
           <DialogHeader>
             <DialogTitle className="text-white">
               {plugins?.find(p => p.id === selectedPlugin)?.name || "Plugin Interface"}
             </DialogTitle>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setZoomLevel(prev => Math.max(0.5, prev - 0.1))}
+                className="text-cyan-500 h-7 w-7"
+                disabled={zoomLevel <= 0.5}
+              >
+                <ZoomOut className="h-3 w-3" />
+              </Button>
+              <span className="text-xs text-gray-400">{Math.round(zoomLevel * 100)}%</span>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setZoomLevel(prev => Math.min(2, prev + 0.1))}
+                className="text-cyan-500 h-7 w-7"
+                disabled={zoomLevel >= 2}
+              >
+                <ZoomIn className="h-3 w-3" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setIsFullscreen(!isFullscreen)}
+                className="text-cyan-500 h-7 w-7 ml-2"
+              >
+                {isFullscreen ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
+              </Button>
+            </div>
           </DialogHeader>
           
-          <div className="min-h-[400px] bg-black/40 rounded-lg p-4 border border-gray-800/50">
-            <div className="flex items-center justify-center h-full">
+          <Resizable
+            ref={resizableRef}
+            defaultSize={{
+              width: "100%",
+              height: 400,
+            }}
+            minHeight={200}
+            maxHeight={isFullscreen ? "80vh" : 800}
+            enable={{
+              top: false,
+              right: false,
+              bottom: true,
+              left: false,
+              topRight: false,
+              bottomRight: false,
+              bottomLeft: false,
+              topLeft: false,
+            }}
+            className="bg-black/40 rounded-lg border border-gray-800/50 overflow-hidden"
+          >
+            <div 
+              className="flex items-center justify-center h-full w-full overflow-auto"
+              style={{ transform: `scale(${zoomLevel})`, transformOrigin: "center center" }}
+            >
               <p className="text-cyan-500 text-center">
                 Plugin UI would render here in a native implementation.
                 <br />
@@ -132,6 +191,10 @@ export const PluginLoader = ({ title, queryKey, filterFn }: PluginLoaderProps) =
                 </span>
               </p>
             </div>
+          </Resizable>
+          
+          <div className="flex justify-center mt-2">
+            <div className="w-12 h-1 bg-gray-700 rounded-full cursor-ns-resize" title="Drag to resize" />
           </div>
           
           <DialogClose className="absolute right-4 top-4" />

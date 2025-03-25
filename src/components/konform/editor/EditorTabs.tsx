@@ -6,7 +6,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Laptop2, Settings, Music2, Wand2, Layers, Grid3x3, FileText, Sliders, Mic, Database, Save } from "lucide-react";
 import { KeybaseView } from "../views/KeybaseView";
 import { TrackEditor } from "./TrackEditor";
-import { DrumPadView } from "../DrumPadView";
+import { DrumbaseView } from "../views/DrumbaseView";
 import { LyricbaseView } from "../views/LyricbaseView";
 import { MixabaseView } from "../views/MixabaseView";
 import { VoxbaseView } from "../views/VoxbaseView";
@@ -156,7 +156,7 @@ export const EditorTabs = () => {
           </TabsContent>
 
           <TabsContent value="drumpad" className="h-full p-0 m-0">
-            <DrumPadView />
+            <DrumbaseView />
           </TabsContent>
 
           <TabsContent value="guitarbase" className="h-full p-0 m-0">
