@@ -1,14 +1,7 @@
 
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { CollabClubLink } from "./CollabClubLink";
-
+import { Link, useLocation } from "react-router-dom";
 interface MobileNavProps {
-  isOpen: boolean;
   session: any;
-
-  onClose: () => void;
-  onSignOut: () => void;
 }
 
 export const MobileNav = ({ isOpen, session, onClose, onSignOut }: MobileNavProps) => {
@@ -45,7 +38,6 @@ export const MobileNav = ({ isOpen, session, onClose, onSignOut }: MobileNavProp
         >
           Konform
         </Link>
-        {session && <CollabClubLink />}
 
         {session ? (
           <Button

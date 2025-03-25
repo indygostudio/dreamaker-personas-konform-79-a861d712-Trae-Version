@@ -1,5 +1,6 @@
 
 import { ChevronDown, ChevronUp, Users, Download, Save, Template, Edit2, Brain, Plus, Clock } from "lucide-react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ReactNode, useState } from "react";
 import { Collaborators } from "./daw/sections/Collaborators";
@@ -31,7 +32,14 @@ interface ProjectNameInputProps {
 
 const ProjectNameInput = ({ currentProject, onSave }: ProjectNameInputProps) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [projectName, setProjectName] = useState(currentProject?.name || 'Untitled Project');
+  const [projectName, setProjectName] = useState(currentProject?.name || '');
+
+  // Update local state when currentProject changes
+  useEffect(() => {
+    if (currentProject?.name) {
+      setProjectName(currentProject.name);
+    }
+  }, [currentProject]);
 
   const handleSave = () => {
     onSave(projectName);
@@ -141,7 +149,7 @@ export const KonformBanner = ({
                   className="text-white/80 hover:text-white flex items-center gap-2"
                   onClick={() => setShowProjectMenu(!showProjectMenu)}
                 >
-                  <span className="text-lg font-semibold">{currentProject?.name || 'Untitled Project'}</span>
+                  <span className="text-lg font-semibold">{currentProject?.name || ''}</span>
                   <ChevronDown className="h-4 w-4" />
                 </Button>
                 {/* Auto-save functionality remains enabled but indicator is hidden */}

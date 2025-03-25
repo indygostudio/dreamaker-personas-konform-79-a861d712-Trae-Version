@@ -20,6 +20,7 @@ import { Save, Edit } from "lucide-react";
 import { useSelectedPersonasStore } from "@/stores/selectedPersonasStore";
 import { useUIStore } from "@/stores/uiStore";
 import { VideoBackground } from "@/components/dreamaker/VideoBackground";
+import { CollabClub } from "@/components/persona/collaboration/CollabClub";
 
 interface ProfileTabsProps {
   selectedPersona: Persona | null;
@@ -108,7 +109,7 @@ export const ProfileTabs = ({
             saveTabSelection(value);
           }}
         >
-          <TabsList className="grid w-full grid-cols-4 rounded-xl glass-panel p-1.5">
+          <TabsList className="grid w-full grid-cols-5 rounded-xl glass-panel p-1.5">
             <TabsTrigger 
               value="about" 
               className="px-6 py-3 rounded-full transition-all duration-300 font-medium uppercase border 
@@ -136,6 +137,13 @@ export const ProfileTabs = ({
               text-white/80 data-[state=active]:bg-[#0EA5E9]/10 data-[state=active]:text-white data-[state=active]:border-[#0EA5E9]/20 data-[state=active]:shadow-[0_4px_20px_rgba(14,165,233,0.3)] data-[state=active]:-translate-y-0.5 bg-black/20 border-white/10 hover:bg-[#0EA5E9]/10 hover:text-white hover:border-[#0EA5E9]/20 hover:shadow-[0_4px_20px_rgba(14,165,233,0.3)] hover:-translate-y-0.5"
             >
               Mindmap
+            </TabsTrigger>
+            <TabsTrigger 
+              value="collaborations" 
+              className="px-6 py-3 rounded-full transition-all duration-300 font-medium uppercase border 
+              text-white/80 data-[state=active]:bg-[#0EA5E9]/10 data-[state=active]:text-white data-[state=active]:border-[#0EA5E9]/20 data-[state=active]:shadow-[0_4px_20px_rgba(14,165,233,0.3)] data-[state=active]:-translate-y-0.5 bg-black/20 border-white/10 hover:bg-[#0EA5E9]/10 hover:text-white hover:border-[#0EA5E9]/20 hover:shadow-[0_4px_20px_rgba(14,165,233,0.3)] hover:-translate-y-0.5"
+            >
+              Collaborations
             </TabsTrigger>
           </TabsList>
 
@@ -336,6 +344,18 @@ export const ProfileTabs = ({
                 <ArtistMindMap personas={transformedPersonas} />
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="collaborations" className="mt-6">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-white">Collaborations</h2>
+                  <p className="text-blue-100/70">Manage your collaboration requests and active sessions</p>
+                </div>
+              </div>
+              <CollabClub />
+            </div>
           </TabsContent>
         </Tabs>
       </div>
