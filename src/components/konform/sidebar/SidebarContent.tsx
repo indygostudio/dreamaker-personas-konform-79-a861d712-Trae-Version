@@ -1,8 +1,9 @@
-import { Music2, FileAudio, Sliders, Settings, Grid3x3, Piano, Orbit, Dice1, CircleDot, LayoutDashboard, PenTool, Bot } from "lucide-react";
+import { Music2, FileAudio, Sliders, Settings, Grid3x3, Piano, Orbit, Dice1, CircleDot, LayoutDashboard, PenTool, Bot, ChevronDown, ChevronUp } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { AgentPanel } from "../AgentPanel";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface SidebarContentProps {
   currentView?: 'dashboard' | 'mixer' | 'drumpad' | 'keypad' | 'files' | 'effects' | 'daw' | 'lyrics';
@@ -10,8 +11,28 @@ interface SidebarContentProps {
   onSettingsClick: () => void;
 }
 
+interface SectionState {
+  project: boolean;
+  tools: boolean;
+  views: boolean;
+  effects: boolean;
+}
+
 export const SidebarContent = ({ currentView = 'dashboard', onViewChange, onSettingsClick }: SidebarContentProps) => {
   const [isAgentPanelOpen, setIsAgentPanelOpen] = useState(false);
+  const [collapsedSections, setCollapsedSections] = useState<SectionState>({
+    project: false,
+    tools: false,
+    views: false,
+    effects: false
+  });
+
+  const toggleSection = (section: keyof SectionState) => {
+    setCollapsedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
 
   useEffect(() => {
     // Set dashboard as default view when component mounts
@@ -23,125 +44,185 @@ export const SidebarContent = ({ currentView = 'dashboard', onViewChange, onSett
   return (
     <div className="flex flex-col items-center py-4 space-y-6">
       <div className="flex flex-col space-y-6 items-center">
-        <div className="flex flex-col items-center space-y-2">
-          <span className="text-xs text-[#00D1FF] opacity-60">Project</span>
-          <div className="flex flex-col space-y-2">
-            <button 
-              onClick={() => onViewChange?.('dashboard')}
-              className={cn(
-                "w-10 h-10 rounded-lg bg-[#1A1A1A] text-[#00D1FF] hover:bg-[#2A2A2A] transition-colors flex items-center justify-center",
-                currentView === 'dashboard' && "bg-[#245A5A] text-[#1A1A1A]"
+        <Collapsible 
+          open={!collapsedSections.project} 
+          onOpenChange={() => toggleSection('project')}
+          className="w-full"
+        >
+          <div className="flex items-center justify-center space-x-1 mb-2">
+            <span className="text-xs text-[#00D1FF] opacity-60">Project</span>
+            <CollapsibleTrigger className="flex items-center justify-center">
+              {collapsedSections.project ? (
+                <ChevronDown className="h-3 w-3 text-[#00D1FF] opacity-60" />
+              ) : (
+                <ChevronUp className="h-3 w-3 text-[#00D1FF] opacity-60" />
               )}
-            >
-              <LayoutDashboard className="w-5 h-5" />
-            </button>
-            <button 
-              onClick={() => onViewChange?.('daw')}
-              className={cn(
-                "w-10 h-10 rounded-lg bg-[#1A1A1A] text-[#00D1FF] hover:bg-[#2A2A2A] transition-colors flex items-center justify-center",
-                currentView === 'daw' && "bg-[#245A5A] text-[#1A1A1A]"
-              )}
-            >
-              <Music2 className="w-5 h-5" />
-            </button>
-            <button 
-              onClick={() => onViewChange?.('lyrics')}
-              className={cn(
-                "w-10 h-10 rounded-lg bg-[#1A1A1A] text-[#00D1FF] hover:bg-[#2A2A2A] transition-colors flex items-center justify-center",
-                currentView === 'lyrics' && "bg-[#245A5A] text-[#1A1A1A]"
-              )}
-            >
-              <PenTool className="w-5 h-5" />
-            </button>
-            <button 
-              onClick={() => onViewChange?.('files')}
-              className={cn(
-                "w-10 h-10 rounded-lg bg-[#1A1A1A] text-[#00D1FF] hover:bg-[#2A2A2A] transition-colors flex items-center justify-center",
-                currentView === 'files' && "bg-[#245A5A] text-[#1A1A1A]"
-              )}
-            >
-              <FileAudio className="w-5 h-5" />
-            </button>
+            </CollapsibleTrigger>
           </div>
-        </div>
+          <CollapsibleContent className="flex flex-col items-center">
+            <div className="flex flex-col space-y-2">
+              <button 
+                onClick={() => onViewChange?.('dashboard')}
+                className={cn(
+                  "w-10 h-10 rounded-lg bg-[#1A1A1A] text-[#00D1FF] hover:bg-[#2A2A2A] transition-colors flex items-center justify-center",
+                  currentView === 'dashboard' && "bg-[#245A5A] text-[#1A1A1A]"
+                )}
+              >
+                <LayoutDashboard className="w-5 h-5" />
+              </button>
+              <button 
+                onClick={() => onViewChange?.('daw')}
+                className={cn(
+                  "w-10 h-10 rounded-lg bg-[#1A1A1A] text-[#00D1FF] hover:bg-[#2A2A2A] transition-colors flex items-center justify-center",
+                  currentView === 'daw' && "bg-[#245A5A] text-[#1A1A1A]"
+                )}
+              >
+                <Music2 className="w-5 h-5" />
+              </button>
+              <button 
+                onClick={() => onViewChange?.('lyrics')}
+                className={cn(
+                  "w-10 h-10 rounded-lg bg-[#1A1A1A] text-[#00D1FF] hover:bg-[#2A2A2A] transition-colors flex items-center justify-center",
+                  currentView === 'lyrics' && "bg-[#245A5A] text-[#1A1A1A]"
+                )}
+              >
+                <PenTool className="w-5 h-5" />
+              </button>
+              <button 
+                onClick={() => onViewChange?.('files')}
+                className={cn(
+                  "w-10 h-10 rounded-lg bg-[#1A1A1A] text-[#00D1FF] hover:bg-[#2A2A2A] transition-colors flex items-center justify-center",
+                  currentView === 'files' && "bg-[#245A5A] text-[#1A1A1A]"
+                )}
+              >
+                <FileAudio className="w-5 h-5" />
+              </button>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
 
         <Separator className="w-8 bg-[#353F51]" />
 
-        <div className="flex flex-col items-center space-y-2">
-          <span className="text-xs text-[#00D1FF] opacity-60">Tools</span>
-          <div className="flex flex-col space-y-2">
-            <button 
-              onClick={() => onViewChange?.('mixer')}
-              className={cn(
-                "w-10 h-10 rounded-lg bg-[#1A1A1A] text-[#00D1FF] hover:bg-[#2A2A2A] transition-colors flex items-center justify-center",
-                currentView === 'mixer' && "bg-[#245A5A] text-[#1A1A1A]"
+        <Collapsible 
+          open={!collapsedSections.tools} 
+          onOpenChange={() => toggleSection('tools')}
+          className="w-full"
+        >
+          <div className="flex items-center justify-center space-x-1 mb-2">
+            <span className="text-xs text-[#00D1FF] opacity-60">Tools</span>
+            <CollapsibleTrigger className="flex items-center justify-center">
+              {collapsedSections.tools ? (
+                <ChevronDown className="h-3 w-3 text-[#00D1FF] opacity-60" />
+              ) : (
+                <ChevronUp className="h-3 w-3 text-[#00D1FF] opacity-60" />
               )}
-            >
-              <Sliders className="w-5 h-5" />
-            </button>
-            <button 
-              onClick={onSettingsClick}
-              className="w-10 h-10 rounded-lg bg-[#1A1A1A] text-[#00D1FF] hover:bg-[#2A2A2A] transition-colors flex items-center justify-center"
-            >
-              <Settings className="w-5 h-5" />
-            </button>
-            <button 
-              onClick={() => setIsAgentPanelOpen(true)}
-              className="w-10 h-10 rounded-lg bg-[#1A1A1A] text-[#00D1FF] hover:bg-[#2A2A2A] transition-colors flex items-center justify-center"
-            >
-              <Bot className="w-5 h-5" />
-            </button>
+            </CollapsibleTrigger>
           </div>
-        </div>
+          <CollapsibleContent className="flex flex-col items-center">
+            <div className="flex flex-col space-y-2">
+              <button 
+                onClick={() => onViewChange?.('mixer')}
+                className={cn(
+                  "w-10 h-10 rounded-lg bg-[#1A1A1A] text-[#00D1FF] hover:bg-[#2A2A2A] transition-colors flex items-center justify-center",
+                  currentView === 'mixer' && "bg-[#245A5A] text-[#1A1A1A]"
+                )}
+              >
+                <Sliders className="w-5 h-5" />
+              </button>
+              <button 
+                onClick={onSettingsClick}
+                className="w-10 h-10 rounded-lg bg-[#1A1A1A] text-[#00D1FF] hover:bg-[#2A2A2A] transition-colors flex items-center justify-center"
+              >
+                <Settings className="w-5 h-5" />
+              </button>
+              <button 
+                onClick={() => setIsAgentPanelOpen(true)}
+                className="w-10 h-10 rounded-lg bg-[#1A1A1A] text-[#00D1FF] hover:bg-[#2A2A2A] transition-colors flex items-center justify-center"
+              >
+                <Bot className="w-5 h-5" />
+              </button>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
 
         <Separator className="w-8 bg-[#353F51]" />
 
-        <div className="flex flex-col items-center space-y-2">
-          <span className="text-xs text-[#00D1FF] opacity-60">Views</span>
-          <div className="flex flex-col space-y-2">
-            <button 
-              onClick={() => onViewChange?.('keypad')}
-              className={cn(
-                "w-10 h-10 rounded-lg bg-[#1A1A1A] text-[#00D1FF] hover:bg-[#2A2A2A] transition-colors flex items-center justify-center",
-                currentView === 'keypad' && "bg-[#245A5A] text-[#1A1A1A]"
+        <Collapsible 
+          open={!collapsedSections.views} 
+          onOpenChange={() => toggleSection('views')}
+          className="w-full"
+        >
+          <div className="flex items-center justify-center space-x-1 mb-2">
+            <span className="text-xs text-[#00D1FF] opacity-60">Views</span>
+            <CollapsibleTrigger className="flex items-center justify-center">
+              {collapsedSections.views ? (
+                <ChevronDown className="h-3 w-3 text-[#00D1FF] opacity-60" />
+              ) : (
+                <ChevronUp className="h-3 w-3 text-[#00D1FF] opacity-60" />
               )}
-            >
-              <Piano className="w-5 h-5" />
-            </button>
-            <button 
-              onClick={() => onViewChange?.('drumpad')}
-              className={cn(
-                "w-10 h-10 rounded-lg bg-[#1A1A1A] text-[#00D1FF] hover:bg-[#2A2A2A] transition-colors flex items-center justify-center",
-                currentView === 'drumpad' && "bg-[#245A5A] text-[#1A1A1A]"
-              )}
-            >
-              <Grid3x3 className="w-5 h-5" />
-            </button>
+            </CollapsibleTrigger>
           </div>
-        </div>
+          <CollapsibleContent className="flex flex-col items-center">
+            <div className="flex flex-col space-y-2">
+              <button 
+                onClick={() => onViewChange?.('keypad')}
+                className={cn(
+                  "w-10 h-10 rounded-lg bg-[#1A1A1A] text-[#00D1FF] hover:bg-[#2A2A2A] transition-colors flex items-center justify-center",
+                  currentView === 'keypad' && "bg-[#245A5A] text-[#1A1A1A]"
+                )}
+              >
+                <Piano className="w-5 h-5" />
+              </button>
+              <button 
+                onClick={() => onViewChange?.('drumpad')}
+                className={cn(
+                  "w-10 h-10 rounded-lg bg-[#1A1A1A] text-[#00D1FF] hover:bg-[#2A2A2A] transition-colors flex items-center justify-center",
+                  currentView === 'drumpad' && "bg-[#245A5A] text-[#1A1A1A]"
+                )}
+              >
+                <Grid3x3 className="w-5 h-5" />
+              </button>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
 
         <Separator className="w-8 bg-[#353F51]" />
 
-        <div className="flex flex-col items-center space-y-2">
-          <span className="text-xs text-[#00D1FF] opacity-60">Effects</span>
-          <div className="flex flex-col space-y-2">
-            <button 
-              onClick={() => onViewChange?.('effects')}
-              className={cn(
-                "w-10 h-10 rounded-lg bg-[#1A1A1A] text-[#00D1FF] hover:bg-[#2A2A2A] transition-colors flex items-center justify-center",
-                currentView === 'effects' && "bg-[#245A5A] text-[#1A1A1A]"
+        <Collapsible 
+          open={!collapsedSections.effects} 
+          onOpenChange={() => toggleSection('effects')}
+          className="w-full"
+        >
+          <div className="flex items-center justify-center space-x-1 mb-2">
+            <span className="text-xs text-[#00D1FF] opacity-60">Effects</span>
+            <CollapsibleTrigger className="flex items-center justify-center">
+              {collapsedSections.effects ? (
+                <ChevronDown className="h-3 w-3 text-[#00D1FF] opacity-60" />
+              ) : (
+                <ChevronUp className="h-3 w-3 text-[#00D1FF] opacity-60" />
               )}
-            >
-              <Orbit className="w-5 h-5" />
-            </button>
-            <button className="w-10 h-10 rounded-lg bg-[#1A1A1A] text-[#00D1FF] hover:bg-[#2A2A2A] transition-colors flex items-center justify-center">
-              <Dice1 className="w-5 h-5" />
-            </button>
-            <button className="w-10 h-10 rounded-lg bg-[#1A1A1A] text-[#00D1FF] hover:bg-[#2A2A2A] transition-colors flex items-center justify-center">
-              <CircleDot className="w-5 h-5" />
-            </button>
+            </CollapsibleTrigger>
           </div>
-        </div>
+          <CollapsibleContent className="flex flex-col items-center">
+            <div className="flex flex-col space-y-2">
+              <button 
+                onClick={() => onViewChange?.('effects')}
+                className={cn(
+                  "w-10 h-10 rounded-lg bg-[#1A1A1A] text-[#00D1FF] hover:bg-[#2A2A2A] transition-colors flex items-center justify-center",
+                  currentView === 'effects' && "bg-[#245A5A] text-[#1A1A1A]"
+                )}
+              >
+                <Orbit className="w-5 h-5" />
+              </button>
+              <button className="w-10 h-10 rounded-lg bg-[#1A1A1A] text-[#00D1FF] hover:bg-[#2A2A2A] transition-colors flex items-center justify-center">
+                <Dice1 className="w-5 h-5" />
+              </button>
+              <button className="w-10 h-10 rounded-lg bg-[#1A1A1A] text-[#00D1FF] hover:bg-[#2A2A2A] transition-colors flex items-center justify-center">
+                <CircleDot className="w-5 h-5" />
+              </button>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
       </div>
 
       <AgentPanel 

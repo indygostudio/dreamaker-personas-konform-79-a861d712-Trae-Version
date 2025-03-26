@@ -191,7 +191,7 @@ export const KonformBanner = ({
               <Button
                 variant="outline"
                 size="sm"
-                className={`bg-black/20 border-white/20 hover:bg-black/40 text-white rounded-full transition-all duration-300 ${useTrainingModeStore.getState().isTrainingEnabled ? 'training-mode-enabled' : ''}`}
+                className={`bg-black/20 border-white/20 hover:bg-black/40 text-white rounded-full transition-all duration-300 ${useTrainingModeStore.getState().isTrainingEnabled ? 'bg-red-600 border-red-600 training-mode-enabled' : ''}`}
                 onClick={() => {
                   const { isTrainingEnabled, setTrainingEnabled } = useTrainingModeStore.getState();
                   setTrainingEnabled(!isTrainingEnabled);
@@ -231,7 +231,7 @@ export const KonformBanner = ({
                   <Button
                     variant="outline"
                     size="sm"
-                    className={`bg-black/20 border-white/20 hover:bg-black/40 text-white rounded-full transition-all duration-300 ${useTrainingModeStore.getState().isTrainingEnabled ? 'training-mode-enabled' : ''}`}
+                    className={`bg-black/20 border-white/20 hover:bg-black/40 text-white rounded-full transition-all duration-300 ${useTrainingModeStore.getState().isTrainingEnabled ? 'bg-red-600 border-red-600 training-mode-enabled' : ''}`}
                     onClick={() => {
                       const { isTrainingEnabled, setTrainingEnabled } = useTrainingModeStore.getState();
                       setTrainingEnabled(!isTrainingEnabled);

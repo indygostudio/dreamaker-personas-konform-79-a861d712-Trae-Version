@@ -155,7 +155,7 @@ const Auth = () => {
           
           <div className="max-w-lg space-y-8 animate-fade-up relative z-20">
             <div className="space-y-4">
-              <h1 className="text-5xl font-bold gradient-text mb-2 text-white">Welcome to DREAMAKER</h1>
+              <h1 className="text-5xl font-bold mb-2 text-white">Welcome to DREAMAKER</h1>
               <p className="text-xl text-gray-300">
                 Your AI-powered music creation journey starts here
               </p>
