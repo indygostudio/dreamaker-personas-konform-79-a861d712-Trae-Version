@@ -91,6 +91,7 @@ export const ArtistProfile = () => {
         });
       }
     }
+    
     // Keep audio state independent of UI changes
     const handleVisibilityChange = () => {
       if (document.hidden && currentAudio && isPlaying) {
@@ -98,9 +99,28 @@ export const ArtistProfile = () => {
       }
     };
     
+    // Handle UI interactions that might interrupt audio
+    const handleUIInteraction = (e: Event) => {
+      // Prevent default behavior for certain UI elements
+      if (currentAudio && isPlaying) {
+        // Ensure audio continues playing after UI interactions
+        setTimeout(() => {
+          if (isPlaying && currentAudio.paused) {
+            currentAudio.play().catch(() => {});
+          }
+        }, 50);
+      }
+    };
+    
+    // Listen for events that might interrupt audio playback
     document.addEventListener('visibilitychange', handleVisibilityChange);
+    document.addEventListener('click', handleUIInteraction, true);
+    document.addEventListener('mousedown', handleUIInteraction, true);
+    
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      document.removeEventListener('click', handleUIInteraction, true);
+      document.removeEventListener('mousedown', handleUIInteraction, true);
     };
   }, [isPlaying, currentAudio]);
 

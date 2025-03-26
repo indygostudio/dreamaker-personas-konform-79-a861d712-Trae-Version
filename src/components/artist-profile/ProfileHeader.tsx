@@ -49,7 +49,9 @@ export const ProfileHeader = ({
     return <HeaderSkeleton />;
   }
 
-  const handleDoubleClick = () => {
+  const handleDoubleClick = (e: React.MouseEvent) => {
+    // Prevent event propagation to avoid interfering with audio playback
+    e.stopPropagation();
     setHeaderExpanded(!isHeaderExpanded);
   };
 

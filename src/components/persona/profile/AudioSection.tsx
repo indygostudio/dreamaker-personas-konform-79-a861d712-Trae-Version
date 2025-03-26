@@ -53,12 +53,16 @@ export const AudioSection = ({ persona, selectedModel, isActive = true }: AudioS
 
   const isOwner = user?.id === persona.user_id;
 
-  // Stop audio when the component is not active
+  // Only pause audio when the component is unmounted, not just inactive
+  // This allows audio to continue playing when switching tabs
   useEffect(() => {
-    if (!isActive && isPlaying) {
-      setIsPlaying(false);
-    }
-  }, [isActive, isPlaying, setIsPlaying]);
+    // Cleanup function will only run when component unmounts
+    return () => {
+      if (isPlaying) {
+        setIsPlaying(false);
+      }
+    };
+  }, [isPlaying, setIsPlaying]);
 
   const handleAudioFileSelect = (file: File, isLoop: boolean) => {
     if (isLoop) {

@@ -111,12 +111,22 @@ export const VideoBackground = ({
         } else {
           video.playbackRate = 1;
         }
+        
+        // Always ensure video is muted to prevent interfering with audio transport
+        video.muted = true;
+        
+        // Store current playing state before attempting to play
+        const wasPlaying = isPlaying;
+        
         video.play()
-          .then(() => setIsPlaying(true))
+          .then(() => {
+            // Only update playing state if it wasn't already playing
+            if (!wasPlaying) setIsPlaying(true);
+          })
           .catch(err => {
             // Just log errors but don't show to users
             console.log("Video play error:", err);
-            setIsPlaying(false);
+            if (!wasPlaying) setIsPlaying(false);
           });
       }, 50);
       
@@ -128,7 +138,7 @@ export const VideoBackground = ({
       
       // Don't reset to first frame - maintain position for next hover
     }
-  }, [isHovering, videoUrl, autoPlay]);
+  }, [isHovering, videoUrl, autoPlay, isReversed, continuePlayback, isPlaying]);
   
   // Ensure video pauses when component unmounts
   useEffect(() => {

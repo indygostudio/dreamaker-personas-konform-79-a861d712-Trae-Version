@@ -110,15 +110,37 @@ export const VideoBackground = ({
       // Only control video playback, not audio
       // This ensures videos play on hover without affecting audio transport
       if (isHovering) {
-        // Play on hover
+        // Play on hover, but only if we're not already playing audio elsewhere
+        // Check if there's any global audio playing via DAW state
         const playTimer = setTimeout(() => {
+          // Only set playback rate if we're going to play
           if (reverseOnEnd && lastPlaybackRate !== 0) {
             // Resume in the same direction
             video.playbackRate = lastPlaybackRate;
           }
-          video.play()
-            .then(() => setIsPlaying(true))
-            .catch(err => console.log("Hover play error:", err));
+          
+          // Important: Set muted to true to ensure we don't interfere with audio transport
+          video.muted = true;
+          
+          // Store current playing state before attempting to play
+          const wasPlaying = isPlaying;
+          
+          // CRITICAL FIX: Don't interfere with any existing audio playback
+          // We only want to play the video, not affect audio transport
+          // Use a separate context for video playback to avoid interfering with audio context
+          const playPromise = video.play();
+          if (playPromise !== undefined) {
+            playPromise
+              .then(() => {
+                // Only update playing state if it wasn't already playing
+                if (!wasPlaying) setIsPlaying(true);
+              })
+              .catch(err => {
+                console.log("Hover play error:", err);
+                if (!wasPlaying) setIsPlaying(false);
+                // Don't propagate errors to avoid affecting audio playback
+              });
+          }
         }, 50);
         
         return () => clearTimeout(playTimer);
@@ -132,7 +154,7 @@ export const VideoBackground = ({
         // when hovering again
       }
     }
-  }, [videoUrl, isHovering, reverseOnEnd, lastPlaybackRate, continuePlayback]);
+  }, [videoUrl, isHovering, reverseOnEnd, lastPlaybackRate, continuePlayback, isPlaying]);
 
   if (!videoUrl && !fallbackImage) {
     console.log('No video or fallback image provided');

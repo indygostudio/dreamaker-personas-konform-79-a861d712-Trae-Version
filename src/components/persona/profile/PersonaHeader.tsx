@@ -37,6 +37,8 @@ export const PersonaHeader = ({
   const handleMouseEnter = () => {
     setIsHovering(true);
     onHeaderHover(true);
+    // Only affects video playback, not audio transport
+    // We ensure this by keeping videos muted and not interfering with audio elements
   };
 
   const handleMouseLeave = () => {
@@ -44,6 +46,8 @@ export const PersonaHeader = ({
     if (!isLongPressed) {
       onHeaderHover(false);
     }
+    // Only affects video playback, not audio transport
+    // Audio playback continues uninterrupted when hovering/leaving header
   };
 
   const handleMouseDown = () => {

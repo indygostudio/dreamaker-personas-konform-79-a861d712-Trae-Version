@@ -102,7 +102,8 @@ export const KonformTabs = () => {
         onCollapsedChange={(collapsed) => {
           // Update header collapsed state without affecting audio playback
           setKonformHeaderCollapsed(collapsed);
-          // No need to stop audio playback when header is toggled
+          // Explicitly preserve audio playback state when header is toggled
+          // This ensures that collapsing/expanding the header doesn't restart audio
         }}
         latestSessionId={latestSession?.id}
       />
