@@ -642,6 +642,24 @@ export const AudioSection = ({ persona, selectedModel }: AudioSectionProps) => {
                           currentTrack={currentTrack}
                           isPlaying={isPlaying && currentTrack?.id === track.id}
                           onTrackPlay={handleTrackPlay}
+                          onDeleteTrack={handleDeleteTrack}
+                          onUpdateArtwork={(trackId, artworkUrl) => {
+                            // Update track artwork
+                            supabase
+                              .from('tracks')
+                              .update({ album_artwork_url: artworkUrl })
+                              .eq('id', trackId)
+                              .then(({ error }) => {
+                                if (error) {
+                                  toast.error("Failed to update artwork");
+                                  console.error(error);
+                                } else {
+                                  toast.success("Artwork updated successfully");
+                                  refetch();
+                                }
+                              });
+                          }}
+                          isOwner={true}
                         />
                         <div className="absolute right-4 top-1/2 -translate-y-1/2 hidden group-hover:flex gap-2 z-10">
                           <Button

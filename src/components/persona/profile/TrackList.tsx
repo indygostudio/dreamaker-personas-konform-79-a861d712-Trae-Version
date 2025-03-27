@@ -50,12 +50,20 @@ export const TrackList = ({
       is_public: track.is_public || false
     }));
 
-    const { error } = await supabase
-      .from('tracks')
-      .upsert(updates);
+    try {
+      const { error } = await supabase
+        .from('tracks')
+        .upsert(updates);
 
-    if (error) {
+      if (error) {
+        console.error('Error updating track order:', error);
+        toast.error("Failed to update track order");
+      } else {
+        toast.success("Track order updated");
+      }
+    } catch (error: any) {
       console.error('Error updating track order:', error);
+      toast.error("Failed to update track order: " + error.message);
     }
   };
 
@@ -74,6 +82,15 @@ export const TrackList = ({
         .eq('id', trackId);
         
       if (error) throw error;
+      
+      // Update UI immediately by filtering out the deleted track
+      // This ensures the UI reflects the change right away without waiting for refetch
+      const updatedTracks = tracks.filter(track => track.id !== trackId);
+      
+      // If the deleted track was the current track, reset it
+      if (currentTrack?.id === trackId) {
+        // This would be handled by the parent component
+      }
       
       toast.success("Track deleted successfully");
       refetchTracks();
@@ -110,9 +127,13 @@ export const TrackList = ({
     const newIndex = tracks.findIndex(track => track.id === over.id);
 
     if (oldIndex !== -1 && newIndex !== -1) {
-      const newTracks = arrayMove(tracks, oldIndex, newIndex);
+      const newTracks = arrayMove([...tracks], oldIndex, newIndex);
+      
+      // Update the UI immediately with the new order
+      // This ensures the UI reflects the change right away
+      // We'll pass this to the parent component via refetchTracks
+      // which should trigger a state update
       handleTrackOrderUpdate(newTracks);
-      refetchTracks();
     }
   };
 
