@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { GripVertical, Image, Scissors } from "lucide-react";
+import { useState, useRef, useCallback } from "react";
+import { GripVertical, Image, Scissors, Upload, UploadCloud, ImageIcon, Save } from "lucide-react";
 import type { Track } from "@/types/track";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -10,9 +10,14 @@ import { LyricsEditor } from "./LyricsEditor";
 import { TrackContent } from "./TrackContent";
 import { TrackLyrics } from "./TrackLyrics";
 import { useTrackLyrics } from "./hooks/useTrackLyrics";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useDropzone } from "react-dropzone";
+import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { Label } from "@/components/ui/label";
 
 interface TrackItemProps {
   track: Track;
@@ -48,6 +53,12 @@ export const TrackItem = ({
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isArtworkDialogOpen, setIsArtworkDialogOpen] = useState(false);
   const [newArtworkUrl, setNewArtworkUrl] = useState(trackState.album_artwork_url || '');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [localPreview, setLocalPreview] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showUrlInput, setShowUrlInput] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
   
   const {
     trackLyrics,
@@ -93,22 +104,137 @@ export const TrackItem = ({
   const handleArtworkClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setNewArtworkUrl(trackState.album_artwork_url || '');
+    setLocalPreview(null);
+    setSelectedFile(null);
+    setShowUrlInput(false);
     setIsArtworkDialogOpen(true);
   };
+  
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
 
-  const handleArtworkSave = () => {
-    if (onUpdateArtwork && newArtworkUrl) {
-      onUpdateArtwork(trackState.id, newArtworkUrl);
+  const validateImageFile = (file: File): boolean => {
+    // Check if file is an image
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return false;
+    }
+    
+    // Check file size (max 5MB)
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error(`File size exceeds 5MB limit (${formatFileSize(file.size)})`);
+      return false;
+    }
+    
+    return true;
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (!validateImageFile(file)) return;
+    
+    setSelectedFile(file);
+    setShowUrlInput(false);
+    
+    // Create a preview URL
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setLocalPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+  
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    const file = acceptedFiles[0];
+    if (!file) return;
+    
+    if (!validateImageFile(file)) return;
+    
+    setSelectedFile(file);
+    setShowUrlInput(false);
+    
+    // Create a preview URL
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setLocalPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  }, []);
+  
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+  
+  const handleUrlClick = () => {
+    setShowUrlInput(true);
+    setSelectedFile(null);
+    setLocalPreview(null);
+  };
+
+  const handleArtworkSave = async () => {
+    setIsLoading(true);
+    try {
+      if (selectedFile) {
+        // Upload file to Supabase storage
+        const fileName = `track_${trackState.id}_${Date.now()}.${selectedFile.name.split('.').pop()}`;
+        const { error: uploadError } = await supabase.storage
+          .from('audio-previews')
+          .upload(fileName, selectedFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('audio-previews')
+          .getPublicUrl(fileName);
+
+        if (onUpdateArtwork) {
+          onUpdateArtwork(trackState.id, publicUrl);
+          
+          // Update local state immediately for better UX
+          setTrackState({
+            ...trackState,
+            album_artwork_url: publicUrl
+          });
+        }
+      } else if (showUrlInput && newArtworkUrl && onUpdateArtwork) {
+        onUpdateArtwork(trackState.id, newArtworkUrl);
+        
+        // Update local state immediately for better UX
+        setTrackState({
+          ...trackState,
+          album_artwork_url: newArtworkUrl
+        });
+      }
       
-      // Update local state immediately for better UX
-      setTrackState({
-        ...trackState,
-        album_artwork_url: newArtworkUrl
-      });
-      
+      toast.success("Artwork updated successfully");
       setIsArtworkDialogOpen(false);
+      // Reset state
+      setSelectedFile(null);
+      setLocalPreview(null);
+      setShowUrlInput(false);
+    } catch (error) {
+      console.error('Error updating artwork:', error);
+      toast.error("Failed to update artwork");
+    } finally {
+      setIsLoading(false);
     }
   };
+  
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      'image/*': ['.jpg', '.jpeg', '.png', '.gif', '.webp']
+    },
+    maxFiles: 1
+  });
 
   const handleTrackUpdated = (updatedTrack: Track) => {
     // Update both the reference track and our local state
@@ -197,46 +323,125 @@ export const TrackItem = ({
             <DialogTitle className="text-white">Update Track Artwork</DialogTitle>
           </DialogHeader>
           
-          <div className="space-y-4 mt-2">
-            <div className="flex justify-center">
-              <div className="w-32 h-32 bg-gray-800 rounded overflow-hidden">
-                <img 
-                  src={newArtworkUrl || '/placeholder.svg'} 
-                  alt="Track Artwork Preview" 
-                  className="w-full h-full object-cover"
-                />
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="trackArtwork">Update Artwork</Label>
+              <div className="flex flex-col gap-4">
+                {!showUrlInput ? (
+                  <div 
+                    {...getRootProps()}
+                    className={cn(
+                      "w-full h-40 bg-gray-800 flex flex-col items-center justify-center rounded cursor-pointer border-2 border-dashed transition-colors",
+                      isDragActive 
+                        ? "border-dreamaker-purple bg-dreamaker-purple/10" 
+                        : "border-gray-700 hover:border-dreamaker-purple/50"
+                    )}
+                  >
+                    <input
+                      {...getInputProps()}
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                    />
+                    
+                    {localPreview ? (
+                      <img 
+                        src={localPreview} 
+                        alt="Track Artwork" 
+                        className="w-full h-full object-cover rounded" 
+                      />
+                    ) : trackState.album_artwork_url ? (
+                      <img 
+                        src={trackState.album_artwork_url} 
+                        alt="Track Artwork" 
+                        className="w-full h-full object-cover rounded" 
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center gap-2 p-4 text-center">
+                        <UploadCloud className="w-10 h-10 text-dreamaker-purple" />
+                        {isDragActive ? (
+                          <p className="text-dreamaker-purple">Drop the image here</p>
+                        ) : (
+                          <>
+                            <p className="font-medium text-gray-300">Drag & drop image here, or click to select</p>
+                            <p className="text-xs text-gray-400">Supported formats: JPG, PNG, GIF, WEBP (max 5MB)</p>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="flex justify-center mb-4">
+                      <div className="w-32 h-32 bg-gray-800 rounded overflow-hidden">
+                        <img 
+                          src={newArtworkUrl || '/placeholder.svg'} 
+                          alt="Track Artwork Preview" 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </div>
+                    <Label htmlFor="artwork-url" className="text-sm text-gray-300 mb-1 block">
+                      Artwork URL
+                    </Label>
+                    <Input
+                      id="artwork-url"
+                      value={newArtworkUrl}
+                      onChange={(e) => setNewArtworkUrl(e.target.value)}
+                      placeholder="Enter image URL"
+                      className="bg-gray-800 border-dreamaker-purple/30 text-white"
+                    />
+                    <p className="text-xs text-gray-400 mt-1">
+                      Enter a URL for the track artwork image
+                    </p>
+                  </div>
+                )}
+                
+                <div className="flex gap-2">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={handleUploadClick}
+                    className={cn("flex-1", showUrlInput && "bg-gray-800")}
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Upload Image
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={handleUrlClick}
+                    className={cn("flex-1", !showUrlInput && "bg-gray-800")}
+                  >
+                    <ImageIcon className="w-4 h-4 mr-2" />
+                    Enter URL
+                  </Button>
+                </div>
               </div>
-            </div>
-            
-            <div>
-              <label htmlFor="artwork-url" className="text-sm text-gray-300 mb-1 block">
-                Artwork URL
-              </label>
-              <Input
-                id="artwork-url"
-                value={newArtworkUrl}
-                onChange={(e) => setNewArtworkUrl(e.target.value)}
-                placeholder="Enter image URL"
-                className="bg-gray-800 border-dreamaker-purple/30 text-white"
-              />
-              <p className="text-xs text-gray-400 mt-1">
-                Enter a URL for the track artwork image
-              </p>
             </div>
           </div>
           
-          <div className="flex justify-end gap-2 mt-4">
+          <DialogFooter>
             <Button variant="outline" onClick={() => setIsArtworkDialogOpen(false)} className="bg-transparent">
               Cancel
             </Button>
             <Button 
               onClick={handleArtworkSave} 
               className="bg-dreamaker-purple hover:bg-dreamaker-purple/90"
-              disabled={!newArtworkUrl}
+              disabled={(showUrlInput && !newArtworkUrl) || (!showUrlInput && !selectedFile && !trackState.album_artwork_url)}
             >
-              Save Artwork
+              {isLoading ? (
+                <>
+                  <span className="animate-spin mr-2">⏳</span>
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Artwork
+                </>
+              )}
             </Button>
-          </div>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
