@@ -10,7 +10,7 @@ import { DrumbaseView } from "../views/DrumbaseView";
 import { LyricbaseView } from "../views/LyricbaseView";
 import { MixbaseView } from "../views/MixbaseView";
 import { VoxbaseView } from "../views/VoxbaseView";
-import { SupabaseView } from "../views/SupabaseView";
+import { SubaseView } from "../views/SubaseView";
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -50,7 +50,7 @@ export const EditorTabs = () => {
     { id: 'guitarbase', value: 'guitarbase', label: 'Guitarbase', icon: <Music2 className="h-4 w-4 mr-2" /> },
     { id: 'lyricbase', value: 'lyricbase', label: 'Lyricbase', icon: <FileText className="h-4 w-4 mr-2" /> },
     { id: 'mixbase', value: 'mixbase', label: 'Mixbase', icon: <Sliders className="h-4 w-4 mr-2" /> },
-    { id: 'supabase', value: 'supabase', label: 'Supabase', icon: <Database className="h-4 w-4 mr-2" /> },
+    { id: 'subase', value: 'subase', label: 'Subase', icon: <Database className="h-4 w-4 mr-2" /> },
     { id: 'voxbase', value: 'voxbase', label: 'Voxbase', icon: <Mic className="h-4 w-4 mr-2" /> },
   ]);
 
@@ -169,8 +169,8 @@ export const EditorTabs = () => {
             <MixbaseView />
           </TabsContent>
 
-          <TabsContent value="supabase" className="h-full p-0 m-0">
-            <SupabaseView />
+          <TabsContent value="subase" className="h-full p-0 m-0">
+            <SubaseView />
           </TabsContent>
 
           <TabsContent value="voxbase" className="h-full p-0 m-0">

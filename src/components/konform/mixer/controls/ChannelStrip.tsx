@@ -179,7 +179,7 @@ export const ChannelStrip = ({
     <ContextMenu>
       <ContextMenuTrigger>
         <div 
-          className={`flex flex-col items-center gap-2 p-2 bg-black/60 rounded-lg border transition-colors ${
+          className={`flex flex-col items-center gap-2 p-2 bg-black/80 backdrop-blur-xl rounded-lg border transition-colors shadow-lg shadow-black/30 ${
             isSelected 
               ? 'border-konform-neon-orange' 
               : type === 'master'
