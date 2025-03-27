@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { KonformBanner } from "./KonformBanner";
 import { useHeaderStore } from "./store/headerStore";
 import { useState, useEffect } from "react";
-import { FileText, Edit3, Video, Film, Save } from "lucide-react";
+import { FileText, Edit3, Video, Film, Save, Music } from "lucide-react";
 import { MixerView } from "./mixer/MixerView";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,9 +31,9 @@ export const KonformTabs = () => {
   // Import DAW state to manage audio playback
   const { isPlaying } = useDAWState();
   
-  // Get the tab from URL query parameters or default to "editor"
+  // Get the tab from URL query parameters or default to "music"
   const urlTab = searchParams.get('tab');
-  const [activeTab, setActiveTab] = useState(urlTab || "editor");
+  const [activeTab, setActiveTab] = useState(urlTab || "music");
 
   // Save video tab state
   const saveVideoTabState = () => {
@@ -113,11 +113,11 @@ export const KonformTabs = () => {
         <Tabs value={activeTab} className="w-full" onValueChange={setActiveTab}>
           <TabsList className="flex justify-center items-center gap-2 w-full rounded-full mb-4 p-1.5 bg-black/60 backdrop-blur-xl">
             <TabsTrigger 
-              value="editor" 
+              value="music" 
               className="flex-1 min-width-[120px] px-6 py-3 rounded-full transition-all duration-300 font-medium uppercase border 
               text-white/80 data-[state=active]:bg-[#0EA5E9]/10 data-[state=active]:text-white data-[state=active]:border-[#0EA5E9]/20 data-[state=active]:shadow-[0_4px_20px_rgba(14,165,233,0.3)] data-[state=active]:-translate-y-0.5 bg-black/20 border-white/10 hover:bg-[#0EA5E9]/10 hover:text-white hover:border-[#0EA5E9]/20 hover:shadow-[0_4px_20px_rgba(14,165,233,0.3)] hover:-translate-y-0.5 text-center"
             >
-              <Edit3 className="w-4 h-4 mr-2" />
+              <Music className="w-4 h-4 mr-2" />
               MUSIC
             </TabsTrigger>
             <TabsTrigger 
@@ -139,7 +139,7 @@ export const KonformTabs = () => {
           </TabsList>
 
           <div className="mt-2">
-            <TabsContent value="editor">
+            <TabsContent value="music">
               <EditorTabs />
             </TabsContent>
             <TabsContent value="video">
