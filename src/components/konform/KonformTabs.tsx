@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { KonformBanner } from "./KonformBanner";
 import { useHeaderStore } from "./store/headerStore";
 import { useState, useEffect } from "react";
-import { FileText, Edit3, Video, Settings, Save } from "lucide-react";
+import { FileText, Edit3, Video, Film, Save } from "lucide-react";
 import { MixerView } from "./mixer/MixerView";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { VideoTab } from "./video/VideoTab";
 import { useDAWState } from "@/hooks/use-daw-state";
+import { EditorView } from "./editor/EditorView";
 
 
 
@@ -128,12 +129,12 @@ export const KonformTabs = () => {
               VIDEO
             </TabsTrigger>
             <TabsTrigger 
-              value="settings" 
+              value="editor" 
               className="flex-1 min-width-[120px] px-6 py-3 rounded-full transition-all duration-300 font-medium uppercase border 
               text-white/80 data-[state=active]:bg-[#0EA5E9]/10 data-[state=active]:text-white data-[state=active]:border-[#0EA5E9]/20 data-[state=active]:shadow-[0_4px_20px_rgba(14,165,233,0.3)] data-[state=active]:-translate-y-0.5 bg-black/20 border-white/10 hover:bg-[#0EA5E9]/10 hover:text-white hover:border-[#0EA5E9]/20 hover:shadow-[0_4px_20px_rgba(14,165,233,0.3)] hover:-translate-y-0.5 text-center"
             >
-              <Settings className="w-4 h-4 mr-2" />
-              SETTINGS
+              <Film className="w-4 h-4 mr-2" />
+              EDITOR
             </TabsTrigger>
           </TabsList>
 
@@ -146,8 +147,8 @@ export const KonformTabs = () => {
                 <VideoTab />
               </div>
             </TabsContent>
-            <TabsContent value="settings">
-              <div className="min-h-[calc(100vh-180px)] bg-black/40 rounded-lg" />
+            <TabsContent value="editor">
+              <EditorView />
             </TabsContent>
           </div>
         </Tabs>

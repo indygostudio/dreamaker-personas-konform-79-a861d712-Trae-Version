@@ -269,7 +269,15 @@ export const ArtistPersonas = ({
         const oldIndex = items.findIndex((item) => item.id === active.id);
         const newIndex = items.findIndex((item) => item.id === over.id);
         
-        return arrayMove(items, oldIndex, newIndex);
+        const newItems = arrayMove(items, oldIndex, newIndex);
+        // Automatically save tab order after reordering
+        localStorage.setItem('artist-profile-tabs-order', JSON.stringify(newItems.map(tab => tab.id)));
+        toast({
+          title: "Tab order saved",
+          description: "Your current tab arrangement will be applied next time",
+          variant: "default"
+        });
+        return newItems;
       });
     }
   };
@@ -352,16 +360,6 @@ export const ArtistPersonas = ({
                       </SortableContext>
                     </TabsList>
                   </DndContext>
-                  
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="ml-2 bg-black/20 border-white/20 hover:bg-black/40 text-white rounded-full h-6 w-6 p-0"
-                    onClick={saveTabsOrder}
-                    title="Save current tab arrangement"
-                  >
-                    <Save className="w-3 h-3" />
-                  </Button>
                 </div>
               </div>
               

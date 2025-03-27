@@ -8,7 +8,6 @@ import { KeybaseView } from "../views/KeybaseView";
 import { TrackEditor } from "./TrackEditor";
 import { DrumbaseView } from "../views/DrumbaseView";
 import { LyricbaseView } from "../views/LyricbaseView";
-import { MixabaseView } from "../views/MixabaseView";
 import { MixbaseView } from "../views/MixbaseView";
 import { VoxbaseView } from "../views/VoxbaseView";
 import { SupabaseView } from "../views/SupabaseView";
@@ -50,9 +49,8 @@ export const EditorTabs = () => {
     { id: 'drumpad', value: 'drumpad', label: 'Drumbase', icon: <Grid3x3 className="h-4 w-4 mr-2" /> },
     { id: 'guitarbase', value: 'guitarbase', label: 'Guitarbase', icon: <Music2 className="h-4 w-4 mr-2" /> },
     { id: 'lyricbase', value: 'lyricbase', label: 'Lyricbase', icon: <FileText className="h-4 w-4 mr-2" /> },
-    { id: 'mixabase', value: 'mixabase', label: 'Mixabase', icon: <Sliders className="h-4 w-4 mr-2" /> },
     { id: 'mixbase', value: 'mixbase', label: 'Mixbase', icon: <Sliders className="h-4 w-4 mr-2" /> },
-    { id: 'supabase', value: 'supabase', label: 'Subase', icon: <Database className="h-4 w-4 mr-2" /> },
+    { id: 'supabase', value: 'supabase', label: 'Supabase', icon: <Database className="h-4 w-4 mr-2" /> },
     { id: 'voxbase', value: 'voxbase', label: 'Voxbase', icon: <Mic className="h-4 w-4 mr-2" /> },
   ]);
 
@@ -109,7 +107,15 @@ export const EditorTabs = () => {
         const oldIndex = items.findIndex((item) => item.id === active.id);
         const newIndex = items.findIndex((item) => item.id === over.id);
         
-        return arrayMove(items, oldIndex, newIndex);
+        const newItems = arrayMove(items, oldIndex, newIndex);
+        // Automatically save tab order after reordering
+        localStorage.setItem('konform-tabs-order', JSON.stringify(newItems.map(tab => tab.id)));
+        toast({
+          title: "Tab order saved",
+          description: "Your current tab arrangement will be applied next time",
+          variant: "default"
+        });
+        return newItems;
       });
     }
   };
@@ -134,16 +140,6 @@ export const EditorTabs = () => {
               </SortableContext>
             </TabsList>
           </DndContext>
-          
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="mb-4 bg-black/20 border-white/20 hover:bg-black/40 text-white rounded-full w-full"
-            onClick={saveTabsOrder}
-            title="Save current tab arrangement"
-          >
-            <Save className="w-4 h-4 mr-2" /> Save Order
-          </Button>
         </div>
 
         <div className="flex-1 h-full">
@@ -167,10 +163,6 @@ export const EditorTabs = () => {
 
           <TabsContent value="lyricbase" className="h-full p-0 m-0">
             <LyricbaseView />
-          </TabsContent>
-
-          <TabsContent value="mixabase" className="h-full p-0 m-0">
-            <MixabaseView />
           </TabsContent>
 
           <TabsContent value="mixbase" className="h-full p-0 m-0">
