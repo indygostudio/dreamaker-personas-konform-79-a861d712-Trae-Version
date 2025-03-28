@@ -9,6 +9,7 @@ import type { Persona } from "@/types/persona";
 import { ReactNode } from "react";
 import { usePersonaDelete } from "@/components/persona/hooks/usePersonaDelete";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAdminMode } from "@/contexts/AdminModeContext";
 
 interface PersonaContextActionsProps {
   artist: Persona;
@@ -23,9 +24,11 @@ export const PersonaContextActions = ({
 }: PersonaContextActionsProps) => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const session = useSession();
+  const { isAdmin } = useAdminMode();
   
   const isOwner = session?.user?.id === artist.user_id;
   const canDelete = isOwner;
+  const showAddToProject = session || isAdmin; // Only show if user is signed in or is admin
 
   const handleShare = async () => {
     try {
@@ -89,13 +92,15 @@ export const PersonaContextActions = ({
       </ContextMenuTrigger>
       
       <ContextMenuContent className="bg-black/80 backdrop-blur-md border border-dreamaker-purple/20">
-        <ContextMenuItem 
-          onClick={onAddToProject}
-          className="hover:bg-dreamaker-purple/20 text-white cursor-pointer"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add to Project
-        </ContextMenuItem>
+        {showAddToProject && (
+          <ContextMenuItem 
+            onClick={onAddToProject}
+            className="hover:bg-dreamaker-purple/20 text-white cursor-pointer"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add to Project
+          </ContextMenuItem>
+        )}
         <ContextMenuItem 
           onClick={handleShare}
           className="hover:bg-dreamaker-purple/20 text-white cursor-pointer"

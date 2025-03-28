@@ -64,6 +64,21 @@ export const DreamakerProduct = () => {
     setHeaderExpanded,
     setDefaultWindowState
   } = useUIStore();
+  
+  // Initialize header expanded state from localStorage or default to expanded
+  useEffect(() => {
+    // Only set the header state on initial load if it's not already set in localStorage
+    const savedHeaderState = localStorage.getItem('headerExpanded');
+    if (savedHeaderState === null) {
+      // If no saved state, default to expanded
+      setHeaderExpanded(true);
+    }
+  }, []);  
+  
+  // Save header expanded state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('headerExpanded', isHeaderExpanded.toString());
+  }, [isHeaderExpanded]);
 
   // Process location state when component mounts
   useEffect(() => {

@@ -6,6 +6,7 @@ import { useSession } from "@supabase/auth-helpers-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import type { Persona } from "@/types/persona";
+import { useAdminMode } from "@/contexts/AdminModeContext";
 
 interface PersonaActionsProps {
   artist: Persona;
@@ -116,16 +117,21 @@ export const PersonaActions = ({
     onAddToProject(artist);
   };
 
+  const { isAdmin } = useAdminMode();
+  const showAddToProject = session || isAdmin; // Only show if user is signed in or is admin
+
   return (
     <div className="absolute bottom-6 right-4 flex gap-2">
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={(e) => handleAddToProject(e)}
-        className="bg-black/40 hover:bg-black/60 text-white h-8 w-8 rounded-full"
-      >
-        <Plus className="h-4 w-4" />
-      </Button>
+      {showAddToProject && (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={(e) => handleAddToProject(e)}
+          className="bg-black/40 hover:bg-black/60 text-white h-8 w-8 rounded-full"
+        >
+          <Plus className="h-4 w-4" />
+        </Button>
+      )}
       
       {showIcons && (
         <>
