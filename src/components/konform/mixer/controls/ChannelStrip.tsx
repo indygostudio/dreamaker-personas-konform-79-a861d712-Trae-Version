@@ -1,16 +1,20 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Volume2, Power, Mic, Copy, Trash2, UserPlus2, PlusSquare, ChevronDown, ToggleLeft, ToggleRight, ArrowDownLeft, ArrowUpRight, FolderPlus, Headphones, Speaker, Monitor } from "lucide-react";
+import { Volume2, Power, Mic, Copy, Trash2, UserPlus2, PlusSquare, ChevronDown, ToggleLeft, ToggleRight, ArrowDownLeft, ArrowUpRight, FolderPlus, Headphones, Speaker, Monitor, Settings, Waveform, Sliders } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSelectedPersonasStore } from "@/stores/selectedPersonasStore";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { transformPersonaData } from "@/lib/utils/personaTransform";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -56,6 +60,14 @@ interface HardwareOutput {
   icon: React.ReactNode;
 }
 
+interface Plugin {
+  id: string;
+  name: string;
+  type: 'eq' | 'comp' | 'reverb' | 'delay' | 'other';
+  icon: React.ReactNode;
+  isActive: boolean;
+}
+
 export const ChannelStrip = ({ 
   channelNumber, 
   isMaster = false,
@@ -73,6 +85,7 @@ export const ChannelStrip = ({
   const [isDisabled, setIsDisabled] = useState(false);
   const [trackName, setTrackName] = useState(`Track ${channelNumber}`);
   const [showPersonasDropdown, setShowPersonasDropdown] = useState(false);
+  const [showPluginSelector, setShowPluginSelector] = useState(false);
   const [currentCollaborator, setCurrentCollaborator] = useState<Persona | undefined>(collaborator);
   const [automation, setAutomation] = useState<AutomationState>({
     read: false,
@@ -81,6 +94,8 @@ export const ChannelStrip = ({
     latch: false
   });
   const [selectedOutput, setSelectedOutput] = useState<string>('default-speakers');
+  const [activePlugins, setActivePlugins] = useState<Plugin[]>([]);
+  const [isPluginPanelOpen, setIsPluginPanelOpen] = useState(false);
   const { selectedPersonas } = useSelectedPersonasStore();
   const { toast } = useToast();
 
@@ -174,25 +189,69 @@ export const ChannelStrip = ({
     { id: 'headphones-1', name: 'Headphones 1', type: 'headphones', icon: <Headphones className="h-4 w-4" /> },
     { id: 'headphones-2', name: 'Headphones 2', type: 'headphones', icon: <Headphones className="h-4 w-4" /> }
   ];
+  
+  const availablePlugins: Plugin[] = [
+    { id: 'eq-1', name: 'Parametric EQ', type: 'eq', icon: <Sliders className="h-4 w-4" />, isActive: false },
+    { id: 'comp-1', name: 'Compressor', type: 'comp', icon: <Waveform className="h-4 w-4" />, isActive: false },
+    { id: 'reverb-1', name: 'Studio Reverb', type: 'reverb', icon: <Settings className="h-4 w-4" />, isActive: false },
+    { id: 'delay-1', name: 'Analog Delay', type: 'delay', icon: <Settings className="h-4 w-4" />, isActive: false },
+    { id: 'eq-2', name: 'Graphic EQ', type: 'eq', icon: <Sliders className="h-4 w-4" />, isActive: false },
+    { id: 'comp-2', name: 'Multiband Compressor', type: 'comp', icon: <Waveform className="h-4 w-4" />, isActive: false },
+  ];
+  
+  const handleAddPlugin = (pluginId: string) => {
+    const plugin = availablePlugins.find(p => p.id === pluginId);
+    if (plugin && !activePlugins.some(p => p.id === pluginId)) {
+      setActivePlugins([...activePlugins, {...plugin, isActive: true}]);
+      toast({
+        title: "Plugin Added",
+        description: `${plugin.name} has been added to ${trackName}.`,
+      });
+    }
+    setShowPluginSelector(false);
+  };
+  
+  const handleRemovePlugin = (pluginId: string) => {
+    setActivePlugins(activePlugins.filter(p => p.id !== pluginId));
+    const plugin = availablePlugins.find(p => p.id === pluginId);
+    if (plugin) {
+      toast({
+        title: "Plugin Removed",
+        description: `${plugin.name} has been removed from ${trackName}.`,
+      });
+    }
+  };
+  
+  const handleTogglePluginActive = (pluginId: string) => {
+    setActivePlugins(activePlugins.map(p => 
+      p.id === pluginId ? {...p, isActive: !p.isActive} : p
+    ));
+  };
 
   return (
     <ContextMenu>
       <ContextMenuTrigger>
-        <div 
-          className={`flex flex-col items-center gap-2 p-2 bg-black/80 backdrop-blur-xl rounded-lg border transition-colors shadow-lg shadow-black/30 ${
+        <motion.div 
+          className={cn(
+            "flex flex-col items-center gap-2 p-2 rounded-lg border transition-all duration-200 shadow-lg",
+            "bg-gradient-to-b from-black/90 to-black/70 backdrop-blur-xl",
+            "shadow-black/30 hover:shadow-konform-neon-blue/10",
             isSelected 
-              ? 'border-konform-neon-orange' 
+              ? 'border-konform-neon-orange ring-1 ring-konform-neon-orange/30' 
               : type === 'master'
                 ? 'border-konform-neon-orange/20 hover:border-konform-neon-orange/40'
                 : type === 'bus'
                   ? 'border-konform-neon-blue/20 hover:border-konform-neon-blue/40'
-                  : 'border-konform-neon-blue/10 hover:border-konform-neon-blue/30'
-          } ${className} ${isDisabled ? 'opacity-50' : ''} ${
+                  : 'border-konform-neon-blue/10 hover:border-konform-neon-blue/30',
+            className,
+            isDisabled ? 'opacity-50' : '',
             viewMode === 'large' ? 'w-48' :
             viewMode === 'normal' ? 'w-32' :
             'w-24'
-          }`}
+          )}
           onClick={onSelect}
+          whileHover={{ y: -2 }}
+          transition={{ type: "spring", stiffness: 500, damping: 30 }}
         >
           <div className="w-full flex justify-between items-center px-2">
             <span className="text-xs text-konform-neon-blue">
@@ -295,23 +354,113 @@ export const ChannelStrip = ({
           {!isMaster && (
             <div className="w-full space-y-1 border-b border-konform-neon-blue/10 pb-2">
               <div className="flex items-center justify-between px-2">
-                <span className="text-xs text-konform-neon-blue">Plugin</span>
-                <Button variant="ghost" size="sm" className="h-6 w-6 p-0 relative">
-                  <PlusSquare className="h-3 w-3 text-konform-neon-blue" />
-                </Button>
+                <span className="text-xs text-konform-neon-blue">Plugins</span>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-6 w-6 p-0 relative hover:bg-konform-neon-blue/10 hover:text-konform-neon-blue"
+                        onClick={() => setShowPluginSelector(!showPluginSelector)}
+                      >
+                        <PlusSquare className="h-3 w-3 text-konform-neon-blue" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">
+                      <p>Add Plugin</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
-              <div className="relative">
-                <Select>
-                  <SelectTrigger className="h-7 text-xs bg-black/20">
-                    <SelectValue placeholder="Add Plugin" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="comp">Compressor</SelectItem>
-                    <SelectItem value="eq">EQ</SelectItem>
-                    <SelectItem value="reverb">Reverb</SelectItem>
-                  </SelectContent>
-                </Select>
+              
+              {/* Active Plugins List */}
+              <div className="space-y-1 max-h-24 overflow-y-auto scrollbar-thin scrollbar-thumb-konform-neon-blue/20 scrollbar-track-black/20">
+                {activePlugins.length > 0 ? (
+                  activePlugins.map((plugin) => (
+                    <div 
+                      key={plugin.id} 
+                      className={cn(
+                        "flex items-center justify-between px-2 py-1 rounded text-xs",
+                        "bg-black/30 hover:bg-black/50 transition-colors",
+                        plugin.isActive ? "border-l-2 border-konform-neon-blue" : "border-l-2 border-transparent"
+                      )}
+                    >
+                      <div className="flex items-center gap-1">
+                        {plugin.icon}
+                        <span className={plugin.isActive ? "text-white" : "text-gray-400"}>{plugin.name}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className={cn(
+                            "h-5 w-5 p-0",
+                            plugin.isActive ? "text-konform-neon-blue" : "text-gray-500"
+                          )}
+                          onClick={() => handleTogglePluginActive(plugin.id)}
+                        >
+                          <Power className="h-2.5 w-2.5" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-5 w-5 p-0 text-gray-500 hover:text-red-500"
+                          onClick={() => handleRemovePlugin(plugin.id)}
+                        >
+                          <Trash2 className="h-2.5 w-2.5" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-1 text-xs text-gray-500">No plugins added</div>
+                )}
               </div>
+              
+              {/* Plugin Selector Dropdown */}
+              <DropdownMenu open={showPluginSelector} onOpenChange={setShowPluginSelector}>
+                <DropdownMenuTrigger asChild>
+                  <div className="hidden">Plugin Selector</div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent 
+                  className="w-56 bg-gradient-to-b from-[#1A1F2C] to-[#141824] border border-konform-neon-blue/20 backdrop-blur-md"
+                  align="start"
+                >
+                  <DropdownMenuLabel className="text-konform-neon-blue text-xs font-normal">
+                    Select Plugin
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-konform-neon-blue/10" />
+                  <div className="max-h-[200px] overflow-y-auto scrollbar-thin scrollbar-thumb-konform-neon-blue/20 scrollbar-track-black/20">
+                    {availablePlugins.map(plugin => (
+                      <DropdownMenuItem 
+                        key={plugin.id}
+                        className="flex items-center gap-2 cursor-pointer hover:bg-konform-neon-blue/10 transition-colors"
+                        onClick={() => handleAddPlugin(plugin.id)}
+                        disabled={activePlugins.some(p => p.id === plugin.id)}
+                      >
+                        <div className="flex items-center gap-2">
+                          {plugin.icon}
+                          <div className="flex flex-col">
+                            <span className="text-sm">{plugin.name}</span>
+                            <span className="text-xs text-gray-400">
+                              {plugin.type === 'eq' ? 'Equalizer' : 
+                               plugin.type === 'comp' ? 'Compressor' : 
+                               plugin.type === 'reverb' ? 'Reverb' : 
+                               plugin.type === 'delay' ? 'Delay' : 'Effect'}
+                            </span>
+                          </div>
+                        </div>
+                        {activePlugins.some(p => p.id === plugin.id) && (
+                          <Badge variant="outline" className="ml-auto text-xs bg-konform-neon-blue/10 text-konform-neon-blue border-konform-neon-blue/20">
+                            Added
+                          </Badge>
+                        )}
+                      </DropdownMenuItem>
+                    ))}
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           )}
 
@@ -357,7 +506,7 @@ export const ChannelStrip = ({
                 <span>-48</span>
               </div>
 
-              <div className="h-full w-3 bg-black/40 rounded-sm overflow-hidden">
+              <div className="h-full w-3 bg-gradient-to-b from-black/60 to-black/40 rounded-sm overflow-hidden backdrop-blur-sm border border-konform-neon-blue/5">
                 <div className="w-full h-full bg-black/20" />
               </div>
 
@@ -466,7 +615,7 @@ export const ChannelStrip = ({
       </ContextMenuTrigger>
       
       <ContextMenuContent 
-        className="w-56 bg-[#1A1F2C] border border-konform-neon-blue/20"
+        className="w-56 bg-gradient-to-b from-[#1A1F2C] to-[#141824] border border-konform-neon-blue/20 backdrop-blur-md shadow-xl shadow-black/50"
       >
         <ContextMenuItem onClick={handleAddToFolder}>
           <FolderPlus className="h-4 w-4 mr-2" />
@@ -498,6 +647,21 @@ export const ChannelStrip = ({
           {isDisabled ? 'Enable' : 'Disable'}
         </ContextMenuItem>
         <ContextMenuSeparator />
+        {!isMaster && (
+          <>
+            <ContextMenuItem onClick={() => setShowPluginSelector(true)}>
+              <PlusSquare className="h-4 w-4 mr-2" />
+              Add Plugin
+            </ContextMenuItem>
+            {activePlugins.length > 0 && (
+              <ContextMenuItem onClick={() => setIsPluginPanelOpen(!isPluginPanelOpen)}>
+                <Settings className="h-4 w-4 mr-2" />
+                Manage Plugins
+              </ContextMenuItem>
+            )}
+            <ContextMenuSeparator />
+          </>
+        )}
         <ContextMenuItem onClick={() => toggleAutomation('read')}>
           {automation.read ? <ToggleRight className="h-4 w-4 mr-2" /> : <ToggleLeft className="h-4 w-4 mr-2" />}
           Read Automation

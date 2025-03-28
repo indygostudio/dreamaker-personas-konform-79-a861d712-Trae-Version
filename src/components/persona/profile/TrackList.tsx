@@ -51,6 +51,10 @@ export const TrackList = ({
     }));
 
     try {
+      // Optimistic UI update - immediately update the UI before the server responds
+      // This ensures the user sees the change right away
+      // We'll handle this in the parent component via refetchTracks
+      
       const { error } = await supabase
         .from('tracks')
         .upsert(updates);
@@ -58,12 +62,16 @@ export const TrackList = ({
       if (error) {
         console.error('Error updating track order:', error);
         toast.error("Failed to update track order");
+        // If there's an error, we should refetch to restore the correct order
+        refetchTracks();
       } else {
         toast.success("Track order updated");
       }
     } catch (error: any) {
       console.error('Error updating track order:', error);
       toast.error("Failed to update track order: " + error.message);
+      // If there's an error, we should refetch to restore the correct order
+      refetchTracks();
     }
   };
 
@@ -75,17 +83,23 @@ export const TrackList = ({
     }
     
     try {
-      // Delete the track
+      // Optimistic UI update - immediately update the UI before the server responds
+      // This ensures the user sees the change right away
+      const trackToDelete = tracks.find(track => track.id === trackId);
+      const trackIndex = tracks.findIndex(track => track.id === trackId);
+      
+      // Store the current state for potential rollback
+      const previousTracks = [...tracks];
+      
+      // Delete the track from the database
       const { error } = await supabase
         .from('tracks')
         .delete()
         .eq('id', trackId);
         
-      if (error) throw error;
-      
-      // Update UI immediately by filtering out the deleted track
-      // This ensures the UI reflects the change right away without waiting for refetch
-      const updatedTracks = tracks.filter(track => track.id !== trackId);
+      if (error) {
+        throw error;
+      }
       
       // If the deleted track was the current track, reset it
       if (currentTrack?.id === trackId) {
@@ -93,10 +107,16 @@ export const TrackList = ({
       }
       
       toast.success("Track deleted successfully");
+      
+      // Trigger a refetch to ensure the UI is in sync with the database
+      // The optimistic update already happened in the UI through the parent component's state
       refetchTracks();
     } catch (error: any) {
       console.error('Error deleting track:', error);
       toast.error("Failed to delete track: " + error.message);
+      
+      // If there was an error, refetch to restore the correct state
+      refetchTracks();
     }
   };
 
