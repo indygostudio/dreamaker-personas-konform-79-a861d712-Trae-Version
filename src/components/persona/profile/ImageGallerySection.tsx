@@ -6,19 +6,29 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, ExternalLink, Trash2, Upload, Image as ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
+import { motion, AnimatePresence } from 'framer-motion';
+
+interface MediaItemType {
+  id: number | string;
+  type: string;
+  title: string;
+  desc: string;
+  url: string;
+  span: string;
+}
 
 interface ImageGalleryProps {
   personaId: string;
 }
 
 export const ImageGallerySection = ({ personaId }: ImageGalleryProps) => {
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<MediaItemType | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
-  const { data: images, isLoading, refetch } = useQuery({
+  const { data: imagesData, isLoading, refetch } = useQuery({
     queryKey: ['ai-images', personaId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -32,9 +42,18 @@ export const ImageGallerySection = ({ personaId }: ImageGalleryProps) => {
     },
   });
 
+  const images = imagesData?.map(img => ({
+    id: img.id,
+    type: 'image',
+    title: img.prompt || 'AI Generated Image',
+    desc: '',
+    url: img.image_url,
+    span: ''
+  })) || [];
+
   useEffect(() => {
-    if (images && images.length > 0 && !selectedImage) {
-      setSelectedImage(images[0].image_url);
+    if (images.length > 0 && !selectedImage) {
+      setSelectedImage(images[0]);
     }
   }, [images, selectedImage]);
 
@@ -189,8 +208,54 @@ export const ImageGallerySection = ({ personaId }: ImageGalleryProps) => {
     );
   }
 
+  const GalleryModal = ({ selectedItem, isOpen, onClose }: { selectedItem: MediaItemType, isOpen: boolean, onClose: () => void }) => {
+    if (!isOpen || !selectedItem) return null;
+
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ scale: 0.9 }}
+          animate={{ scale: 1 }}
+          exit={{ scale: 0.9 }}
+          className="relative max-w-7xl w-full h-full md:h-auto md:aspect-video m-4 bg-black/40 rounded-lg overflow-hidden"
+          onClick={e => e.stopPropagation()}
+        >
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/50 hover:bg-black/70 transition-colors"
+          >
+            <Trash2 className="w-6 h-6 text-white" />
+          </button>
+          <img
+            src={selectedItem.url}
+            alt={selectedItem.title}
+            className="w-full h-full object-contain"
+          />
+          <div className="absolute bottom-4 right-4 flex gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => handleDownload(selectedItem.url)}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Download
+            </Button>
+          </div>
+        </motion.div>
+      </motion.div>
+    );
+  };
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="space-y-6">
       <input
         ref={fileInputRef}
         type="file"
@@ -198,30 +263,57 @@ export const ImageGallerySection = ({ personaId }: ImageGalleryProps) => {
         onChange={handleFileInputChange}
         className="hidden"
       />
-      <div className="md:col-span-2">
-        {selectedImage ? (
-          <div className="relative bg-black/40 rounded-lg overflow-hidden">
-            <img
-              src={selectedImage}
-              alt="Selected AI Image"
-              className="w-full h-auto object-contain rounded-lg"
-            />
-            <div className="absolute bottom-4 right-4 flex gap-2">
-              <Button 
-                variant="secondary" 
-                size="sm" 
-                onClick={() => handleDownload(selectedImage)}
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Download
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <div className="h-64 flex items-center justify-center bg-black/40 rounded-lg">
-            <p className="text-gray-400">Select an image to view</p>
-          </div>
+      <AnimatePresence>
+        {selectedImage && (
+          <GalleryModal
+            selectedItem={selectedImage}
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+          />
         )}
+      </AnimatePresence>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {images.map((image) => (
+          <motion.div
+            key={image.id}
+            layout
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <Card
+              className="overflow-hidden cursor-pointer transition-all hover:ring-2 hover:ring-dreamaker-purple"
+              onClick={() => {
+                setSelectedImage(image);
+                setIsModalOpen(true);
+              }}
+            >
+              <div className="relative aspect-square">
+                <img
+                  src={image.url}
+                  alt={image.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity flex items-end justify-between p-2">
+                  <span className="text-xs text-white truncate max-w-[70%]">
+                    {image.title}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 text-white hover:bg-red-500/20"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteImage(image.id as string);
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+        ))}
       </div>
 
       <div className="space-y-4">

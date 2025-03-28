@@ -172,10 +172,9 @@ export const PersonaContextMenu = ({
             onClick={() => setShowTransferDialog(true)} 
             className="text-gray-300 hover:text-white focus:text-white hover:bg-dreamaker-purple/10 focus:bg-dreamaker-purple/10"
           >
-            <UserPlus2 className="h-4 w-4 mr-2" />
+            <UserMinus2 className="h-4 w-4 mr-2" />
             Transfer Ownership
           </ContextMenuItem>
-          <ContextMenuSeparator className="bg-dreamaker-purple/20" />
           <ContextMenuItem 
             onClick={() => setShowDeleteDialog(true)} 
             className="text-red-500 hover:text-red-400 focus:text-red-400 hover:bg-red-500/10 focus:bg-red-500/10"
@@ -198,6 +197,13 @@ export const PersonaContextMenu = ({
         personaId={personaId}
         onDelete={onDelete}
       />
+      {showTransferDialog && (
+        <TransferOwnershipDialog
+          open={showTransferDialog}
+          onOpenChange={setShowTransferDialog}
+          personaId={personaId}
+        />
+      )}
     </>
   );
 };
