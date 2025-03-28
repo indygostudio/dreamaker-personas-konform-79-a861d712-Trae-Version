@@ -181,7 +181,7 @@ export const PersonaContextMenu = ({
             className="text-red-500 hover:text-red-400 focus:text-red-400 hover:bg-red-500/10 focus:bg-red-500/10"
           >
             <Trash2Icon className="h-4 w-4 mr-2" />
-            Delete
+            Delete Profile
           </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>

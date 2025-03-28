@@ -2,12 +2,13 @@
 import { useState } from "react";
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "@/components/ui/context-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Plus, Share2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { Plus, Share2, Trash2 } from "lucide-react";
 import { useSession } from "@supabase/auth-helpers-react";
 import { toast } from "@/hooks/use-toast";
 import type { Persona } from "@/types/persona";
 import { ReactNode } from "react";
+import { usePersonaDelete } from "@/components/persona/hooks/usePersonaDelete";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface PersonaContextActionsProps {
   artist: Persona;
@@ -42,27 +43,40 @@ export const PersonaContextActions = ({
     }
   };
 
+  const queryClient = useQueryClient();
+  const { handleDeletePersona } = usePersonaDelete();
+
   const handleDelete = async () => {
     if (!canDelete) return;
 
     try {
-      const { error } = await supabase
-        .from('personas')
-        .delete()
-        .eq('id', artist.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Persona deleted",
-        description: "The persona has been successfully deleted",
-      });
-
-      window.location.reload();
+      const success = await handleDeletePersona(artist.id);
+      
+      if (success) {
+        // Invalidate relevant queries to refresh UI
+        await queryClient.invalidateQueries({ 
+          queryKey: ["personas"]
+        });
+        
+        // Check if we're on an artist profile page
+        if (artist.artist_profile_id) {
+          await queryClient.invalidateQueries({ 
+            queryKey: ["artist-personas", artist.artist_profile_id]
+          });
+          await queryClient.invalidateQueries({ 
+            queryKey: ["artist-profile", artist.artist_profile_id]
+          });
+        }
+        
+        toast({
+          title: "Success",
+          description: "Persona deleted successfully",
+        });
+      }
     } catch (error: any) {
       toast({
         title: "Error deleting persona",
-        description: error.message,
+        description: error.message || "Failed to delete persona",
         variant: "destructive",
       });
     }
@@ -94,7 +108,7 @@ export const PersonaContextActions = ({
             onClick={() => setDeleteDialogOpen(true)}
             className="hover:bg-red-500/20 text-red-400 cursor-pointer"
           >
-            <span className="h-4 w-4 mr-2">🗑️</span>
+            <Trash2 className="h-4 w-4 mr-2" />
             Delete Profile
           </ContextMenuItem>
         )}
