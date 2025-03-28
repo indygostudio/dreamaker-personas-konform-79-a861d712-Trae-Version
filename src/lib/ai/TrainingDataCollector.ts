@@ -1,6 +1,6 @@
 import { User } from '@/types/user';
 import { TrainingData } from '@/types/training';
-import { supabase } from '@/lib/supabaseClient';
+import { supabase } from '@/integrations/supabase/client';
 
 export class TrainingDataCollector {
   private static instance: TrainingDataCollector;

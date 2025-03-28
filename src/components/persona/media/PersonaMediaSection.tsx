@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { MediaCollectionCard } from "@/components/media/MediaCollectionCard";
 import { MediaCollectionDialog } from "@/components/media/MediaCollectionDialog";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 
 export const PersonaMediaSection = ({ persona }: { persona: Persona }) => {
   const [isCreating, setIsCreating] = useState(false);

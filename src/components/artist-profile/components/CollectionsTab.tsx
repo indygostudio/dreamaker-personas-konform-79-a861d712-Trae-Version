@@ -2,7 +2,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Persona } from "@/types/persona";
 import { Folder, X } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CollectionsTabProps {
   collections?: any[];

@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Heart, PlayCircle, Share2, StopCircle, Users, Star, Music, Mic2, Trash2, Volume2, VolumeX, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/hooks/useUser";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 import { useSelectedPersonasStore } from "@/stores/selectedPersonasStore";
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "@/components/ui/context-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
