@@ -16,8 +16,9 @@ export const ExpandToggle = ({
     <button 
       className="absolute left-1/2 transform -translate-x-1/2 bottom-4 bg-black/40 p-1 rounded-full hover:bg-black/60 transition-colors z-10"
       onClick={(e) => {
-        // Prevent event propagation to avoid interfering with audio playback
+        // Prevent event propagation and default browser actions to avoid interfering with audio playback
         e.stopPropagation();
+        e.preventDefault();
         onToggle();
       }}
     >

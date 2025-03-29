@@ -107,39 +107,49 @@ export const VideoBackground = ({
     if (videoUrl && videoRef.current) {
       const video = videoRef.current;
       
-      // Only control video playback, not audio
-      // This ensures videos play on hover without affecting audio transport
+      // This is where the issue is happening - video playback is interfering with audio transport
       if (isHovering) {
-        // Play on hover, but only if we're not already playing audio elsewhere
-        // Check if there's any global audio playing via DAW state
+        // Create a completely isolated play attempt that won't affect audio contexts
         const playTimer = setTimeout(() => {
-          // Only set playback rate if we're going to play
-          if (reverseOnEnd && lastPlaybackRate !== 0) {
-            // Resume in the same direction
-            video.playbackRate = lastPlaybackRate;
+          // IMPORTANT: Prevent video playback from affecting audio contexts
+          // First, disconnect any audio tracks that might exist in the video
+          try {
+            // Ensure video is completely muted with no audio track interaction
+            video.muted = true;
+            video.volume = 0;
+            
+            // Set video attributes to prevent audio context usage
+            video.setAttribute('disableRemotePlayback', 'true');
+            video.setAttribute('x-webkit-airplay', 'deny');
+            
+            // Create a flag in the DOM to mark video as visuals-only
+            if (!video.hasAttribute('data-visuals-only')) {
+              video.setAttribute('data-visuals-only', 'true');
+            }
+            
+            // Only set playback rate if we're going to play
+            if (reverseOnEnd && lastPlaybackRate !== 0) {
+              // Resume in the same direction
+              video.playbackRate = lastPlaybackRate;
+            }
+          } catch (e) {
+            console.error("Error configuring video:", e);
           }
           
-          // Important: Set muted to true to ensure we don't interfere with audio transport
-          video.muted = true;
-          
-          // Store current playing state before attempting to play
+          // Store current playing state
           const wasPlaying = isPlaying;
           
-          // CRITICAL FIX: Don't interfere with any existing audio playback
-          // We only want to play the video, not affect audio transport
-          // Use a separate context for video playback to avoid interfering with audio context
-          const playPromise = video.play();
-          if (playPromise !== undefined) {
-            playPromise
-              .then(() => {
-                // Only update playing state if it wasn't already playing
-                if (!wasPlaying) setIsPlaying(true);
-              })
-              .catch(err => {
-                console.log("Hover play error:", err);
-                if (!wasPlaying) setIsPlaying(false);
-                // Don't propagate errors to avoid affecting audio playback
-              });
+          // Use a completely separate try/catch that won't bubble up
+          try {
+            // Use a void promise to completely isolate any errors
+            void video.play().then(() => {
+              if (!wasPlaying) setIsPlaying(true);
+            }).catch(() => {
+              // Silently fail - don't let this affect audio playback at all
+              // We prioritize audio transport stability over video playback
+            });
+          } catch (e) {
+            // Completely swallow any errors to prevent audio interruption
           }
         }, 50);
         
@@ -184,7 +194,20 @@ export const VideoBackground = ({
               // Copy properties if DOM swaps the element
               el.currentTime = videoRef.current.currentTime;
               el.playbackRate = videoRef.current.playbackRate;
-              if (!videoRef.current.paused) el.play();
+              
+              // Ensure video is completely isolated from audio contexts
+              el.muted = true;
+              el.volume = 0;
+              el.setAttribute('disableRemotePlayback', 'true');
+              el.setAttribute('x-webkit-airplay', 'deny');
+              el.setAttribute('data-visuals-only', 'true');
+              
+              if (!videoRef.current.paused) {
+                // Use a separate try/catch block for play() that won't affect audio
+                try {
+                  void el.play().catch(() => {});
+                } catch (e) {}
+              }
             }
           }}
           src={videoUrl}
@@ -193,6 +216,7 @@ export const VideoBackground = ({
           loop={true}
           playsInline
           autoPlay={autoPlay}
+          data-visuals-only="true"
           preload={priority ? "auto" : "metadata"} // Use 'auto' for priority loading
           className={`w-full h-full object-cover transition-opacity duration-300 ${
             isVideoLoaded ? 'opacity-100' : 'opacity-0'

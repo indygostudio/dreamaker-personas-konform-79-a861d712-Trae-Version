@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { CardContent, CardFooter } from "@/components/ui/card";
 import type { Persona } from "@/types/persona";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useSelectedPersonasStore } from "@/stores/selectedPersonasStore";
 import { VideoBackground } from "./VideoBackground";
 import { UserCardContent } from "./UserCardContent";
@@ -34,9 +34,12 @@ export const PersonaCard = ({
   const [isHovering, setIsHovering] = useState(false);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { wormholeAnimations, addPersona, setShowDropContainer } = useSelectedPersonasStore();
 
   const isInWormhole = wormholeAnimations.has(artist.name);
+  const fromKonform = location.state?.fromKonform;
+  const konformSessionId = location.state?.konformSessionId;
 
   const handleNavigateToProfile = () => {
     navigate(`/personas/${artist.id}`);
@@ -79,15 +82,33 @@ export const PersonaCard = ({
         type: artist.type
       });
       
+      // Handle redirection back to Konform if we came from there
+      const redirectionDelay = fromKonform && artist.is_collab ? 500 : 2000;
+      
       // Remove wormhole effect after a delay
       setTimeout(() => {
         document.body.removeChild(wormholeContainer);
-      }, 2000);
-      
-      toast({
-        title: "Added to project",
-        description: `${artist.name} has been added to your project`,
-      });
+        
+        // If we came from Konform and this is a collaboration, redirect back to Konform
+        if (fromKonform && artist.is_collab) {
+          navigate('/konform', {
+            state: {
+              selectedCollaborationId: artist.id,
+              collaborationName: artist.name
+            }
+          });
+          
+          toast({
+            title: "Collaboration selected",
+            description: `${artist.name} has been selected for your Konform project`,
+          });
+        } else {
+          toast({
+            title: "Added to project",
+            description: `${artist.name} has been added to your project`,
+          });
+        }
+      }, redirectionDelay);
     }
   };
 

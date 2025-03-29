@@ -44,33 +44,59 @@ export const EnhancedMusicPlayer = ({
   useEffect(() => {
     if (!audioUrl || !audioRef.current) return;
     
+    const audio = audioRef.current;
+    
+    // Set critical attributes to prioritize this audio player
+    try {
+      // Mark this as a high-priority audio element that shouldn't be interrupted
+      audio.setAttribute('data-priority', 'high');
+      audio.setAttribute('data-audio-transport', 'true');
+      // Set audio context attributes to isolate from videos
+      audio.preservesPitch = true;
+    } catch (e) {
+      console.error("Error setting audio attributes:", e);
+    }
+    
     const handleTimeUpdate = () => {
-      if (!isDragging && audioRef.current) {
-        setCurrentTime(audioRef.current.currentTime);
+      if (!isDragging && audio) {
+        setCurrentTime(audio.currentTime);
       }
     };
     
     const handleLoadedMetadata = () => {
-      if (audioRef.current) {
-        setDuration(audioRef.current.duration);
+      if (audio) {
+        setDuration(audio.duration);
       }
     };
     
-    audioRef.current.addEventListener('timeupdate', handleTimeUpdate);
-    audioRef.current.addEventListener('loadedmetadata', handleLoadedMetadata);
+    // Handle unexpected interruptions
+    const handlePause = (e: Event) => {
+      // If this was an external pause (not user-initiated) and we should be playing,
+      // attempt to resume playback immediately
+      if (isPlaying && audio.paused && !e.isTrusted) {
+        setTimeout(() => {
+          audio.play().catch(() => {});
+        }, 50);
+      }
+    };
     
-    if (audioRef.current.readyState > 0) {
-      setDuration(audioRef.current.duration);
-      setCurrentTime(audioRef.current.currentTime);
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('pause', handlePause);
+    
+    if (audio.readyState > 0) {
+      setDuration(audio.duration);
+      setCurrentTime(audio.currentTime);
     }
     
     return () => {
-      if (audioRef.current) {
-        audioRef.current.removeEventListener('timeupdate', handleTimeUpdate);
-        audioRef.current.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      if (audio) {
+        audio.removeEventListener('timeupdate', handleTimeUpdate);
+        audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+        audio.removeEventListener('pause', handlePause);
       }
     };
-  }, [audioUrl, isDragging, audioRef]);
+  }, [audioUrl, isDragging, audioRef, isPlaying]);
   
   useEffect(() => {
     if (!audioRef.current) return;

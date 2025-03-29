@@ -6,15 +6,17 @@ interface AvatarSectionProps {
   avatarUrl?: string;
   name: string;
   isOwner?: boolean;
+  className?: string;
 }
 
-export const AvatarSection = ({ 
-  avatarUrl, 
+export const AvatarSection = ({
+  avatarUrl,
   name,
-  isOwner = false
+  isOwner = false,
+  className = ""
 }: AvatarSectionProps) => {
   return (
-    <div className="relative">
+    <div className={`relative ${className}`}>
       <Avatar className="h-16 w-16 border-2 border-white/10 shadow-xl">
         <AvatarImage src={avatarUrl} alt={name} className="object-cover" />
         <AvatarFallback className="bg-dreamaker-purple/20 text-white">

@@ -72,19 +72,45 @@ export const WaveformPlayer = ({
           normalize: true,
           fillParent: true,
           minPxPerSec: 50,
-          backend: 'WebAudio',
+          // Use MediaElement backend to be more resilient to UI changes
+          backend: disableAudio ? 'MediaElement' : 'WebAudio',
           hideScrollbar: true,
-          interact: true,
-          // Disable audio output from WaveSurfer to prevent double playback
-          media: disableAudio ? { volume: 0 } : undefined,
+          // Limit interaction to prevent UI events from affecting the waveform
+          interact: enableRegionSelection, // Only allow interaction if regions are enabled
+          // We'll set volume after instance creation
+          // Add plugins
           plugins: plugins
         });
 
         wavesurfer.current = ws;
+        
+        // Set volume after instance is created to ensure it doesn't affect audio transport
+        if (disableAudio) {
+          try {
+            ws.setVolume(0);
+            
+            // Add attributes to prevent audio conflicts
+            const mediaElement = ws.getMediaElement();
+            if (mediaElement) {
+              mediaElement.setAttribute('data-visuals-only', 'true');
+              mediaElement.muted = true;
+              mediaElement.volume = 0;
+            }
+          } catch (e) {
+            console.error('Error configuring WaveSurfer volume:', e);
+          }
+        }
 
         ws.on('ready', () => {
           console.log('WaveSurfer is ready');
           setIsInitialized(true);
+          
+          // Double-check volume setting after ready
+          if (disableAudio) {
+            try {
+              ws.setVolume(0);
+            } catch (e) {}
+          }
           
           // Create region if region selection is enabled
           if (enableRegionSelection && regionsPlugin.current) {

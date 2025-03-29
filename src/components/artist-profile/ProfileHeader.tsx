@@ -50,8 +50,9 @@ export const ProfileHeader = ({
   }
 
   const handleDoubleClick = (e: React.MouseEvent) => {
-    // Prevent event propagation to avoid interfering with audio playback
+    // Prevent event propagation and default browser actions to avoid interfering with audio playback
     e.stopPropagation();
+    e.preventDefault();
     setHeaderExpanded(!isHeaderExpanded);
   };
 
@@ -59,14 +60,40 @@ export const ProfileHeader = ({
     setBannerUrl(newUrl);
   };
 
-  const handleMouseEnter = () => {
+  // Modify hover handlers to prevent affecting audio playback
+  const handleMouseEnter = (e: React.MouseEvent) => {
+    // For header hover, we need to prevent default to avoid audio interference
+    e.preventDefault();
+    e.stopPropagation();
+    
+    console.log('[DEBUG] Header mouse enter - this should NOT affect audio playback');
+    
+    // Create a custom event to indicate this is a header hover event
+    // This allows us to track if this event is somehow affecting audio
+    const customEvent = new CustomEvent('header-hover-start', {
+      detail: { timestamp: Date.now() }
+    });
+    document.dispatchEvent(customEvent);
+    
+    // Only update hover state for video elements, not for audio
     setIsHovering(true);
-    // Only affects video playback, not audio
   };
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = (e: React.MouseEvent) => {
+    // For header hover, we need to prevent default to avoid audio interference
+    e.preventDefault();
+    e.stopPropagation();
+    
+    console.log('[DEBUG] Header mouse leave - this should NOT affect audio playback');
+    
+    // Create a custom event to indicate this is a header hover end event
+    const customEvent = new CustomEvent('header-hover-end', {
+      detail: { timestamp: Date.now() }
+    });
+    document.dispatchEvent(customEvent);
+    
+    // Only update hover state for video elements, not for audio
     setIsHovering(false);
-    // Only affects video playback, not audio
   };
   
   // Handle hover state for video playback

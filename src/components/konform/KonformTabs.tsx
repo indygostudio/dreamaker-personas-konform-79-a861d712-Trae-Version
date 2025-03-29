@@ -19,7 +19,12 @@ import { EditorView } from "./editor/EditorView";
 
 
 
-export const KonformTabs = () => {
+interface KonformTabsProps {
+  selectedCollaborationId?: string;
+  collaborationName?: string;
+}
+
+export const KonformTabs = ({ selectedCollaborationId, collaborationName }: KonformTabsProps) => {
   const { toast } = useToast();
   const location = useLocation();
   const [searchParams] = useSearchParams();
@@ -68,10 +73,20 @@ export const KonformTabs = () => {
     }
   }, [location, searchParams]);
 
+  // Effect to show toast when returning with a selected collaboration
+  useEffect(() => {
+    if (selectedCollaborationId && collaborationName) {
+      toast({
+        title: "Collaboration Loaded",
+        description: `${collaborationName} has been loaded into your Konform project`,
+      });
+    }
+  }, [selectedCollaborationId, collaborationName, toast]);
+
   const {
     data: latestSession
   } = useQuery({
-    queryKey: ['latest_collaboration'],
+    queryKey: ['latest_collaboration', selectedCollaborationId],
     queryFn: async () => {
       const {
         data: {
@@ -79,6 +94,26 @@ export const KonformTabs = () => {
         }
       } = await supabase.auth.getUser();
       if (!user) return null;
+      
+      // If a specific collaboration was selected, prioritize it
+      if (selectedCollaborationId) {
+        const {
+          data: collaborationData,
+          error: collaborationError
+        } = await supabase
+          .from('collaboration_sessions')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('id', selectedCollaborationId)
+          .single();
+          
+        if (!collaborationError && collaborationData) {
+          console.log('Selected collaboration session:', collaborationData);
+          return collaborationData;
+        }
+      }
+      
+      // Otherwise fetch latest session as fallback
       const {
         data,
         error

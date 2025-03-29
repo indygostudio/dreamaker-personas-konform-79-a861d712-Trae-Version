@@ -1,14 +1,19 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { KonformProduct } from "@/pages/KonformProduct";
 import { useHeaderStore } from "@/components/konform/store/headerStore";
 import { KonformTabs } from "@/components/konform/KonformTabs";
 import { useAuth } from "@/hooks/use-auth";
 const Konform = () => {
   const { session } = useAuth();
+  const location = useLocation();
   const {
     konformHeaderCollapsed,
     setKonformHeaderCollapsed
   } = useHeaderStore();
+  
+  // Extract any collaboration selected from Dreamaker
+  const selectedCollaborationId = location.state?.selectedCollaborationId;
+  const collaborationName = location.state?.collaborationName;
 
   if (session === null) {
     return (
@@ -23,7 +28,10 @@ const Konform = () => {
   }
   return <div className="min-h-screen bg-gradient-to-br from-black to-konform-bg">
       <div className="max-w-[2400px] mx-auto px-6 py-[66px]">
-        <KonformTabs />
+        <KonformTabs
+          selectedCollaborationId={selectedCollaborationId}
+          collaborationName={collaborationName}
+        />
       </div>
     </div>;
 };

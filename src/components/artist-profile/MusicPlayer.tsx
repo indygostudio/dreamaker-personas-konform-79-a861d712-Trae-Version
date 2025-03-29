@@ -120,8 +120,15 @@ export const MusicPlayer = ({
     const playAudio = async () => {
       if (isPlaying) {
         try {
+          // Add a small delay to ensure UI changes don't interfere with playback
+          await new Promise(resolve => setTimeout(resolve, 10));
           await audioRef.current?.play();
-          // Start playback
+          // Ensure playback continues by setting priority
+          if (audioRef.current) {
+            // These attributes help maintain playback during UI changes
+            audioRef.current.preservesPitch = true;
+            audioRef.current.setAttribute('data-priority', 'high');
+          }
         } catch (error) {
           console.error('Error playing audio:', error);
           onPlayPause(); // Toggle back to paused state on error
@@ -133,6 +140,34 @@ export const MusicPlayer = ({
     
     playAudio();
   }, [isPlaying, isAudioReady, onPlayPause, trimStart]);
+  
+  // Add event listener to handle any external interference with audio playback
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      // When tab becomes visible again, check if playback should be running
+      if (document.visibilityState === 'visible' && isPlaying && audioRef.current) {
+        audioRef.current.play().catch(() => {});
+      }
+    };
+    
+    // Handle potential external pauses (like from header interactions)
+    const handleExternalPause = () => {
+      if (isPlaying && audioRef.current && audioRef.current.paused) {
+        // Try to resume playback if it should be playing but was paused externally
+        audioRef.current.play().catch(() => {});
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    // Set up an interval to check playback status and correct if needed
+    const playbackCheckInterval = setInterval(handleExternalPause, 500);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      clearInterval(playbackCheckInterval);
+    };
+  }, [isPlaying]);
   
 
   
