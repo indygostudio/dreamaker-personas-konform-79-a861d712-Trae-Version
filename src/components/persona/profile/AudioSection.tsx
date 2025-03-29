@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { PlaylistCreator } from "@/components/artist-profile/PlaylistCreator";
-import { MusicPlayer } from "@/components/artist-profile/MusicPlayer";
+import { MusicPlayer } from "./MusicPlayer";
 import { useUser } from "@/hooks/useUser";
 import { PlaylistSelector } from "./PlaylistSelector";
 import { TrackList } from "./TrackList";
@@ -153,12 +153,16 @@ export const AudioSection = ({ persona, selectedModel, isActive = true }: AudioS
       )}
 
       {currentTrack && (
-        <MusicPlayer 
-          audioUrl={currentTrack.audio_url} 
+        <MusicPlayer
+          currentTrack={currentTrack}
+          tracks={tracks || []}
           isPlaying={isPlaying && isActive}
-          onPlayPause={handlePlayPause}
-          trackTitle={currentTrack.title}
-          artistName={currentTrack.artist || persona.name}
+          isShuffled={false}
+          isLooping={false}
+          setIsPlaying={setIsPlaying}
+          setIsShuffled={() => {}}
+          setIsLooping={() => {}}
+          onTrackSelect={handlePlayTrack}
         />
       )}
       
