@@ -140,6 +140,9 @@ export const RecentCollaborations = ({
 
       if (error) throw error;
 
+      // Update local state after successful removal
+      setItems(items => items.filter(item => item.id !== personaId));
+
       toast({
         title: "Collaboration removed",
         description: "The collaboration has been removed from your list"

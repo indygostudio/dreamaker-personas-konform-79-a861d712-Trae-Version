@@ -27,7 +27,7 @@ interface AdminModeProviderProps {
 // In a production environment, this would be fetched from the database
 const ADMIN_USER_IDS = [
   // Add admin user IDs here
-  "*" // Wildcard to grant admin access to all users temporarily
+  "indygorecording@gmail.com" // Admin user email
 ];
 
 export const AdminModeProvider: React.FC<AdminModeProviderProps> = ({ children }) => {
@@ -47,10 +47,10 @@ export const AdminModeProvider: React.FC<AdminModeProviderProps> = ({ children }
 
       try {
         // Check if user is in the admin list
-        const userId = session.user.id;
+        const userEmail = session.user.email;
         
         // Option 1: Check against hardcoded list
-        const isAdminUser = ADMIN_USER_IDS.includes(userId);
+        const isAdminUser = ADMIN_USER_IDS.includes(userEmail);
         
         // Option 2: Check against database (uncomment to use)
         // const { data, error } = await supabase

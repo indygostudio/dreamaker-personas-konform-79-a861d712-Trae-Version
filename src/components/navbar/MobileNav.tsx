@@ -1,10 +1,18 @@
 
 import { Link, useLocation } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { useAdminMode } from "@/contexts/AdminModeContext";
+import { ShieldCheck } from "lucide-react";
+
 interface MobileNavProps {
   session: any;
+  isOpen: boolean;
+  onClose: () => void;
+  onSignOut: () => void;
 }
 
 export const MobileNav = ({ isOpen, session, onClose, onSignOut }: MobileNavProps) => {
+  const { isAdmin, isAdminMode, toggleAdminMode } = useAdminMode();
   if (!isOpen) return null;
 
   return (
@@ -40,16 +48,30 @@ export const MobileNav = ({ isOpen, session, onClose, onSignOut }: MobileNavProp
         </Link>
 
         {session ? (
-          <Button
-            variant="ghost"
-            className="text-white hover:text-white/80 justify-start rounded-full border border-white/10 hover:bg-[#0EA5E9]/10 hover:border-[#0EA5E9]/20"
-            onClick={() => {
-              onSignOut();
-              onClose();
-            }}
-          >
-            Sign Out
-          </Button>
+          <>
+            {isAdmin && (
+              <Button
+                variant="ghost"
+                className={`text-white hover:text-white/80 justify-start rounded-full border border-white/10 hover:bg-[#0EA5E9]/10 hover:border-[#0EA5E9]/20 ${isAdminMode ? 'bg-[#0EA5E9]/20' : ''}`}
+                onClick={() => {
+                  toggleAdminMode();
+                }}
+              >
+                <ShieldCheck className="h-4 w-4 mr-2" />
+                Admin
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              className="text-white hover:text-white/80 justify-start rounded-full border border-white/10 hover:bg-[#0EA5E9]/10 hover:border-[#0EA5E9]/20"
+              onClick={() => {
+                onSignOut();
+                onClose();
+              }}
+            >
+              Sign Out
+            </Button>
+          </>
         ) : (
           <>
             <Link to="/auth" onClick={onClose}>
