@@ -1,7 +1,8 @@
 
 import { useEffect, useState } from "react";
 import { PlaylistCreator } from "@/components/artist-profile/PlaylistCreator";
-import { MusicPlayer } from "./MusicPlayer";
+// Unified audio implementation
+import { AudioSectionAdapter } from "./AudioSectionAdapter";
 import { useUser } from "@/hooks/useUser";
 import { PlaylistSelector } from "./PlaylistSelector";
 import { TrackList } from "./TrackList";
@@ -11,6 +12,7 @@ import { Activity, Plus, Music } from "lucide-react";
 import { AddAudioDialog } from "./AddAudioDialog";
 import { LoopDetailsDialog } from "./LoopDetailsDialog";
 import { LoopBrowser } from "./LoopBrowser";
+import type { Track } from "@/types/track";
 
 interface AudioSectionProps {
   persona: any;
@@ -50,19 +52,66 @@ export const AudioSection = ({ persona, selectedModel, isActive = true }: AudioS
   } = useAudioSection();
 
   const [isLoopBrowserOpen, setIsLoopBrowserOpen] = useState(false);
+  const [isMusicPlayerVisible, setIsMusicPlayerVisible] = useState(false);
 
   const isOwner = user?.id === persona.user_id;
+
+  // Store the current track in session storage when it changes
+  // so we can recover it when returning to the tab
+  useEffect(() => {
+    if (currentTrack) {
+      // Save current track to session storage to persist during tab switching
+      sessionStorage.setItem('currentAudioTrack', JSON.stringify(currentTrack));
+    }
+  }, [currentTrack]);
+
+  // Restore track and visibility state when the component mounts or becomes active
+  useEffect(() => {
+    // Check if we have a stored track and we're returning to the tab
+    if (isActive) {
+      const storedTrackJson = sessionStorage.getItem('currentAudioTrack');
+      
+      // If audio is playing but no current track is set, restore it from session storage
+      if (isPlaying && !currentTrack && storedTrackJson) {
+        try {
+          const storedTrack = JSON.parse(storedTrackJson);
+          setCurrentTrack(storedTrack);
+        } catch (e) {
+          console.error('Failed to parse stored track:', e);
+        }
+      }
+      
+      // Always ensure the music player is visible when returning to an active tab with playing audio
+      if (isPlaying) {
+        setIsMusicPlayerVisible(true);
+      }
+    }
+  }, [isActive, isPlaying, currentTrack, setCurrentTrack]);
 
   // Only pause audio when the component is unmounted, not just inactive
   // This allows audio to continue playing when switching tabs
   useEffect(() => {
+    // Make sure music player is visible when a track is playing
+    if (isPlaying) {
+      setIsMusicPlayerVisible(true);
+    }
+    
     // Cleanup function will only run when component unmounts
     return () => {
       if (isPlaying) {
         setIsPlaying(false);
+        // Clear stored track when component unmounts and playback stops
+        sessionStorage.removeItem('currentAudioTrack');
       }
     };
   }, [isPlaying, setIsPlaying]);
+
+  // Enhanced track selection handler with unified audio system integration
+  const handleTrackSelection = (track: Track) => {
+    setIsMusicPlayerVisible(true);
+    handlePlayTrack(track);
+    // The AudioSectionAdapter now handles the actual playback through the unified system
+  };
 
   const handleAudioFileSelect = (file: File, isLoop: boolean) => {
     if (isLoop) {
@@ -136,7 +185,7 @@ export const AudioSection = ({ persona, selectedModel, isActive = true }: AudioS
         isLoading={isLoadingTracks}
         currentTrack={currentTrack}
         isPlaying={isPlaying}
-        handlePlayTrack={handlePlayTrack}
+        handlePlayTrack={handleTrackSelection}
         selectedPlaylistId={selectedPlaylistId}
         isOwner={isOwner}
         refetchTracks={refetchTracks}
@@ -152,18 +201,9 @@ export const AudioSection = ({ persona, selectedModel, isActive = true }: AudioS
         />
       )}
 
-      {currentTrack && (
-        <MusicPlayer
-          currentTrack={currentTrack}
-          tracks={tracks || []}
-          isPlaying={isPlaying && isActive}
-          isShuffled={false}
-          isLooping={false}
-          setIsPlaying={setIsPlaying}
-          setIsShuffled={() => {}}
-          setIsLooping={() => {}}
-          onTrackSelect={handlePlayTrack}
-        />
+      {/* Use our adapter for the unified audio system */}
+      {(isMusicPlayerVisible || isPlaying) && currentTrack && (
+        <AudioSectionAdapter />
       )}
       
       <AddAudioDialog

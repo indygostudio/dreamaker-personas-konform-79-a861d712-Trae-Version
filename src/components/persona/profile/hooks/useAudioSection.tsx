@@ -96,10 +96,18 @@ export const useAudioSection = () => {
 
   const handlePlayTrack = (track: Track) => {
     if (currentTrack?.id === track.id) {
+      // If it's the same track, toggle play/pause
       setIsPlaying(!isPlaying);
     } else {
-      setCurrentTrack(track);
-      setIsPlaying(true);
+      // If it's a different track, pause the current one and play the new one
+      if (isPlaying) {
+        setIsPlaying(false);
+      }
+      // Small delay to ensure clean transition between tracks
+      setTimeout(() => {
+        setCurrentTrack(track);
+        setIsPlaying(true);
+      }, 50);
     }
   };
 

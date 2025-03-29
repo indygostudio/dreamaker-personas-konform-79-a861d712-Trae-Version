@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { TrackItem } from "@/components/artist-profile/TrackItem";
-import { MusicPlayer } from "@/components/persona/profile/MusicPlayer";
+// Import unified audio implementation
+import { ArtistAudioPlayerAdapter } from "./ArtistAudioPlayerAdapter";
 import { Button } from "@/components/ui/button";
 import { 
   Upload, 
@@ -698,7 +699,7 @@ export const AudioSection = ({ persona, selectedModel }: AudioSectionProps) => {
       )}
 
       {tracks.length > 0 && currentTrack && (
-        <MusicPlayer
+        <ArtistAudioPlayerAdapter
           currentTrack={currentTrack}
           tracks={tracks}
           isPlaying={isPlaying}

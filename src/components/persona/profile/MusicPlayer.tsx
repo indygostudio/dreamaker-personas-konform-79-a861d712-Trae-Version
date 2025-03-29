@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { 
-  Play, 
-  Pause, 
-  SkipBack, 
-  SkipForward, 
-  Shuffle, 
-  Repeat 
+import {
+  Play,
+  Pause,
+  SkipBack,
+  SkipForward,
+  Shuffle,
+  Repeat,
+  X
 } from "lucide-react";
 import type { Track } from "@/types/track";
 import WaveSurfer from 'wavesurfer.js';
@@ -21,6 +22,7 @@ interface MusicPlayerProps {
   setIsShuffled: (isShuffled: boolean) => void;
   setIsLooping: (isLooping: boolean) => void;
   onTrackSelect: (track: Track) => void;
+  onClose?: () => void; // New prop for closing the player
   trimStart?: number; // Start time in seconds for trimmed playback
   trimEnd?: number; // End time in seconds for trimmed playback
 }
@@ -34,7 +36,8 @@ export const MusicPlayer = ({
   setIsPlaying,
   setIsShuffled,
   setIsLooping,
-  onTrackSelect
+  onTrackSelect,
+  onClose
 }: MusicPlayerProps) => {
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -362,7 +365,20 @@ export const MusicPlayer = ({
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-md p-4 border-t border-white/10 z-50">
-      <div className="max-w-7xl mx-auto flex flex-col">
+      <div className="max-w-7xl mx-auto flex flex-col relative">
+        {onClose && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              setIsPlaying(false);
+              onClose();
+            }}
+            className="absolute top-0 right-0 text-gray-400 hover:text-white"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        )}
         {hasError && (
           <div className="bg-red-900/50 text-red-200 text-xs px-3 py-1 rounded mb-2 flex items-center justify-between">
             <span>There was an issue playing this track. Please try again or select another track.</span>
