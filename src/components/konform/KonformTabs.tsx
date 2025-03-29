@@ -1,22 +1,19 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { KonformBanner } from "./KonformBanner";
 import { useHeaderStore } from "./store/headerStore";
 import { useState, useEffect } from "react";
-import { FileText, Edit3, Video, Film, Save, Music } from "lucide-react";
-import { MixerView } from "./mixer/MixerView";
+import { Video, Film, Music } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Collaborators } from "./daw/sections/Collaborators";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { EditorTabs } from "./editor/EditorTabs";
-import { LyricsView } from "./lyrics/LyricsView";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { VideoTab } from "./video/VideoTab";
 import { useDAWState } from "@/hooks/use-daw-state";
 import { EditorView } from "./editor/EditorView";
 
+// DEBUG: Log component load
+console.log('[DEBUG] KonformTabs component loaded');
 
 
 interface KonformTabsProps {
@@ -40,21 +37,9 @@ export const KonformTabs = ({ selectedCollaborationId, collaborationName }: Konf
   const urlTab = searchParams.get('tab');
   const [activeTab, setActiveTab] = useState(urlTab || "music");
 
-  // Save video tab state
-  const saveVideoTabState = () => {
-    // This is a placeholder for future video tab state
-    // Currently just saving a flag that the button was clicked
-    localStorage.setItem('konform-video-state', JSON.stringify({
-      savedAt: new Date().toISOString(),
-      // Add more video-specific state here in the future
-    }));
-    
-    toast({
-      title: "Video tab state saved",
-      description: "Your current video settings will be applied next time",
-      variant: "default"
-    });
-  };
+  // Using isPlaying from useDAWState to monitor audio playback
+  // This helps coordinate with header state
+  console.log('[DEBUG] DAW playback state:', isPlaying);
 
   useEffect(() => {
     // Update active tab when URL query parameter changes

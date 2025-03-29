@@ -102,10 +102,32 @@ export const VideoBackground = ({
     }
   }, [videoUrl, reverseOnEnd, isReversed, continuePlayback, autoPlay, isHovering]);
 
-  // Handle hover behavior 
+  // Handle hover behavior
   useEffect(() => {
     if (videoUrl && videoRef.current) {
       const video = videoRef.current;
+      
+      // DEBUG: Log hover state change with related audio state
+      console.log('[DEBUG] VideoBackground hover change:', {
+        isHovering,
+        videoUrl,
+        isPlaying,
+        videoMuted: video.muted,
+        videoPaused: video.paused
+      });
+      
+      // Check for any active audio elements
+      const audioElements = document.querySelectorAll('audio');
+      const activeAudio = Array.from(audioElements).find(audio =>
+        !audio.paused && audio.getAttribute('data-audio-transport') === 'true'
+      );
+      
+      console.log('[DEBUG] Active audio while hover change:', {
+        activeAudioExists: !!activeAudio,
+        activeAudioPaused: activeAudio?.paused,
+        activeAudioMuted: activeAudio?.muted,
+        activeAudioVolume: activeAudio?.volume
+      });
       
       // This is where the issue is happening - video playback is interfering with audio transport
       if (isHovering) {
@@ -132,6 +154,16 @@ export const VideoBackground = ({
               // Resume in the same direction
               video.playbackRate = lastPlaybackRate;
             }
+            
+            // DEBUG: Log video configuration
+            console.log('[DEBUG] Video configured for playback:', {
+              videoMuted: video.muted,
+              videoVolume: video.volume,
+              videoAttributes: {
+                visuals_only: video.getAttribute('data-visuals-only'),
+                disableRemotePlayback: video.getAttribute('disableRemotePlayback')
+              }
+            });
           } catch (e) {
             console.error("Error configuring video:", e);
           }
@@ -143,13 +175,19 @@ export const VideoBackground = ({
           try {
             // Use a void promise to completely isolate any errors
             void video.play().then(() => {
-              if (!wasPlaying) setIsPlaying(true);
-            }).catch(() => {
+              if (!wasPlaying) {
+                setIsPlaying(true);
+                console.log('[DEBUG] Video playback started successfully');
+              }
+            }).catch((error) => {
+              // Log the error but don't let it bubble up
+              console.log('[DEBUG] Video play error (suppressed):', error.message);
               // Silently fail - don't let this affect audio playback at all
               // We prioritize audio transport stability over video playback
             });
           } catch (e) {
             // Completely swallow any errors to prevent audio interruption
+            console.log('[DEBUG] Video playback error captured and suppressed');
           }
         }, 50);
         
@@ -171,8 +209,10 @@ export const VideoBackground = ({
     return <div className="w-full h-full bg-gradient-to-b from-black/20 to-black/60" />;
   }
 
-  // Calculate opacity based on darkness factor (0-1)
-  const opacityClass = `opacity-${Math.min(Math.floor(darkness * 100), 90)}`;
+  // Use inline style for opacity instead of dynamic Tailwind class that might get purged
+  const opacityValue = Math.min(darkness, 0.9); // Cap at 0.9 (90%)
+  
+  console.log('[DEBUG] VideoBackground rendering with opacity:', opacityValue);
 
   return (
     <div className="relative w-full h-full">
@@ -232,7 +272,10 @@ export const VideoBackground = ({
           loading={priority ? "eager" : "lazy"} // Use 'eager' for priority loading of images
         />
       )}
-      <div className={`absolute inset-0 bg-gradient-to-b from-transparent via-black/50 to-black ${opacityClass} group-hover:opacity-90 transition-opacity duration-300`} />
+      <div
+        className="absolute inset-0 bg-gradient-to-b from-transparent via-black/50 to-black group-hover:opacity-90 transition-opacity duration-300"
+        style={{ opacity: opacityValue }}
+      />
     </div>
   );
 };

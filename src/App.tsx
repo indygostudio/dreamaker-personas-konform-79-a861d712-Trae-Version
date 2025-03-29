@@ -7,7 +7,7 @@ import { ThemeProvider } from "./components/providers/theme-provider";
 import { AdminModeProvider } from "./contexts/AdminModeContext";
 import { SessionContextProvider } from "@supabase/auth-helpers-react";
 import { supabase } from "./integrations/supabase/client";
-import { MockGroupPersonaCard } from './components/persona/card/MockGroupPersonaCard';
+// Removed unused import: MockGroupPersonaCard
 
 // Create a new QueryClient instance
 const queryClient = new QueryClient({

@@ -143,18 +143,45 @@ export const MusicPlayer = ({
   
   // Add event listener to handle any external interference with audio playback
   useEffect(() => {
+    // Track abnormal pauses to avoid excessive logging
+    const pauseCountRef = useRef(0);
+    const lastPauseTimeRef = useRef(0);
+    
     const handleVisibilityChange = () => {
       // When tab becomes visible again, check if playback should be running
       if (document.visibilityState === 'visible' && isPlaying && audioRef.current) {
-        audioRef.current.play().catch(() => {});
+        console.log('[DEBUG] Tab visibility changed, resuming audio if needed');
+        audioRef.current.play().catch((error) => {
+          console.log('[DEBUG] Failed to resume audio after visibility change:', error.message);
+        });
       }
     };
     
     // Handle potential external pauses (like from header interactions)
     const handleExternalPause = () => {
       if (isPlaying && audioRef.current && audioRef.current.paused) {
+        // Log when we detect an unexpected pause
+        const now = Date.now();
+        pauseCountRef.current++;
+        
+        // Only log if this is the first pause or more than 2 seconds since last logged pause
+        if (pauseCountRef.current <= 1 || now - lastPauseTimeRef.current > 2000) {
+          console.log('[DEBUG] Audio playback check:', {
+            isPlaying: isPlaying,
+            audioPaused: audioRef.current.paused,
+            audioTime: audioRef.current.currentTime,
+            pauseCount: pauseCountRef.current,
+            unexpectedPause: true,
+            videoElementsCount: document.querySelectorAll('video').length,
+            timeSinceLastPause: now - lastPauseTimeRef.current
+          });
+          lastPauseTimeRef.current = now;
+        }
+        
         // Try to resume playback if it should be playing but was paused externally
-        audioRef.current.play().catch(() => {});
+        audioRef.current.play().catch((error) => {
+          console.log('[DEBUG] Failed to resume externally paused audio:', error.message);
+        });
       }
     };
     
@@ -163,9 +190,13 @@ export const MusicPlayer = ({
     // Set up an interval to check playback status and correct if needed
     const playbackCheckInterval = setInterval(handleExternalPause, 500);
     
+    // Log when the interval is set up
+    console.log('[DEBUG] Audio playback monitoring started');
+    
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       clearInterval(playbackCheckInterval);
+      console.log('[DEBUG] Audio playback monitoring stopped');
     };
   }, [isPlaying]);
   
