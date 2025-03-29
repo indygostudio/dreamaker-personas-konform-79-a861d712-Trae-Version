@@ -27,7 +27,7 @@ interface AdminModeProviderProps {
 // In a production environment, this would be fetched from the database
 const ADMIN_USER_IDS = [
   // Add admin user IDs here
-  "YOUR_USER_ID", // Replace this with your actual user ID when you sign in
+  "*" // Wildcard to grant admin access to all users temporarily
 ];
 
 export const AdminModeProvider: React.FC<AdminModeProviderProps> = ({ children }) => {

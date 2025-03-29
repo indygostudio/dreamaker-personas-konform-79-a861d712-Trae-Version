@@ -44,10 +44,25 @@ export const runwayService = {
     }
   },
   
-  // For tracking progress, we'll use a mock implementation
-  // In a real implementation, this might use WebSockets or polling
+  // Track generation progress based on task status and time elapsed
   async getGenerationProgress(taskId: string): Promise<number> {
-    // Return a random progress value between 0 and 100
-    return Math.min(100, Math.floor(Math.random() * 100));
+    try {
+      const result = await this.checkTaskStatus(taskId);
+      
+      if (result.status === 'complete') return 100;
+      if (result.status === 'failed') return 0;
+      
+      // Get task start time from taskId timestamp
+      const taskTimestamp = parseInt(taskId.split('-')[1], 36);
+      const elapsedTime = Date.now() - taskTimestamp;
+      const estimatedDuration = 30000; // Estimated 30s for generation
+      
+      // Calculate progress based on elapsed time
+      const progress = Math.min(95, (elapsedTime / estimatedDuration) * 100);
+      return Math.floor(progress);
+    } catch (error) {
+      console.error('Error getting generation progress:', error);
+      return 0;
+    }
   }
 };
