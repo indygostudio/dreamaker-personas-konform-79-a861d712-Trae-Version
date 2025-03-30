@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { PersonaBasicInfo } from "@/components/persona/form/PersonaBasicInfo";
 import { PersonaTypeSelector } from "@/components/persona/form/PersonaTypeSelector";
 import { PersonaSpecificFields } from "@/components/persona/form/PersonaSpecificFields";
+import { PersonaSubtypeSelector } from "@/components/persona/form/PersonaSubtypeSelector";
 import { AvatarUpload } from "@/components/persona/AvatarUpload";
 import { BannerUpload } from "@/components/persona/BannerUpload";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";

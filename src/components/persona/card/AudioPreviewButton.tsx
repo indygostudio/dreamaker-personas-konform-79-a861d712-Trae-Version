@@ -28,13 +28,13 @@ export const AudioPreviewButton = ({ audioUrl, personaName = "Audio Preview" }: 
       <button
         ref={buttonRef}
         onClick={handleAudioToggle}
-        className="absolute bottom-4 right-4 text-white hover:text-dreamaker-purple transition-colors bg-black/40 hover:bg-black/60 rounded-full p-2 z-10"
+        className="absolute bottom-4 right-4 text-white hover:text-amber-500 transition-colors bg-black/40 hover:bg-black/60 rounded-full p-2 z-10 border border-amber-500/50 hover:border-amber-500"
         aria-label={isPlaying ? "Pause audio preview" : "Play audio preview"}
       >
         {isPlaying ? (
-          <PauseCircle className="h-8 w-8" />
+          <PauseCircle className="h-6 w-6" />
         ) : (
-          <PlayCircle className="h-8 w-8" />
+          <PlayCircle className="h-6 w-6" />
         )}
       </button>
       

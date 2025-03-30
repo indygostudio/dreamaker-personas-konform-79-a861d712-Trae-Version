@@ -26,12 +26,12 @@ function App() {
       <SessionContextProvider supabaseClient={supabase}>
         <AdminModeProvider>
           <ThemeProvider defaultTheme="dark" storageKey="dreamaker-theme">
-            <AudioProvider>
-              <BrowserRouter>
+            <BrowserRouter>
+              <AudioProvider>
                 <AppRoutes />
                 <Toaster />
-              </BrowserRouter>
-            </AudioProvider>
+              </AudioProvider>
+            </BrowserRouter>
           </ThemeProvider>
         </AdminModeProvider>
       </SessionContextProvider>

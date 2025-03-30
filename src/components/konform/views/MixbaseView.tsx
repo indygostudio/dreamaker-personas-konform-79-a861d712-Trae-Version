@@ -98,7 +98,7 @@ export const MixbaseView = () => {
           persona: {
             id: persona.id,
             name: persona.name,
-            avatarUrl: persona.avatar_url || persona.avatarUrl,
+            avatarUrl: persona.avatar_url,
             type: persona.type
           }
         }));

@@ -47,15 +47,11 @@ export const EnhancedMusicPlayer = ({
     const audio = audioRef.current;
     
     // Set critical attributes to prioritize this audio player
-    try {
-      // Mark this as a high-priority audio element that shouldn't be interrupted
-      audio.setAttribute('data-priority', 'high');
-      audio.setAttribute('data-audio-transport', 'true');
-      // Set audio context attributes to isolate from videos
-      audio.preservesPitch = true;
-    } catch (e) {
-      console.error("Error setting audio attributes:", e);
-    }
+    // Mark this as a high-priority audio element that shouldn't be interrupted
+    audio.setAttribute('data-priority', 'high');
+    audio.setAttribute('data-audio-transport', 'true');
+    // Set audio context attributes to isolate from videos
+    audio.preservesPitch = true;
     
     const handleTimeUpdate = () => {
       if (!isDragging && audio) {

@@ -9,11 +9,32 @@ export type MidjourneyVariationIndex = '1' | '2' | '3' | '4' | 'high_variation' 
 
 export type PersonaType = "AI_CHARACTER" | "AI_VOCALIST" | "AI_INSTRUMENTALIST" | "AI_EFFECT" | "AI_SOUND" | "AI_MIXER" | "AI_WRITER";
 
+// Subtypes for each persona type
+export type VocalistSubtype = "Gender" | "Genre" | "Range" | "Technique";
+export type InstrumentalistSubtype = "InstrumentCategory" | "Style" | "Technique";
+export type CharacterSubtype = "Personality" | "Archetype" | "Background";
+export type EffectSubtype = "EffectType" | "Application" | "ProcessingStyle";
+export type SoundSubtype = "SoundCategory" | "Source" | "Ambience";
+export type MixerSubtype = "Specialty" | "MixingStyle" | "Workflow";
+export type WriterSubtype = "WritingStyle" | "Genre" | "ContentType";
+
+// Union of all subtypes
+export type PersonaSubtype = 
+  VocalistSubtype | 
+  InstrumentalistSubtype | 
+  CharacterSubtype | 
+  EffectSubtype | 
+  SoundSubtype | 
+  MixerSubtype | 
+  WriterSubtype;
+
 export interface Persona {
   id: string;
   name: string;
   description?: string;
   type: PersonaType;
+  subtype?: PersonaSubtype;
+  subtype_value?: string;
   avatar_url?: string;
   banner_url?: string;
   banner_position?: MediaPosition;

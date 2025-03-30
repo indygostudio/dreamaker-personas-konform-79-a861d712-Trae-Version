@@ -4,6 +4,7 @@ import { useAudio, VisualizationMode } from '@/contexts/AudioContext';
 // This component provides the main audio player interface that appears at the bottom of the screen
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import { useLocation } from "react-router-dom";
 import {
   Play,
   Pause,
@@ -26,6 +27,7 @@ import {
 type TransportMode = 'collapsed' | 'expanded' | 'minimized';
 
 export const GlobalAudioPlayer = () => {
+  const location = useLocation();
   const {
     globalAudioState,
     play,
@@ -61,8 +63,8 @@ export const GlobalAudioPlayer = () => {
     }
   }, [calculateProgress, isDraggingProgress, currentTime, duration]);
 
-  // Only hide the player if there's no current track
-  if (!currentTrack) {
+  // Hide the player if there's no current track or if we're on the home page
+  if (!currentTrack || location.pathname === '/') {
     return null;
   }
 

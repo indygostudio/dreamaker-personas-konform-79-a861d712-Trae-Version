@@ -132,18 +132,18 @@ export const ProfileTabs = ({
               Media
             </TabsTrigger>
             <TabsTrigger 
-              value="mindmap" 
-              className="px-6 py-3 rounded-full transition-all duration-300 font-medium uppercase border 
-              text-white/80 data-[state=active]:bg-[#0EA5E9]/10 data-[state=active]:text-white data-[state=active]:border-[#0EA5E9]/20 data-[state=active]:shadow-[0_4px_20px_rgba(14,165,233,0.3)] data-[state=active]:-translate-y-0.5 bg-black/20 border-white/10 hover:bg-[#0EA5E9]/10 hover:text-white hover:border-[#0EA5E9]/20 hover:shadow-[0_4px_20px_rgba(14,165,233,0.3)] hover:-translate-y-0.5"
-            >
-              Mindmap
-            </TabsTrigger>
-            <TabsTrigger 
               value="collaborations" 
               className="px-6 py-3 rounded-full transition-all duration-300 font-medium uppercase border 
               text-white/80 data-[state=active]:bg-[#0EA5E9]/10 data-[state=active]:text-white data-[state=active]:border-[#0EA5E9]/20 data-[state=active]:shadow-[0_4px_20px_rgba(14,165,233,0.3)] data-[state=active]:-translate-y-0.5 bg-black/20 border-white/10 hover:bg-[#0EA5E9]/10 hover:text-white hover:border-[#0EA5E9]/20 hover:shadow-[0_4px_20px_rgba(14,165,233,0.3)] hover:-translate-y-0.5"
             >
               Collaborations
+            </TabsTrigger>
+            <TabsTrigger 
+              value="mindmap" 
+              className="px-6 py-3 rounded-full transition-all duration-300 font-medium uppercase border 
+              text-white/80 data-[state=active]:bg-[#0EA5E9]/10 data-[state=active]:text-white data-[state=active]:border-[#0EA5E9]/20 data-[state=active]:shadow-[0_4px_20px_rgba(14,165,233,0.3)] data-[state=active]:-translate-y-0.5 bg-black/20 border-white/10 hover:bg-[#0EA5E9]/10 hover:text-white hover:border-[#0EA5E9]/20 hover:shadow-[0_4px_20px_rgba(14,165,233,0.3)] hover:-translate-y-0.5"
+            >
+              Mindmap
             </TabsTrigger>
           </TabsList>
 

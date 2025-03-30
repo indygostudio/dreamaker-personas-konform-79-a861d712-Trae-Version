@@ -66,18 +66,14 @@ export function PersonaCard({
 
   // Create track object from persona audio preview
   const audioPreviewTrack = useMemo(() => {
-    console.log(`Creating preview track for ${persona.name}`, {
-      has_preview: !!persona.audio_preview_url,
-      preview_url: persona.audio_preview_url
-    });
+    // Use demo audio file for demonstration
+    const demoAudioUrl = '/Audio/Demo/sample1.mp3';
     
-    if (!persona.audio_preview_url) return null;
-    
-    const track = {
+    return {
       id: `persona-preview-${persona.id}`,
       title: `${persona.name} Preview`,
       artist: persona.name,
-      audio_url: persona.audio_preview_url,
+      audio_url: demoAudioUrl,
       album_artwork_url: persona.avatar_url || '',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -87,9 +83,6 @@ export function PersonaCard({
       duration: 0,
       persona_id: persona.id
     };
-    
-    console.log('Created audio preview track:', track);
-    return track;
   }, [persona.id, persona.name, persona.audio_preview_url, persona.avatar_url]);
 
   useEffect(() => {
@@ -101,50 +94,13 @@ export function PersonaCard({
     };
   }, [isAudioPreviewing, setIsPlaying]);
 
-  const handleAudioButtonMouseEnter = () => {
-    console.log(`Mouse enter for ${persona.name} audio button`);
-    if (!persona.audio_preview_url || !audioPreviewTrack) {
-      console.log('No audio preview URL or track available');
-      return;
-    }
-    
-    console.log('Playing track on mouse enter:', audioPreviewTrack);
-    handlePlayTrack(audioPreviewTrack);
-    setIsAudioPreviewing(true);
-  };
-
-  const handleAudioButtonMouseLeave = () => {
-    console.log(`Mouse leave for ${persona.name} audio button, isAudioPreviewing:`, isAudioPreviewing);
-    if (isAudioPreviewing) {
-      console.log('Stopping playback on mouse leave');
-      setIsPlaying(false);
-      setIsAudioPreviewing(false);
-    }
-  };
-
   const handleAudioToggle = (e?: React.MouseEvent) => {
-    console.log(`[DEBUG] Audio toggle for ${persona.name}`, {
-      sourceElement: e?.target,
-      buttonPressed: e?.currentTarget?.tagName,
-      eventType: e?.type
-    });
-    
     if (e) {
       e.stopPropagation();
     }
     
-    if (!persona.audio_preview_url) {
-      console.error('[DEBUG] No audio preview URL available');
-      toast({
-        description: "This persona doesn't have an audio preview yet."
-      });
-      return;
-    }
     
     if (!audioPreviewTrack) {
-      console.error('[DEBUG] No audio preview track available, but URL exists:', persona.audio_preview_url);
-      
-      // Attempt to create a track directly if the memo failed
       const fallbackTrack: Track = {
         id: `preview-${persona.id}`,
         title: `${persona.name} Preview`,
@@ -160,33 +116,15 @@ export function PersonaCard({
         persona_id: persona.id
       };
       
-      console.log('[DEBUG] Created fallback track:', fallbackTrack);
-      
-      // Try to play with fallback track
       handlePlayTrack(fallbackTrack);
       setIsAudioPreviewing(true);
-      
-      // Still show error toast for debugging
-      toast({
-        description: "Audio preview track created on-demand."
-      });
       return;
     }
 
-    console.log('[DEBUG] Current audio state:', {
-      isPlaying,
-      isAudioPreviewing,
-      audioUrl: persona.audio_preview_url,
-      trackId: audioPreviewTrack?.id
-    });
-    
     if (isPlaying && isAudioPreviewing) {
-      console.log('[DEBUG] Stopping currently playing track');
       setIsPlaying(false);
       setIsAudioPreviewing(false);
     } else {
-      console.log('[DEBUG] Playing track on button click:', audioPreviewTrack);
-      // Directly play the track instead of checking URL first
       handlePlayTrack(audioPreviewTrack);
       setIsAudioPreviewing(true);
     }
@@ -298,17 +236,15 @@ export function PersonaCard({
             <div className="flex items-start justify-between mb-2">
               <PersonaAvatar avatarUrl={persona.avatar_url} name={persona.name} personaId={persona.id} type={persona.type} size={variant === 'compact' ? 'sm' : 'md'} />
               {variant === 'default' && <div className="flex gap-2">
-                  {persona.audio_preview_url && (
-                    <Button 
-                      ref={audioButtonRef}
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={handleAudioToggle}
-                      className="bg-black/40 hover:bg-black/60 text-white h-8 w-8"
-                    >
-                      {isPlaying && isAudioPreviewing ? <Volume2 className="h-4 w-4" /> : <PlayCircle className="h-4 w-4" />}
-                    </Button>
-                  )}
+                  <Button 
+                    ref={audioButtonRef}
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={handleAudioToggle}
+                    className="bg-black/40 hover:bg-black/60 text-white h-8 w-8"
+                  >
+                    {isPlaying && isAudioPreviewing ? <Volume2 className="h-4 w-4" /> : <PlayCircle className="h-4 w-4" />}
+                  </Button>
                   <Button variant="ghost" size="icon" onClick={e => {
                 e.stopPropagation();
                 handleFavorite();
@@ -377,63 +313,37 @@ export function PersonaCard({
           
           {isInWormhole && <div className="absolute inset-0 bg-black/60 z-10 pointer-events-none transition-opacity duration-500"></div>}
           
-          {/* Audio preview hover button that appears when hovering and the persona has an audio preview */}
-          {persona.audio_preview_url && isHovering && !(isPlaying && isAudioPreviewing) && (
+          {/* Audio preview button that appears when hovering */}
+          {(
             <Button
               variant="ghost"
               size="icon"
-              onClick={(e) => {
-                console.log('[DEBUG] Center play button clicked for', persona.name);
-                console.log('[DEBUG] Event details:', {
-                  type: e.type,
-                  target: e.target,
-                  currentTarget: e.currentTarget
-                });
-                
-                // Validate audio URL before playing
-                const testAudio = new Audio();
-                testAudio.addEventListener('canplaythrough', () => {
-                  console.log('[DEBUG] Audio can be played through without buffering');
-                });
-                testAudio.addEventListener('error', (err) => {
-                  console.error('[DEBUG] Error loading audio:', err, testAudio.error);
-                });
-                console.log('[DEBUG] Testing audio URL:', persona.audio_preview_url);
-                testAudio.src = persona.audio_preview_url;
-                
-                console.log('[DEBUG] Audio preview URL:', persona.audio_preview_url);
-                console.log('[DEBUG] Audio preview track:', audioPreviewTrack);
-                handleAudioToggle(e);
-              }}
-              className="absolute top-20 right-1/2 transform translate-x-1/2 -translate-y-1/2 bg-black/60 text-white hover:bg-black/80 rounded-full w-16 h-16 flex items-center justify-center transition-all duration-200 z-20"
+              onClick={handleAudioToggle}
+              className={`absolute top-20 right-1/2 transform translate-x-1/2 -translate-y-1/2 
+                ${isHovering || (isPlaying && isAudioPreviewing) ? 'opacity-100' : 'opacity-0'} 
+                ${isPlaying && isAudioPreviewing ? 'bg-dreamaker-purple/80' : 'bg-black/60 hover:bg-black/80'} 
+                text-white rounded-full w-16 h-16 flex items-center justify-center transition-all duration-200 z-20`}
             >
-              <PlayCircle className="h-8 w-8 text-dreamaker-purple" />
+              {isPlaying && isAudioPreviewing ? (
+                <StopCircle className="h-8 w-8 text-white" />
+              ) : (
+                <PlayCircle className="h-8 w-8 text-dreamaker-purple" />
+              )}
             </Button>
           )}
           
-          {/* Hidden music player for handling audio through the enhanced player */}
-          {persona.audio_preview_url && (() => {
-            console.log('[DEBUG] Rendering MusicPlayer with:', {
-              audioUrl: persona.audio_preview_url,
-              isPlaying,
-              trackTitle: `${persona.name} Preview`,
-              personaId: persona.id
-            });
-            return (
-              <div className="music-player-container">
-                <MusicPlayer
-                  audioUrl={persona.audio_preview_url}
-                  isPlaying={isPlaying}
-                  onPlayPause={() => {
-                    console.log('[DEBUG] onPlayPause called from PersonaCard, current isPlaying:', isPlaying);
-                    setIsPlaying(!isPlaying);
-                  }}
-                  trackTitle={`${persona.name} Preview`}
-                  artistName={persona.name}
-                />
-              </div>
-            );
-          })()}
+          {/* Hidden music player for audio handling */}
+          {(
+            <div className="music-player-container">
+              <MusicPlayer
+                audioUrl={audioPreviewTrack?.audio_url}
+                isPlaying={isPlaying}
+                onPlayPause={() => setIsPlaying(!isPlaying)}
+                trackTitle={`${persona.name} Preview`}
+                artistName={persona.name}
+              />
+            </div>
+          )}
         </Card>
       </ContextMenuTrigger>
       

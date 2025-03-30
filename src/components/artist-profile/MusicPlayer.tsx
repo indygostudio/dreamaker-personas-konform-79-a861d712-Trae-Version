@@ -26,19 +26,8 @@ export const MusicPlayer = ({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isAudioReady, setIsAudioReady] = useState(false);
   
-  console.log('[DEBUG] MusicPlayer initialized with:', {
-    audioUrl,
-    isPlaying,
-    trackTitle,
-    hasRef: !!audioRef.current,
-    isAudioReady
-  });
-  
   // If no audioUrl is provided, don't render the player
-  if (!audioUrl) {
-    console.log('[DEBUG] No audioUrl provided, not rendering player');
-    return null;
-  }
+  if (!audioUrl) return null;
   
   // Initialize or update audio element with robust error handling and continuous playback
   useEffect(() => {
@@ -57,19 +46,11 @@ export const MusicPlayer = ({
         });
         
         audio.addEventListener('canplaythrough', () => {
-          console.log('[DEBUG] Audio can play through event fired', {
-            audioUrl,
-            currentSrc: audio.currentSrc,
-            readyState: audio.readyState,
-            paused: audio.paused,
-            isPlaying
-          });
           setIsAudioReady(true);
           // Attempt to resume playback if it was playing
           if (isPlaying) {
-            console.log('[DEBUG] Attempting to play after canplaythrough');
             audio.play().catch((err) => {
-              console.error('[DEBUG] Failed to play after canplaythrough:', err.message);
+              console.error('Failed to play after canplaythrough:', err.message);
             });
           }
         });
@@ -137,50 +118,30 @@ export const MusicPlayer = ({
   // Handle play/pause state changes and trim points
   useEffect(() => {
     if (!audioRef.current || !isAudioReady) {
-      console.log('[DEBUG] Skip play/pause effect - Audio not ready or ref missing', {
-        hasRef: !!audioRef.current,
-        isAudioReady,
-        isPlaying
-      });
       return;
     }
     
     // Set trim points if provided
     if (trimStart !== undefined && audioRef.current) {
-      console.log('[DEBUG] Setting trim start point:', trimStart);
       audioRef.current.currentTime = trimStart;
     }
     
     const playAudio = async () => {
       if (isPlaying) {
-        console.log('[DEBUG] Attempting to play audio:', {
-          audioUrl,
-          currentSrc: audioRef.current?.currentSrc,
-          readyState: audioRef.current?.readyState,
-          networkState: audioRef.current?.networkState,
-        });
-        
         try {
           // Add a small delay to ensure UI changes don't interfere with playback
           await new Promise(resolve => setTimeout(resolve, 10));
           
-          if (!audioRef.current) {
-            console.error('[DEBUG] Audio ref lost before playing');
-            return;
-          }
+          if (!audioRef.current) return;
           
           // Check if audio source is actually loaded
           if (!audioRef.current.src || audioRef.current.src === 'about:blank') {
-            console.error('[DEBUG] Audio source is empty or invalid:', audioRef.current.src);
             audioRef.current.src = audioUrl;
             audioRef.current.load();
           }
           
-          console.log('[DEBUG] Calling play() method');
           const playPromise = audioRef.current.play();
           await playPromise;
-          
-          console.log('[DEBUG] Play successful');
           
           // Ensure playback continues by setting priority
           if (audioRef.current) {
@@ -189,16 +150,12 @@ export const MusicPlayer = ({
             audioRef.current.setAttribute('data-priority', 'high');
           }
         } catch (error) {
-          console.error('[DEBUG] Error playing audio:', error);
           // Potentially retry once with reload
           if (audioRef.current) {
-            console.log('[DEBUG] Attempting to reload and play again');
             try {
               audioRef.current.load();
               await audioRef.current.play();
-              console.log('[DEBUG] Retry successful');
             } catch (retryError) {
-              console.error('[DEBUG] Retry failed:', retryError);
               onPlayPause(); // Toggle back to paused state on error
             }
           } else {
@@ -206,7 +163,6 @@ export const MusicPlayer = ({
           }
         }
       } else {
-        console.log('[DEBUG] Pausing audio');
         audioRef.current?.pause();
       }
     };
@@ -223,10 +179,7 @@ export const MusicPlayer = ({
     const handleVisibilityChange = () => {
       // When tab becomes visible again, check if playback should be running
       if (document.visibilityState === 'visible' && isPlaying && audioRef.current) {
-        console.log('[DEBUG] Tab visibility changed, resuming audio if needed');
-        audioRef.current.play().catch((error) => {
-          console.log('[DEBUG] Failed to resume audio after visibility change:', error.message);
-        });
+        audioRef.current.play().catch(() => {});
       }
     };
     
@@ -239,22 +192,11 @@ export const MusicPlayer = ({
         
         // Only log if this is the first pause or more than 2 seconds since last logged pause
         if (pauseCountRef.current <= 1 || now - lastPauseTimeRef.current > 2000) {
-          console.log('[DEBUG] Audio playback check:', {
-            isPlaying: isPlaying,
-            audioPaused: audioRef.current.paused,
-            audioTime: audioRef.current.currentTime,
-            pauseCount: pauseCountRef.current,
-            unexpectedPause: true,
-            videoElementsCount: document.querySelectorAll('video').length,
-            timeSinceLastPause: now - lastPauseTimeRef.current
-          });
           lastPauseTimeRef.current = now;
         }
         
         // Try to resume playback if it should be playing but was paused externally
-        audioRef.current.play().catch((error) => {
-          console.log('[DEBUG] Failed to resume externally paused audio:', error.message);
-        });
+        audioRef.current.play().catch(() => {});
       }
     };
     
@@ -263,13 +205,9 @@ export const MusicPlayer = ({
     // Set up an interval to check playback status and correct if needed
     const playbackCheckInterval = setInterval(handleExternalPause, 500);
     
-    // Log when the interval is set up
-    console.log('[DEBUG] Audio playback monitoring started');
-    
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       clearInterval(playbackCheckInterval);
-      console.log('[DEBUG] Audio playback monitoring stopped');
     };
   }, [isPlaying]);
   

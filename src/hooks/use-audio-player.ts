@@ -35,23 +35,17 @@ export const useAudioPlayer = () => {
   
   // Compatibility with existing MusicPlayer components
   const handlePlayTrack = useCallback((track: Track) => {
-    console.log('Attempting to play track:', track);
-    console.log('Current audio state:', playbackState.status);
-    
     if (currentTrack?.id === track.id) {
       // Toggle play/pause for current track
       if (playbackState.status === 'playing') {
-        console.log('Pausing current track');
         pause();
       } else {
-        console.log('Resuming current track');
         play().catch(err => {
           console.error('Error resuming track:', err);
         });
       }
     } else {
       // Play new track
-      console.log('Playing new track:', track.title);
       play(track).catch(err => {
         console.error('Error playing new track:', err);
       });
