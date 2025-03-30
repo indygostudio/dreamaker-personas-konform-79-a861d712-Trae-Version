@@ -129,7 +129,7 @@ export const ProjectMenu = ({ onClose }: ProjectMenuProps) => {
   };
 
   return (
-    <div className="bg-black/80 backdrop-blur-xl border border-konform-neon-blue/20 rounded-lg shadow-lg p-4 w-72 z-[100]">
+    <div className="bg-black/80 backdrop-blur-xl border border-konform-neon-blue/20 rounded-lg shadow-lg p-4 w-72 z-[1000]">
       {!showSettings ? (
         <>
           {isCreatingNew ? (

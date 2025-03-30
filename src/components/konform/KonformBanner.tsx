@@ -1,8 +1,9 @@
 
-import { ChevronDown, ChevronUp, Users, Download, Save, Template, Edit2, Brain, Plus, Clock } from "lucide-react";
+import { ChevronDown, ChevronUp, Users, Download, Save, Template, Edit2, Brain, Plus, Clock, Music, Volume2 } from "lucide-react";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ReactNode, useState } from "react";
+import { Link } from "react-router-dom";
 import { Collaborators } from "./daw/sections/Collaborators";
 import { PercentageSplits } from "./daw/sections/PercentageSplits";
 import { useQuery } from "@tanstack/react-query";
@@ -95,8 +96,10 @@ export const KonformBanner = ({
   const { 
     collaboratorsCollapsed, 
     percentageSplitsCollapsed,
+    audioSystemDemoCollapsed,
     setCollaboratorsCollapsed,
-    setPercentageSplitsCollapsed 
+    setPercentageSplitsCollapsed,
+    setAudioSystemDemoCollapsed 
   } = useBannerSectionsStore();
   
   // Fetch latest session if not provided
@@ -345,6 +348,47 @@ export const KonformBanner = ({
                   </div>
                   <CollapsibleContent>
                     <PercentageSplits sessionId={latestSession.id} />
+                  </CollapsibleContent>
+                </div>
+              </Collapsible>
+              
+              {/* Audio System Demo Section */}
+              <Collapsible 
+                open={!audioSystemDemoCollapsed} 
+                onOpenChange={(open) => setAudioSystemDemoCollapsed(!open)}
+              >
+                <div className="bg-black/40 rounded-lg overflow-hidden">
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-konform-neon-blue/20">
+                    <h3 className="text-lg font-medium text-white flex items-center gap-2">
+                      <Volume2 className="w-4 h-4" />
+                      Audio System Demo
+                    </h3>
+                    <CollapsibleTrigger asChild>
+                      <Button variant="ghost" size="sm" className="p-0 h-auto">
+                        {audioSystemDemoCollapsed ? (
+                          <ChevronDown className="h-5 w-5 text-gray-400" />
+                        ) : (
+                          <ChevronUp className="h-5 w-5 text-gray-400" />
+                        )}
+                      </Button>
+                    </CollapsibleTrigger>
+                  </div>
+                  <CollapsibleContent>
+                    <div className="p-4">
+                      <p className="text-gray-300 mb-4">
+                        Experience the new premium audio playback system with enhanced visualizations.
+                      </p>
+                      <Link to="/audio-system-demo">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="bg-black/20 border-white/20 hover:bg-black/40 text-white rounded-full"
+                        >
+                          <Music className="w-4 h-4 mr-2" />
+                          Open Audio System Demo
+                        </Button>
+                      </Link>
+                    </div>
                   </CollapsibleContent>
                 </div>
               </Collapsible>

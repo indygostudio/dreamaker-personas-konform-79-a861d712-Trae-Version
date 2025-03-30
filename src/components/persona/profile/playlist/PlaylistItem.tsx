@@ -5,6 +5,7 @@ import { Track } from "@/types/track";
 import { Playlist } from "@/types/playlist";
 import { AudioUploadSection } from "@/components/artist-profile/form/AudioUploadSection";
 import { TrackList } from "./TrackList";
+import { useAudioPlayer } from "@/hooks/use-audio-player";
 
 interface PlaylistItemProps {
   playlist: Playlist;
@@ -37,6 +38,8 @@ export const PlaylistItem = ({
   onAudioUploadSuccess,
   onTrackDragEnd,
 }: PlaylistItemProps) => {
+  // Get the audio player hook to control the unified music player
+  const { handlePlayTrack, initializeTracks } = useAudioPlayer();
   return (
     <div className="w-full">
       <div 

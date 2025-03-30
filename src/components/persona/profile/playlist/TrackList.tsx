@@ -6,6 +6,7 @@ import { Track } from "@/types/track";
 import { TrackItem } from "@/components/artist-profile/TrackItem";
 import { Button } from "@/components/ui/button";
 import { ImageIcon, Trash } from "lucide-react";
+import { useAudioPlayer } from "@/hooks/use-audio-player";
 
 interface TrackListProps {
   tracks: Track[];
@@ -26,6 +27,9 @@ export const TrackList = ({
   onTrackArtworkEdit,
   onDragEnd
 }: TrackListProps) => {
+  // Get the audio player hook to control the unified music player
+  const { handlePlayTrack, initializeTracks } = useAudioPlayer();
+  
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -64,7 +68,20 @@ export const TrackList = ({
                 track={track} 
                 currentTrack={currentTrack} 
                 isPlaying={isPlaying && currentTrack?.id === track.id} 
-                onTrackPlay={onTrackPlay} 
+                onTrackPlay={(track) => {
+                  // Call the original onTrackPlay to maintain local state
+                  onTrackPlay(track);
+                  
+                  // Also play through the unified audio system
+                  // This will open the unified music player at the bottom of the page
+                  handlePlayTrack(track);
+                  
+                  // Initialize the playlist with all tracks, starting with the selected track
+                  const trackIndex = tracks.findIndex(t => t.id === track.id);
+                  if (trackIndex !== -1) {
+                    initializeTracks(tracks, trackIndex, true);
+                  }
+                }} 
               />
               <div className="absolute right-4 top-1/2 -translate-y-1/2 hidden group-hover:flex gap-2 z-10">
                 <Button 

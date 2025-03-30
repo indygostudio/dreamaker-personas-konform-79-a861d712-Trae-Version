@@ -1,6 +1,10 @@
 import { FileMusic, Music } from "lucide-react";
 import { VoiceSample } from "../media/VoiceSample";
 import { BackgroundMusic } from "../media/BackgroundMusic";
+import { useEffect, useState } from "react";
+import { useAudioPlayer } from "@/hooks/use-audio-player";
+import type { Track } from "@/types/track";
+import { AudioSectionAdapter } from "./AudioSectionAdapter";
 
 interface AudioFilesProps {
   persona: {
@@ -17,6 +21,8 @@ export const AudioFiles = ({
   onVoiceSampleUpdate,
   onBackgroundMusicUpdate,
 }: AudioFilesProps) => {
+  // The useAudioPlayer hook is now used directly in child components
+  // No need for custom event listeners anymore
   return (
     <section className="bg-black/40 backdrop-blur-sm p-6 rounded-xl mt-8">
       <h2 className="text-2xl font-bold text-white mb-6">Audio Files</h2>

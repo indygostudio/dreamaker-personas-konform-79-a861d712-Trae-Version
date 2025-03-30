@@ -60,8 +60,8 @@ export const GlobalAudioPlayer = () => {
     }
   }, [calculateProgress, isDraggingProgress, currentTime, duration]);
 
-  // If no track is playing, don't render the player
-  if (!currentTrack || status === 'paused') {
+  // Only hide the player if there's no current track
+  if (!currentTrack) {
     return null;
   }
 

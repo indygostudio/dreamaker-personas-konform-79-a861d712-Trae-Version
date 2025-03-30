@@ -14,7 +14,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RecentCollaborations } from "./components/RecentCollaborations";
 import { FavoriteCollaborations } from "./components/FavoriteCollaborations";
 import { CollectionsTab } from "./components/CollectionsTab";
-import { Star, Users, ChevronDown, ChevronUp, FolderOpen, Save } from "lucide-react";
+import { ProjectsTab } from "./components/ProjectsTab";
+import { Star, Users, ChevronDown, ChevronUp, FolderOpen, Save, Folder } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, horizontalListSortingStrategy } from '@dnd-kit/sortable';
@@ -93,6 +94,7 @@ export const ArtistPersonas = ({
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(true);
   const [favoritePersonas, setFavoritePersonas] = useState<Persona[]>([]);
   const [collections, setCollections] = useState<any[]>([]);
+  const [projects, setProjects] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState("recent");
   // Changed this to start in the collapsed state
   const [isTabsCollapsed, setIsTabsCollapsed] = useState(true);
@@ -100,6 +102,7 @@ export const ArtistPersonas = ({
     { id: 'recent', value: 'recent', label: 'Collaborations', icon: <Users className="h-3 w-3" /> },
     { id: 'favorites', value: 'favorites', label: 'Favorites', icon: <Star className="h-3 w-3 text-yellow-400" /> },
     { id: 'collections', value: 'collections', label: 'Collections', icon: <FolderOpen className="h-3 w-3 text-blue-400" /> },
+    { id: 'projects', value: 'projects', label: 'Projects', icon: <Folder className="h-3 w-3 text-green-400" /> },
   ]);
   const { toast } = useToast();
   
@@ -173,6 +176,30 @@ export const ArtistPersonas = ({
     },
     enabled: !!id
   });
+  
+  // Fetch user's projects
+  const {
+    data: projectsData = [],
+    refetch: refetchProjects
+  } = useQuery({
+    queryKey: ["user-projects", id],
+    queryFn: async () => {
+      if (!id) throw new Error("No artist ID provided");
+      const {
+        data,
+        error
+      } = await supabase
+        .from("konform_projects")
+        .select("*")
+        .eq("user_id", id)
+        .eq("status", "draft")
+        .order("last_opened_at", { ascending: false });
+        
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!id
+  });
 
   const {
     data: favorites = [],
@@ -225,6 +252,12 @@ export const ArtistPersonas = ({
       setCollections(collectionsData);
     }
   }, [collectionsData]);
+  
+  useEffect(() => {
+    if (projectsData) {
+      setProjects(projectsData);
+    }
+  }, [projectsData]);
 
   // Load tabs order from localStorage on component mount
   useEffect(() => {
@@ -384,6 +417,15 @@ export const ArtistPersonas = ({
               <TabsContent value="collections" className="px-3 pb-2 pt-1">
                 <CollectionsTab 
                   collections={collections} 
+                  isOpen={true} 
+                  onOpenChange={() => {}} 
+                  onPersonaSelect={onPersonaSelect} 
+                />
+              </TabsContent>
+              
+              <TabsContent value="projects" className="px-3 pb-2 pt-1">
+                <ProjectsTab 
+                  projects={projects} 
                   isOpen={true} 
                   onOpenChange={() => {}} 
                   onPersonaSelect={onPersonaSelect} 

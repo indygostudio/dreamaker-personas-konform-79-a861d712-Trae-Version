@@ -56,6 +56,8 @@ export const AudioVisualizerContainer = ({
           <WaveformVisualizer 
             height={containerHeight * 0.8}
             className="my-2"
+            showTransportControls={true}
+            loopable={true}
           />
         );
         

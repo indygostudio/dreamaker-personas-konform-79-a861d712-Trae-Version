@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { PlaylistCreator } from "@/components/artist-profile/PlaylistCreator";
 // Unified audio implementation
 import { AudioSectionAdapter } from "./AudioSectionAdapter";
@@ -8,7 +8,8 @@ import { PlaylistSelector } from "./PlaylistSelector";
 import { TrackList } from "./TrackList";
 import { useAudioSection } from "./hooks/useAudioSection";
 import { Button } from "@/components/ui/button";
-import { Activity, Plus, Music } from "lucide-react";
+import { Activity, Plus, Music, Pencil, FileText } from "lucide-react";
+import { toast } from "sonner";
 import { AddAudioDialog } from "./AddAudioDialog";
 import { LoopDetailsDialog } from "./LoopDetailsDialog";
 import { LoopBrowser } from "./LoopBrowser";
@@ -53,6 +54,9 @@ export const AudioSection = ({ persona, selectedModel, isActive = true }: AudioS
 
   const [isLoopBrowserOpen, setIsLoopBrowserOpen] = useState(false);
   const [isMusicPlayerVisible, setIsMusicPlayerVisible] = useState(false);
+  const [isEditTrackDialogOpen, setIsEditTrackDialogOpen] = useState(false);
+  const [isEditLyricsDialogOpen, setIsEditLyricsDialogOpen] = useState(false);
+  const [currentEditTrack, setCurrentEditTrack] = useState<Track | null>(null);
 
   const isOwner = user?.id === persona.user_id;
 
@@ -62,6 +66,8 @@ export const AudioSection = ({ persona, selectedModel, isActive = true }: AudioS
     if (currentTrack) {
       // Save current track to session storage to persist during tab switching
       sessionStorage.setItem('currentAudioTrack', JSON.stringify(currentTrack));
+      // Always ensure the music player is visible when a track is selected
+      setIsMusicPlayerVisible(true);
     }
   }, [currentTrack]);
 
@@ -112,6 +118,22 @@ export const AudioSection = ({ persona, selectedModel, isActive = true }: AudioS
     handlePlayTrack(track);
     // The AudioSectionAdapter now handles the actual playback through the unified system
   };
+
+  // Handle editing track details
+  const handleEditTrack = useCallback((track: Track) => {
+    setCurrentEditTrack(track);
+    setIsEditTrackDialogOpen(true);
+    // For now, just show a toast. In a real implementation, this would open a dialog
+    toast.info(`Editing track: ${track.title}`);
+  }, []);
+
+  // Handle editing track lyrics
+  const handleEditLyrics = useCallback((track: Track) => {
+    setCurrentEditTrack(track);
+    setIsEditLyricsDialogOpen(true);
+    // For now, just show a toast. In a real implementation, this would open a dialog
+    toast.info(`Editing lyrics for: ${track.title}`);
+  }, []);
 
   const handleAudioFileSelect = (file: File, isLoop: boolean) => {
     if (isLoop) {
@@ -189,6 +211,8 @@ export const AudioSection = ({ persona, selectedModel, isActive = true }: AudioS
         selectedPlaylistId={selectedPlaylistId}
         isOwner={isOwner}
         refetchTracks={refetchTracks}
+        onEditTrack={handleEditTrack}
+        onEditLyrics={handleEditLyrics}
       />
 
       {isOwner && (

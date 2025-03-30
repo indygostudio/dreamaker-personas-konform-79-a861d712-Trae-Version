@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Music, Upload } from "lucide-react";
+import { Music, Upload, Pause } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useAudioPlayer } from "@/hooks/use-audio-player";
 
 interface BackgroundMusicProps {
   personaId: string;
@@ -68,30 +69,34 @@ export const BackgroundMusic = ({ personaId, backgroundMusicUrl, onUpdate }: Bac
     }
   };
 
+  // Get the unified audio player hook
+  const { handlePlayTrack, currentTrack, isPlaying: isAudioPlaying } = useAudioPlayer();
+  
+  // Update local playing state when global state changes
+  useEffect(() => {
+    // Check if the current track is this background music
+    if (currentTrack && currentTrack.id === `background-music-${personaId}`) {
+      setIsPlaying(isAudioPlaying);
+    } else if (isPlaying) {
+      // If another track is playing, update our local state
+      setIsPlaying(false);
+    }
+  }, [currentTrack, isAudioPlaying, personaId, isPlaying]);
+
   const togglePlay = () => {
     if (!backgroundMusicUrl) return;
     
-    if (!audioRef.current) {
-      audioRef.current = new Audio(backgroundMusicUrl);
-      audioRef.current.onended = () => setIsPlaying(false);
-    }
-
-    if (isPlaying) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      audioRef.current.play()
-        .catch(error => {
-          console.error("Error playing audio:", error);
-          toast({
-            title: "Error",
-            description: "Failed to play audio",
-            variant: "destructive"
-          });
-          setIsPlaying(false);
-        });
-      setIsPlaying(true);
-    }
+    // Create a track object for the unified audio player
+    const backgroundTrack = {
+      id: `background-music-${personaId}`,
+      title: "Background Music",
+      audio_url: backgroundMusicUrl,
+      is_public: true,
+      album_artwork_url: "/placeholder.svg"
+    };
+    
+    // Use the unified audio player to handle playback
+    handlePlayTrack(backgroundTrack);
   };
 
   return (
@@ -102,8 +107,17 @@ export const BackgroundMusic = ({ personaId, backgroundMusicUrl, onUpdate }: Bac
           variant="outline"
           className="w-32"
         >
-          <Music className={`h-4 w-4 mr-2 ${isPlaying ? "animate-pulse" : ""}`} />
-          {isPlaying ? "Playing..." : "Play"}
+          {isPlaying ? (
+            <>
+              <Pause className="h-4 w-4 mr-2 animate-pulse" />
+              Playing...
+            </>
+          ) : (
+            <>
+              <Music className="h-4 w-4 mr-2" />
+              Play
+            </>
+          )}
         </Button>
       ) : (
         <div className="relative">

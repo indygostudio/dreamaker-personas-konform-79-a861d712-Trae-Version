@@ -2,10 +2,11 @@
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
-import { TrackItem } from "@/components/artist-profile/TrackItem";
+import { TrackItem } from "@/components/persona/profile/TrackItem";
 import type { Track } from "@/types/track";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useState } from "react";
 
 interface TrackListProps {
   tracks: Track[];
@@ -16,6 +17,8 @@ interface TrackListProps {
   selectedPlaylistId: string | null;
   isOwner: boolean;
   refetchTracks: () => void;
+  onEditTrack?: (track: Track) => void;
+  onEditLyrics?: (track: Track) => void;
 }
 
 export const TrackList = ({
@@ -26,7 +29,9 @@ export const TrackList = ({
   handlePlayTrack,
   selectedPlaylistId,
   isOwner,
-  refetchTracks
+  refetchTracks,
+  onEditTrack,
+  onEditLyrics
 }: TrackListProps) => {
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -181,6 +186,8 @@ export const TrackList = ({
                 id={track.id}
                 onDeleteTrack={handleDeleteTrack}
                 onUpdateArtwork={handleUpdateTrackArtwork}
+                onEditTrack={onEditTrack}
+                onEditLyrics={onEditLyrics}
                 isOwner={isOwner}
               />
             ))}

@@ -24,8 +24,10 @@ export const AudioSectionAdapter = () => {
     setIsAddAudioDialogOpen
   } = useAudioSection();
   
-  // Local state to handle visibility (since this was in the AudioSection component)
+  // Local state to handle visibility, looping, and shuffle
   const [isMusicPlayerVisible, setIsMusicPlayerVisible] = useState(false);
+  const [isShuffled, setIsShuffled] = useState(false);
+  const [isLooping, setIsLooping] = useState(false);
   
   // Get the unified audio player
   const { handlePlayTrack: unifiedPlayTrack } = useAudioPlayer();
@@ -37,7 +39,7 @@ export const AudioSectionAdapter = () => {
     clearPlaylist
   } = useAudioPlayer();
   
-  // Keep track lists in sync
+  // Keep track lists in sync and handle initial state
   useEffect(() => {
     if (tracks && tracks.length > 0) {
       // Find current track index
@@ -51,8 +53,26 @@ export const AudioSectionAdapter = () => {
         currentIndex >= 0 ? currentIndex : 0,
         false // Don't autoplay when initializing
       );
+      
+      // Check for stored loop/shuffle state in session storage
+      const storedLoopState = sessionStorage.getItem('audioPlayerLooping');
+      const storedShuffleState = sessionStorage.getItem('audioPlayerShuffled');
+      
+      if (storedLoopState) {
+        setIsLooping(storedLoopState === 'true');
+      }
+      
+      if (storedShuffleState) {
+        setIsShuffled(storedShuffleState === 'true');
+      }
     }
   }, [tracks, currentTrack, initializeTracks]);
+  
+  // Save loop and shuffle state to session storage when they change
+  useEffect(() => {
+    sessionStorage.setItem('audioPlayerLooping', isLooping.toString());
+    sessionStorage.setItem('audioPlayerShuffled', isShuffled.toString());
+  }, [isLooping, isShuffled]);
   
   // Intercept track selection to route through the unified system
   const handleTrackSelect = (track: Track) => {
@@ -63,22 +83,32 @@ export const AudioSectionAdapter = () => {
     unifiedPlayTrack(track);
   };
   
-  // Only render the music player if there's a current track and we're playing
-  // or the music player should be visible
+  // Only render the music player if there's a current track
+  // We want to show the player even if not playing, as long as a track is selected
   if (!currentTrack) {
     return null;
   }
   
+  // Function to handle shuffle toggle
+  const handleSetIsShuffled = (shuffleState: boolean) => {
+    setIsShuffled(shuffleState);
+  };
+  
+  // Function to handle loop toggle
+  const handleSetIsLooping = (loopState: boolean) => {
+    setIsLooping(loopState);
+  };
+
   return (
     <UnifiedMusicPlayer
       currentTrack={currentTrack}
       tracks={tracks || []}
       isPlaying={isPlaying}
-      isShuffled={false} // Default to false as in the original component
-      isLooping={false}  // Default to false as in the original component
+      isShuffled={isShuffled}
+      isLooping={isLooping}
       setIsPlaying={setIsPlaying}
-      setIsShuffled={() => {}} // Not implemented in original component
-      setIsLooping={() => {}}  // Not implemented in original component
+      setIsShuffled={handleSetIsShuffled}
+      setIsLooping={handleSetIsLooping}
       onTrackSelect={handleTrackSelect}
       onClose={() => {
         setIsPlaying(false);

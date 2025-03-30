@@ -32,16 +32,26 @@ export const useAudioPlayer = () => {
   
   // Compatibility with existing MusicPlayer components
   const handlePlayTrack = useCallback((track: Track) => {
+    console.log('Attempting to play track:', track);
+    console.log('Current audio state:', playbackState.status);
+    
     if (currentTrack?.id === track.id) {
       // Toggle play/pause for current track
       if (playbackState.status === 'playing') {
+        console.log('Pausing current track');
         pause();
       } else {
-        play();
+        console.log('Resuming current track');
+        play().catch(err => {
+          console.error('Error resuming track:', err);
+        });
       }
     } else {
       // Play new track
-      play(track);
+      console.log('Playing new track:', track.title);
+      play(track).catch(err => {
+        console.error('Error playing new track:', err);
+      });
     }
   }, [currentTrack, playbackState.status, play, pause]);
   
@@ -90,7 +100,7 @@ export const useAudioPlayer = () => {
     progress: playbackState.duration > 0 ? (playbackState.currentTime / playbackState.duration) * 100 : 0,
     volume: playbackState.volume,
     isMuted: playbackState.isMuted,
-    visualizationMode: visualization.mode,
+    visualizationMode: globalAudioState.visualization.mode,
     
     // Existing API methods (for backward compatibility)
     handlePlayTrack,

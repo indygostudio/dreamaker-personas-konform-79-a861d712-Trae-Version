@@ -1,6 +1,8 @@
 
 import { Button } from "@/components/ui/button";
-import { Play, Pause, GripVertical, Trash } from "lucide-react";
+import { Play, Pause, GripVertical, Trash, Pencil, FileText, Image } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 import type { Track } from "@/types/track";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -13,10 +15,24 @@ interface TrackItemProps {
   onTrackPlay: (track: Track) => void;
   id: string;
   onDeleteTrack?: (trackId: string) => void;
+  onUpdateArtwork?: (trackId: string, artworkUrl: string) => void;
+  onEditTrack?: (track: Track) => void;
+  onEditLyrics?: (track: Track) => void;
   isOwner?: boolean;
 }
 
-export const TrackItem = ({ track, currentTrack, isPlaying, onTrackPlay, id, onDeleteTrack, isOwner = false }: TrackItemProps) => {
+export const TrackItem = ({ 
+  track, 
+  currentTrack, 
+  isPlaying, 
+  onTrackPlay, 
+  id, 
+  onDeleteTrack, 
+  onUpdateArtwork,
+  onEditTrack,
+  onEditLyrics,
+  isOwner = false 
+}: TrackItemProps) => {
   const isCurrentTrack = currentTrack?.id === track.id;
   
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
@@ -32,10 +48,39 @@ export const TrackItem = ({ track, currentTrack, isPlaying, onTrackPlay, id, onD
       onDeleteTrack(track.id);
     }
   };
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onEditTrack) {
+      onEditTrack(track);
+    } else {
+      toast.info("Edit functionality coming soon");
+    }
+  };
+
+  const handleLyricsClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onEditLyrics) {
+      onEditLyrics(track);
+    } else {
+      toast.info("Lyrics editor coming soon");
+    }
+  };
+
+  const handleArtworkClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onUpdateArtwork) {
+      // For now, let's just show a toast. In a real implementation, you'd open a dialog
+      toast.info("Artwork update dialog would open here");
+    }
+  };
   
   return (
     <TrackContextMenu
       onPlayClick={() => onTrackPlay(track)}
+      onEditClick={isOwner ? handleEditClick : undefined}
+      onLyricsClick={isOwner ? handleLyricsClick : undefined}
+      onArtworkClick={isOwner ? handleArtworkClick : undefined}
       onDeleteClick={isOwner ? handleDeleteClick : undefined}
     >
       <div 

@@ -36,8 +36,34 @@ export const AudioSystemShowcase = () => {
   const { 
     globalAudioState,
     setVisualizationMode,
-    setPlaybackRate
+    setPlaybackRate,
+    audioContext
   } = useAudio();
+  
+  // Resume AudioContext on user interaction
+  useEffect(() => {
+    const resumeAudioContext = () => {
+      if (audioContext && audioContext.state === 'suspended') {
+        audioContext.resume().then(() => {
+          console.log('AudioContext resumed successfully');
+        }).catch(err => {
+          console.error('Failed to resume AudioContext:', err);
+        });
+      }
+    };
+    
+    // Add event listeners for user interactions
+    document.addEventListener('click', resumeAudioContext);
+    document.addEventListener('touchstart', resumeAudioContext);
+    
+    // Try to resume immediately in case we already have permission
+    resumeAudioContext();
+    
+    return () => {
+      document.removeEventListener('click', resumeAudioContext);
+      document.removeEventListener('touchstart', resumeAudioContext);
+    };
+  }, [audioContext]);
   
   const {
     currentTrack,
@@ -58,13 +84,14 @@ export const AudioSystemShowcase = () => {
     previous
   } = useAudioPlayer();
   
-  // Sample tracks for demonstration
+  // Sample tracks for demonstration - using reliable hosted mp3s
   const sampleTracks = [
     {
       id: "track1",
       title: "Cosmic Horizons",
       artist: "Dreamaker AI",
-      audio_url: "https://audio-samples.github.io/samples/mp3/blizzard_primed.mp3",
+      // Using a different audio source that's more reliable
+      audio_url: "https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg",
       album_artwork_url: "/lovable-uploads/7c4edcb9-c964-4db6-9f1a-3e689edff38f.png",
       duration: 180,
       created_at: new Date().toISOString(),
@@ -77,7 +104,8 @@ export const AudioSystemShowcase = () => {
       id: "track2",
       title: "Neural Symphony",
       artist: "AI Composer",
-      audio_url: "https://audio-samples.github.io/samples/mp3/blizzard_magical_timed.mp3",
+      // Using a different audio source that's more reliable
+      audio_url: "https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg",
       album_artwork_url: "/lovable-uploads/4fcaace6-9ca6-4012-8e19-966bfcd94cc4.png",
       duration: 210,
       created_at: new Date().toISOString(),

@@ -189,6 +189,9 @@ export const UnifiedMusicPlayer = ({
           <WaveformVisualizer 
             height={40}
             className="w-full bg-gray-800 rounded-lg overflow-hidden h-[40px]"
+            showTransportControls={true}
+            loopable={true}
+            onClose={onClose ? handleClose : undefined}
           />
         </div>
       </div>

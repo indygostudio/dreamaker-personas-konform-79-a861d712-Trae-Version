@@ -267,12 +267,27 @@ export const AudioProvider = ({ children }: AudioProviderProps) => {
     // Initialize Web Audio API (requires user interaction)
     const initWebAudio = () => {
       try {
+        console.log('Initializing Web Audio API');
         const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
         const context = new AudioContextClass();
         audioContextRef.current = context;
         
+        // Log the initial state of the audio context
+        console.log('AudioContext initial state:', context.state);
+        
+        // Attempt to resume the context immediately
+        if (context.state === 'suspended') {
+          console.log('Attempting to resume AudioContext');
+          context.resume().then(() => {
+            console.log('AudioContext resumed successfully');
+          }).catch(err => {
+            console.error('Failed to resume AudioContext:', err);
+          });
+        }
+        
         // Create source from audio element
         if (audioElementRef.current) {
+          console.log('Creating media element source');
           const source = context.createMediaElementSource(audioElementRef.current);
           
           // Create analyzer
@@ -302,6 +317,9 @@ export const AudioProvider = ({ children }: AudioProviderProps) => {
           
           // Start analyzer update loop
           updateAnalyzerData();
+          console.log('Audio processing chain initialized successfully');
+        } else {
+          console.error('Audio element not available for source creation');
         }
       } catch (error) {
         console.error('Failed to initialize Web Audio API:', error);

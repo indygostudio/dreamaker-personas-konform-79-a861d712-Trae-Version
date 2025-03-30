@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Play, Upload } from "lucide-react";
+import { Play, Upload, Pause } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useAudioPlayer } from "@/hooks/use-audio-player";
 
 interface VoiceSampleProps {
   personaId: string;
@@ -68,30 +69,34 @@ export const VoiceSample = ({ personaId, voiceSampleUrl, onUpdate }: VoiceSample
     }
   };
 
+  // Get the unified audio player hook
+  const { handlePlayTrack, currentTrack, isPlaying: isAudioPlaying } = useAudioPlayer();
+  
+  // Update local playing state when global state changes
+  useEffect(() => {
+    // Check if the current track is this voice sample
+    if (currentTrack && currentTrack.id === `voice-sample-${personaId}`) {
+      setIsPlaying(isAudioPlaying);
+    } else if (isPlaying) {
+      // If another track is playing, update our local state
+      setIsPlaying(false);
+    }
+  }, [currentTrack, isAudioPlaying, personaId, isPlaying]);
+
   const togglePlay = () => {
     if (!voiceSampleUrl) return;
     
-    if (!audioRef.current) {
-      audioRef.current = new Audio(voiceSampleUrl);
-      audioRef.current.onended = () => setIsPlaying(false);
-    }
-
-    if (isPlaying) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      audioRef.current.play()
-        .catch(error => {
-          console.error("Error playing audio:", error);
-          toast({
-            title: "Error",
-            description: "Failed to play audio",
-            variant: "destructive"
-          });
-          setIsPlaying(false);
-        });
-      setIsPlaying(true);
-    }
+    // Create a track object for the unified audio player
+    const voiceTrack = {
+      id: `voice-sample-${personaId}`,
+      title: "Voice Sample",
+      audio_url: voiceSampleUrl,
+      is_public: true,
+      album_artwork_url: "/placeholder.svg"
+    };
+    
+    // Use the unified audio player to handle playback
+    handlePlayTrack(voiceTrack);
   };
 
   return (
@@ -102,8 +107,17 @@ export const VoiceSample = ({ personaId, voiceSampleUrl, onUpdate }: VoiceSample
           variant="outline"
           className="w-32"
         >
-          <Play className={`h-4 w-4 mr-2 ${isPlaying ? "animate-pulse" : ""}`} />
-          {isPlaying ? "Playing..." : "Play"}
+          {isPlaying ? (
+            <>
+              <Pause className="h-4 w-4 mr-2 animate-pulse" />
+              Playing...
+            </>
+          ) : (
+            <>
+              <Play className="h-4 w-4 mr-2" />
+              Play
+            </>
+          )}
         </Button>
       ) : (
         <div className="relative">
