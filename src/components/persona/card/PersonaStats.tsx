@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Heart, Share2, PlusCircle } from "lucide-react";
+import { Heart, Share2, PlusCircle, PlayCircle, StopCircle } from "lucide-react";
 import { useZoomStore } from "@/stores/useZoomStore";
 
 interface PersonaStatsProps {
@@ -14,6 +13,9 @@ interface PersonaStatsProps {
   onCollaborate: () => void;
   onFavorite?: () => void;
   onShare?: () => void;
+  onAudioToggle?: (e: React.MouseEvent) => void;
+  hasAudioPreview?: boolean;
+  isAudioPlaying?: boolean;
 }
 
 export function PersonaStats({
@@ -25,7 +27,10 @@ export function PersonaStats({
   rating,
   onCollaborate,
   onFavorite,
-  onShare
+  onShare,
+  onAudioToggle,
+  hasAudioPreview = false,
+  isAudioPlaying = false
 }: PersonaStatsProps) {
   const zoomLevel = useZoomStore(state => state.zoomLevel);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -46,6 +51,27 @@ export function PersonaStats({
   
   return (
     <div className="flex items-center gap-2">
+      {hasAudioPreview && (
+        <Button
+          onClick={(e) => {
+            console.log('Audio button clicked in PersonaStats');
+            console.log('hasAudioPreview:', hasAudioPreview);
+            console.log('isAudioPlaying:', isAudioPlaying);
+            if (onAudioToggle) onAudioToggle(e);
+          }}
+          variant="outline"
+          size={isIconOnly ? "icon" : "sm"}
+          className="glass-button bg-dreamaker-purple/10 hover:bg-dreamaker-purple/20 border-dreamaker-purple/50 text-dreamaker-purple min-w-[32px]"
+        >
+          {isAudioPlaying ? (
+            <StopCircle className="h-4 w-4" />
+          ) : (
+            <PlayCircle className="h-4 w-4" />
+          )}
+          {!isIconOnly && <span className="ml-2 hidden sm:inline">{isAudioPlaying ? 'Stop' : 'Play'}</span>}
+        </Button>
+      )}
+      
       <Button 
         onClick={onFavorite} 
         variant="outline" 

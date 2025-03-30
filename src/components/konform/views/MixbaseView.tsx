@@ -1,7 +1,7 @@
 
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { useState } from "react";
-import { Plus } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Plus, UserPlus2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import type { Track } from "../daw/Track";
@@ -9,8 +9,25 @@ import { MixerChannel } from "../daw/MixerChannel";
 import { MasterVolume } from "../mixer/MasterVolume";
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, horizontalListSortingStrategy } from "@dnd-kit/sortable";
+import { useSelectedPersonasStore } from "@/stores/selectedPersonasStore";
+import { useToast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { transformPersonaData } from "@/lib/utils/personaTransform";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import type { Persona } from "@/types/persona";
 
 export const MixbaseView = () => {
+  const { selectedPersonas } = useSelectedPersonasStore();
+  const { toast } = useToast();
   const [tracks, setTracks] = useState<Track[]>([{
     id: 1,
     name: 'Master',
@@ -44,6 +61,57 @@ export const MixbaseView = () => {
     mode: 'ai-audio',
     clips: [],
   }]);
+  
+  // Fetch available personas for channel strips
+  const { data: availablePersonas = [], isLoading: isLoadingPersonas } = useQuery({
+    queryKey: ['available_personas'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('personas')
+        .select('*');
+      
+      return data ? data.map(transformPersonaData) : [];
+    }
+  });
+  
+  // Effect to load selected personas into mixer channels
+  useEffect(() => {
+    if (selectedPersonas.length > 0) {
+      // Create a new track for each selected persona that doesn't already have a track
+      const existingPersonaIds = tracks
+        .filter(t => t.persona)
+        .map(t => t.persona?.id);
+      
+      const newPersonas = selectedPersonas.filter(p => 
+        p.id && !existingPersonaIds.includes(p.id)
+      );
+      
+      if (newPersonas.length > 0) {
+        const newTracks = newPersonas.map(persona => ({
+          id: Math.max(...tracks.map(t => t.id)) + 1,
+          name: persona.name,
+          volume: 75,
+          isMuted: false,
+          isSolo: false,
+          mode: 'ai-audio' as const,
+          clips: [],
+          persona: {
+            id: persona.id,
+            name: persona.name,
+            avatarUrl: persona.avatar_url || persona.avatarUrl,
+            type: persona.type
+          }
+        }));
+        
+        setTracks(prev => [...prev, ...newTracks]);
+        
+        toast({
+          title: "Personas Added to Mixer",
+          description: `${newPersonas.length} persona(s) have been added to the mixer channels.`
+        });
+      }
+    }
+  }, [selectedPersonas, tracks, toast]);
 
   const [masterVolume, setMasterVolume] = useState(80);
   const [viewMode, setViewMode] = useState<'large' | 'normal' | 'compact'>('normal');
@@ -124,6 +192,55 @@ export const MixbaseView = () => {
     const dbValue = track.volume > 0 ? Math.round((track.volume - 75) / 25 * 12) : -48;
     const dbDisplay = dbValue > 0 ? `+${dbValue}` : dbValue;
     
+    // State for persona dropdown
+    const [showPersonasDropdown, setShowPersonasDropdown] = useState(false);
+    
+    // Filter personas based on track type
+    const filteredPersonas = availablePersonas.filter(persona => 
+      track.mode === 'master' 
+        ? persona.type === 'AI_MIXER' || persona.type === 'AI_EFFECT'
+        : !['AI_MIXER', 'AI_EFFECT'].includes(persona.type)
+    );
+    
+    // Handle persona selection
+    const handlePersonaSelect = (persona: Persona) => {
+      setTracks(tracks.map(t => 
+        t.id === track.id ? {
+          ...t,
+          name: persona.name,
+          persona: {
+            id: persona.id,
+            name: persona.name,
+            avatarUrl: persona.avatar_url || persona.avatarUrl,
+            type: persona.type
+          }
+        } : t
+      ));
+      setShowPersonasDropdown(false);
+      
+      toast({
+        title: "Persona Added to Channel",
+        description: `${persona.name} has been added to channel ${track.id}.`
+      });
+    };
+    
+    // Handle double click on avatar area
+    const handleAvatarDoubleClick = () => {
+      if (track.persona) return;
+
+      if (filteredPersonas.length === 0) {
+        toast({
+          title: track.mode === 'master' ? "No Mixer Personas Available" : "No Personas Available",
+          description: track.mode === 'master' 
+            ? "Please add a mixer persona from the collaborators section" 
+            : "Please add personas from the collaborators section",
+          variant: "destructive"
+        });
+      } else {
+        setShowPersonasDropdown(true);
+      }
+    };
+    
     return (
       <div key={track.id} className={`flex-shrink-0 ${viewMode === 'large' ? 'w-96' : viewMode === 'normal' ? 'w-64' : 'w-48'}`}>
         <div className="bg-[#2a9cb2] rounded-lg border border-gray-700 overflow-hidden flex flex-col h-full">
@@ -147,6 +264,69 @@ export const MixbaseView = () => {
             >
               {track.mode === 'master' ? 'MASTER' : track.mode === 'bus' ? `BUS ${index}` : 'TRACK'}
             </Button>
+          </div>
+          
+          {/* Persona Avatar */}
+          <div className="bg-[#2a9cb2] p-2 border-b border-gray-700 flex justify-center">
+            <DropdownMenu open={showPersonasDropdown} onOpenChange={setShowPersonasDropdown}>
+              <DropdownMenuTrigger asChild>
+                {track.persona ? (
+                  <Avatar 
+                    className="h-12 w-12 cursor-pointer hover:ring-2 hover:ring-yellow-300 transition-all"
+                  >
+                    <AvatarImage src={track.persona.avatarUrl} />
+                    <AvatarFallback>{track.persona.name?.[0]}</AvatarFallback>
+                  </Avatar>
+                ) : (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-12 w-12 rounded-full border-2 border-dashed border-yellow-300/20 hover:border-yellow-300/50"
+                    onDoubleClick={handleAvatarDoubleClick}
+                  >
+                    <UserPlus2 className="h-6 w-6 text-yellow-300/50" />
+                  </Button>
+                )}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                className="w-56 bg-[#1A1F2C] border border-yellow-300/20"
+              >
+                <DropdownMenuLabel>
+                  {track.persona ? "Change Persona" : "Add Persona"}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <div className="max-h-[300px] overflow-y-auto scrollbar-thin scrollbar-thumb-yellow-300/20 scrollbar-track-black/20">
+                  {isLoadingPersonas ? (
+                    <DropdownMenuItem disabled>
+                      Loading personas...
+                    </DropdownMenuItem>
+                  ) : filteredPersonas.length === 0 ? (
+                    <DropdownMenuItem disabled>
+                      No personas available
+                    </DropdownMenuItem>
+                  ) : (
+                    filteredPersonas.map(persona => (
+                      <DropdownMenuItem 
+                        key={persona.id}
+                        className="flex items-center gap-2 cursor-pointer hover:bg-yellow-300/10 transition-colors"
+                        onClick={() => handlePersonaSelect(persona)}
+                      >
+                        <Avatar className="h-6 w-6">
+                          <AvatarImage src={persona.avatar_url} />
+                          <AvatarFallback>{persona.name[0]}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col">
+                          <span className="text-sm">{persona.name}</span>
+                          <span className="text-xs text-gray-400">
+                            {persona.type.replace('AI_', '')}
+                          </span>
+                        </div>
+                      </DropdownMenuItem>
+                    ))
+                  )}
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
           
           {/* Level Meter */}

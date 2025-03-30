@@ -13,9 +13,9 @@ interface MusicPlayerProps {
   trimEnd?: number; // End time in seconds for trimmed playback
 }
 
-export const MusicPlayer = ({ 
-  audioUrl, 
-  isPlaying, 
+export const MusicPlayer = ({
+  audioUrl,
+  isPlaying,
   onPlayPause,
   trackTitle,
   artistName,
@@ -25,8 +25,18 @@ export const MusicPlayer = ({
 }: MusicPlayerProps) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isAudioReady, setIsAudioReady] = useState(false);
+  
+  console.log('[DEBUG] MusicPlayer initialized with:', {
+    audioUrl,
+    isPlaying,
+    trackTitle,
+    hasRef: !!audioRef.current,
+    isAudioReady
+  });
+  
   // If no audioUrl is provided, don't render the player
   if (!audioUrl) {
+    console.log('[DEBUG] No audioUrl provided, not rendering player');
     return null;
   }
   
@@ -47,15 +57,31 @@ export const MusicPlayer = ({
         });
         
         audio.addEventListener('canplaythrough', () => {
+          console.log('[DEBUG] Audio can play through event fired', {
+            audioUrl,
+            currentSrc: audio.currentSrc,
+            readyState: audio.readyState,
+            paused: audio.paused,
+            isPlaying
+          });
           setIsAudioReady(true);
           // Attempt to resume playback if it was playing
           if (isPlaying) {
-            audio.play().catch(() => {});
+            console.log('[DEBUG] Attempting to play after canplaythrough');
+            audio.play().catch((err) => {
+              console.error('[DEBUG] Failed to play after canplaythrough:', err.message);
+            });
           }
         });
         
         audio.addEventListener('error', (e) => {
-          console.error('Audio element error:', e);
+          const error = audio.error;
+          console.error('Audio element error:', {
+            errorCode: error ? error.code : 'unknown',
+            errorMessage: error ? error.message : 'unknown',
+            audioUrl,
+            errorEvent: e
+          });
           setIsAudioReady(false);
           onPlayPause(); // Ensure UI state reflects playback state
         });
@@ -110,19 +136,52 @@ export const MusicPlayer = ({
   
   // Handle play/pause state changes and trim points
   useEffect(() => {
-    if (!audioRef.current || !isAudioReady) return;
+    if (!audioRef.current || !isAudioReady) {
+      console.log('[DEBUG] Skip play/pause effect - Audio not ready or ref missing', {
+        hasRef: !!audioRef.current,
+        isAudioReady,
+        isPlaying
+      });
+      return;
+    }
     
     // Set trim points if provided
     if (trimStart !== undefined && audioRef.current) {
+      console.log('[DEBUG] Setting trim start point:', trimStart);
       audioRef.current.currentTime = trimStart;
     }
     
     const playAudio = async () => {
       if (isPlaying) {
+        console.log('[DEBUG] Attempting to play audio:', {
+          audioUrl,
+          currentSrc: audioRef.current?.currentSrc,
+          readyState: audioRef.current?.readyState,
+          networkState: audioRef.current?.networkState,
+        });
+        
         try {
           // Add a small delay to ensure UI changes don't interfere with playback
           await new Promise(resolve => setTimeout(resolve, 10));
-          await audioRef.current?.play();
+          
+          if (!audioRef.current) {
+            console.error('[DEBUG] Audio ref lost before playing');
+            return;
+          }
+          
+          // Check if audio source is actually loaded
+          if (!audioRef.current.src || audioRef.current.src === 'about:blank') {
+            console.error('[DEBUG] Audio source is empty or invalid:', audioRef.current.src);
+            audioRef.current.src = audioUrl;
+            audioRef.current.load();
+          }
+          
+          console.log('[DEBUG] Calling play() method');
+          const playPromise = audioRef.current.play();
+          await playPromise;
+          
+          console.log('[DEBUG] Play successful');
+          
           // Ensure playback continues by setting priority
           if (audioRef.current) {
             // These attributes help maintain playback during UI changes
@@ -130,10 +189,24 @@ export const MusicPlayer = ({
             audioRef.current.setAttribute('data-priority', 'high');
           }
         } catch (error) {
-          console.error('Error playing audio:', error);
-          onPlayPause(); // Toggle back to paused state on error
+          console.error('[DEBUG] Error playing audio:', error);
+          // Potentially retry once with reload
+          if (audioRef.current) {
+            console.log('[DEBUG] Attempting to reload and play again');
+            try {
+              audioRef.current.load();
+              await audioRef.current.play();
+              console.log('[DEBUG] Retry successful');
+            } catch (retryError) {
+              console.error('[DEBUG] Retry failed:', retryError);
+              onPlayPause(); // Toggle back to paused state on error
+            }
+          } else {
+            onPlayPause(); // Toggle back to paused state on error
+          }
         }
       } else {
+        console.log('[DEBUG] Pausing audio');
         audioRef.current?.pause();
       }
     };

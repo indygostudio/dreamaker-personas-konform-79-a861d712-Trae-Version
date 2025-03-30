@@ -1,8 +1,15 @@
-
 import { useState, useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Maximize2, Minimize2, Layers } from "lucide-react";
+import {
+  ContextMenu,
+  ContextMenuTrigger,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuLabel
+} from "@/components/ui/context-menu";
 import { ChannelStrip } from "./controls/ChannelStrip";
 import { MixerHeader } from "./MixerHeader";
 import { 
@@ -23,6 +30,10 @@ import { CSS } from "@dnd-kit/utilities";
 import type { Persona } from "@/types/persona";
 import { useViewModeStore } from '@/stores/viewModeStore';
 import { useToast } from "@/hooks/use-toast";
+import { useSelectedPersonasStore } from "@/stores/selectedPersonasStore";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { transformPersonaData } from "@/lib/utils/personaTransform";
 
 interface Channel {
   id: string;
@@ -72,6 +83,8 @@ const SortableChannel = ({ channel, isSelected, onSelect, onDelete, onDuplicate,
 
 export const MixerView = () => {
   const { mixerViewMode, setMixerViewMode } = useViewModeStore();
+  const { selectedPersonas } = useSelectedPersonasStore();
+  const { toast } = useToast();
   const [channels, setChannels] = useState<Channel[]>(() => [
     {
       id: 'master',
@@ -95,6 +108,20 @@ export const MixerView = () => {
     }
   ]);
   const [selectedChannels, setSelectedChannels] = useState<Set<string>>(new Set());
+  const [currentMixer, setCurrentMixer] = useState<Persona | null>(null);
+  
+  // Fetch mixer personas (AI_MIXER type)
+  const { data: mixerPersonas = [] } = useQuery({
+    queryKey: ['mixer-personas'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('personas')
+        .select('*')
+        .eq('type', 'AI_MIXER');
+      
+      return data ? data.map(transformPersonaData) : [];
+    }
+  });
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -113,6 +140,77 @@ export const MixerView = () => {
     });
   };
 
+  // Effect to load selected personas into mixer channels
+  useEffect(() => {
+    if (selectedPersonas.length > 0) {
+      // Create a new channel for each selected persona that doesn't already have a channel
+      const existingPersonaIds = channels
+        .filter(c => c.collaborator)
+        .map(c => c.collaborator?.id);
+      
+      const newPersonas = selectedPersonas.filter(p => 
+        p.id && !existingPersonaIds.includes(p.id)
+      );
+      
+      if (newPersonas.length > 0) {
+        const newChannels = newPersonas.map(persona => ({
+          id: `channel-${Date.now()}-${persona.id}`,
+          number: channels.filter(c => c.type === 'audio').length + 1,
+          type: 'audio' as const,
+          collaborator: {
+            id: persona.id || '',
+            name: persona.name,
+            avatar_url: persona.avatar_url || persona.avatarUrl,
+            type: persona.type,
+            user_id: ''
+          }
+        }));
+        
+        setChannels(prev => [...prev, ...newChannels]);
+        
+        toast({
+          title: "Personas Added to Mixer",
+          description: `${newPersonas.length} persona(s) have been added to the mixer channels.`
+        });
+      }
+    }
+  }, [selectedPersonas, channels, toast]);
+  
+  // Effect to set the current mixer if available
+  useEffect(() => {
+    if (mixerPersonas.length > 0 && !currentMixer) {
+      setCurrentMixer(mixerPersonas[0]);
+    }
+  }, [mixerPersonas, currentMixer]);
+  
+  const handleMixerChange = (mixerId: string) => {
+    const mixer = mixerPersonas.find(p => p.id === mixerId);
+    if (mixer) {
+      setCurrentMixer(mixer);
+    }
+  };
+  
+  const getCurrentMixerState = () => {
+    // Return current mixer state for presets
+    return {
+      channels: channels.map(c => ({
+        id: c.id,
+        type: c.type,
+        collaborator: c.collaborator ? c.collaborator.id : null
+      }))
+    };
+  };
+  
+  const handleLoadPreset = (mixerState: any) => {
+    // Load a mixer preset
+    if (mixerState?.channels) {
+      toast({
+        title: "Mixer Preset Loaded",
+        description: "The mixer preset has been loaded successfully."
+      });
+    }
+  };
+  
   const handleAddChannel = () => {
     setChannels(prev => [
       ...prev,
@@ -184,99 +282,120 @@ export const MixerView = () => {
   const audioChannels = channels.filter(c => c.type === 'audio');
 
   return (
-    <div className="h-[calc(100vh-200px)] bg-black/40 rounded-lg p-4 flex flex-col">
-      <div className="mb-4">
-        <MixerHeader 
-          currentMixer={currentMixer}
-          mixerPersonas={mixerPersonas}
-          onMixerChange={handleMixerChange}
-          currentMixerState={getCurrentMixerState()}
-          onLoadPreset={handleLoadPreset}
-        />
-      </div>
-      <div className="mt-auto border-t border-konform-neon-blue/10 pt-4">
-        <ScrollArea className="w-full" type="scroll" scrollHideDelay={0}>
-          <DndContext 
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <div className="flex gap-4 p-2 relative min-w-max">
-              {/* View Mode Buttons - Moved to left side */}
-              <div className="flex items-center justify-between mb-4">
-                {/* Removing the view mode buttons from here as they've been moved to the left side */}
-                <div className="flex items-center gap-2">
-                  {/* Empty div to maintain layout structure */}
+    <ContextMenu>
+      <ContextMenuTrigger>
+        <div className="h-[calc(100vh-200px)] bg-black/40 rounded-lg p-4 flex flex-col">
+          <div className="mb-4">
+            <MixerHeader 
+              currentMixer={currentMixer}
+              mixerPersonas={mixerPersonas}
+              onMixerChange={handleMixerChange}
+              currentMixerState={getCurrentMixerState()}
+              onLoadPreset={handleLoadPreset}
+            />
+          </div>
+          <div className="mt-auto border-t border-konform-neon-blue/10 pt-4">
+            <ScrollArea className="w-full" type="scroll" scrollHideDelay={0}>
+              <DndContext 
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <div className="flex gap-4 p-2 relative min-w-max">
+                  <div className="flex items-end gap-2 bg-gradient-to-b from-konform-neon-orange/5 to-transparent p-4 rounded-lg border border-konform-neon-orange/10">
+                    <SortableContext 
+                      items={masterChannels.map(c => c.id)}
+                      strategy={horizontalListSortingStrategy}
+                    >
+                      {masterChannels.map((channel, index) => (
+                        <SortableChannel
+                          key={channel.id}
+                          channel={channel}
+                          isSelected={selectedChannels.has(channel.id)}
+                          onSelect={handleSelect}
+                          onDelete={() => handleDeleteChannel(index)}
+                          onDuplicate={() => handleDuplicateChannel(index)}
+                          viewMode={mixerViewMode}
+                        />
+                      ))}
+                    </SortableContext>
+                  </div>
+
+                  <div className="flex items-end gap-2 bg-gradient-to-b from-konform-neon-blue/5 to-transparent p-4 rounded-lg border border-konform-neon-blue/10">
+                    <SortableContext 
+                      items={busChannels.map(c => c.id)}
+                      strategy={horizontalListSortingStrategy}
+                    >
+                      {busChannels.map((channel, index) => (
+                        <SortableChannel
+                          key={channel.id}
+                          channel={channel}
+                          isSelected={selectedChannels.has(channel.id)}
+                          onSelect={handleSelect}
+                          onDelete={() => handleDeleteChannel(index)}
+                          onDuplicate={() => handleDuplicateChannel(index)}
+                          viewMode={mixerViewMode}
+                        />
+                      ))}
+                    </SortableContext>
+                  </div>
+
+                  <div className="flex items-end gap-2 bg-gradient-to-b from-konform-neon-blue/5 to-transparent p-4 rounded-lg border border-konform-neon-blue/10">
+                    <SortableContext 
+                      items={audioChannels.map(c => c.id)}
+                      strategy={horizontalListSortingStrategy}
+                    >
+                      {audioChannels.map((channel, index) => (
+                        <SortableChannel
+                          key={channel.id}
+                          channel={channel}
+                          isSelected={selectedChannels.has(channel.id)}
+                          onSelect={handleSelect}
+                          onDelete={() => handleDeleteChannel(index)}
+                          onDuplicate={() => handleDuplicateChannel(index)}
+                          viewMode={mixerViewMode}
+                        />
+                      ))}
+                    </SortableContext>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={handleAddChannel}
+                      className="h-12 w-12 rounded-full bg-black/60 border border-konform-neon-blue/30 hover:border-konform-neon-blue text-konform-neon-blue hover:text-konform-neon-orange transition-colors"
+                    >
+                      <Plus className="h-6 w-6" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-end gap-2 bg-gradient-to-b from-konform-neon-orange/5 to-transparent p-4 rounded-lg border border-konform-neon-orange/10">
-                <SortableContext 
-                  items={masterChannels.map(c => c.id)}
-                  strategy={horizontalListSortingStrategy}
-                >
-                  {masterChannels.map((channel, index) => (
-                    <SortableChannel
-                      key={channel.id}
-                      channel={channel}
-                      isSelected={selectedChannels.has(channel.id)}
-                      onSelect={handleSelect}
-                      onDelete={() => handleDeleteChannel(index)}
-                      onDuplicate={() => handleDuplicateChannel(index)}
-                      viewMode={mixerViewMode}
-                    />
-                  ))}
-                </SortableContext>
-              </div>
-
-              <div className="flex items-end gap-2 bg-gradient-to-b from-konform-neon-blue/5 to-transparent p-4 rounded-lg border border-konform-neon-blue/10">
-                <SortableContext 
-                  items={busChannels.map(c => c.id)}
-                  strategy={horizontalListSortingStrategy}
-                >
-                  {busChannels.map((channel, index) => (
-                    <SortableChannel
-                      key={channel.id}
-                      channel={channel}
-                      isSelected={selectedChannels.has(channel.id)}
-                      onSelect={handleSelect}
-                      onDelete={() => handleDeleteChannel(index)}
-                      onDuplicate={() => handleDuplicateChannel(index)}
-                      viewMode={mixerViewMode}
-                    />
-                  ))}
-                </SortableContext>
-              </div>
-
-              <div className="flex items-end gap-2 bg-gradient-to-b from-konform-neon-blue/5 to-transparent p-4 rounded-lg border border-konform-neon-blue/10">
-                <SortableContext 
-                  items={audioChannels.map(c => c.id)}
-                  strategy={horizontalListSortingStrategy}
-                >
-                  {audioChannels.map((channel, index) => (
-                    <SortableChannel
-                      key={channel.id}
-                      channel={channel}
-                      isSelected={selectedChannels.has(channel.id)}
-                      onSelect={handleSelect}
-                      onDelete={() => handleDeleteChannel(index)}
-                      onDuplicate={() => handleDuplicateChannel(index)}
-                      viewMode={mixerViewMode}
-                    />
-                  ))}
-                </SortableContext>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleAddChannel}
-                  className="h-12 w-12 rounded-full bg-black/60 border border-konform-neon-blue/30 hover:border-konform-neon-blue text-konform-neon-blue hover:text-konform-neon-orange transition-colors"
-                >
-                  <Plus className="h-6 w-6" />
-                </Button>
-              </div>
-            </div>
-          </DndContext>
-        </ScrollArea>
-      </div>
-    </div>
+              </DndContext>
+            </ScrollArea>
+          </div>
+        </div>
+      </ContextMenuTrigger>
+      <ContextMenuContent className="bg-black/90 border border-konform-neon-blue/30 text-white">
+        <ContextMenuLabel>View Mode</ContextMenuLabel>
+        <ContextMenuItem 
+          onClick={() => setMixerViewMode('large')}
+          className={mixerViewMode === 'large' ? 'bg-konform-neon-blue/20 text-konform-neon-blue' : ''}
+        >
+          <Maximize2 className="mr-2 h-4 w-4" />
+          Large
+        </ContextMenuItem>
+        <ContextMenuItem 
+          onClick={() => setMixerViewMode('normal')}
+          className={mixerViewMode === 'normal' ? 'bg-konform-neon-blue/20 text-konform-neon-blue' : ''}
+        >
+          <Layers className="mr-2 h-4 w-4" />
+          Normal
+        </ContextMenuItem>
+        <ContextMenuItem 
+          onClick={() => setMixerViewMode('compact')}
+          className={mixerViewMode === 'compact' ? 'bg-konform-neon-blue/20 text-konform-neon-blue' : ''}
+        >
+          <Minimize2 className="mr-2 h-4 w-4" />
+          Compact
+        </ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   );
 };
