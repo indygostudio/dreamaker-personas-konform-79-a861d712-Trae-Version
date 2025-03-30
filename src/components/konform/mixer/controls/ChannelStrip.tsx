@@ -1,18 +1,16 @@
-import { useState, useEffect, useMemo } from "react";
+
+import { useState, useEffect } from "react";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Volume2, Power, Mic, Copy, Trash2, UserPlus2, PlusSquare, ChevronDown, ToggleLeft, ToggleRight, ArrowDownLeft, ArrowUpRight, FolderPlus, Headphones, Speaker, Monitor, Settings, Activity, Sliders, Play, Pause, PlayCircle } from "lucide-react";
+import { Volume2, Power, Mic, Copy, Trash2, UserPlus2, PlusSquare, ChevronDown, ToggleLeft, ToggleRight, ArrowDownLeft, ArrowUpRight, FolderPlus, Headphones, Speaker, Monitor, Settings, Waveform, Sliders } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSelectedPersonasStore } from "@/stores/selectedPersonasStore";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { transformPersonaData } from "@/lib/utils/personaTransform";
-import { useAudioPlayer } from "@/hooks/use-audio-player";
-import type { Track } from "@/types/track";
-import { MusicPlayer } from "@/components/artist-profile/MusicPlayer";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -70,8 +68,8 @@ interface Plugin {
   isActive: boolean;
 }
 
-export const ChannelStrip = ({
-  channelNumber,
+export const ChannelStrip = ({ 
+  channelNumber, 
   isMaster = false,
   collaborator,
   isSelected = false,
@@ -80,7 +78,7 @@ export const ChannelStrip = ({
   viewMode = 'normal',
   onSelect,
   onDelete,
-  onDuplicate
+  onDuplicate 
 }: ChannelStripProps) => {
   const [isMuted, setIsMuted] = useState(false);
   const [isSolo, setIsSolo] = useState(false);
@@ -89,9 +87,6 @@ export const ChannelStrip = ({
   const [showPersonasDropdown, setShowPersonasDropdown] = useState(false);
   const [showPluginSelector, setShowPluginSelector] = useState(false);
   const [currentCollaborator, setCurrentCollaborator] = useState<Persona | undefined>(collaborator);
-  const [isAudioPreviewing, setIsAudioPreviewing] = useState(false);
-  
-  const { handlePlayTrack, handlePlayPause, isPlaying, setIsPlaying } = useAudioPlayer();
   
   // Update currentCollaborator when collaborator prop changes
   useEffect(() => {
@@ -99,83 +94,6 @@ export const ChannelStrip = ({
       setCurrentCollaborator(collaborator);
     }
   }, [collaborator]);
-  
-  // Create track object from persona audio preview
-  const audioPreviewTrack = useMemo(() => {
-    if (!currentCollaborator?.audio_preview_url) return null;
-    
-    const track: Track = {
-      id: `persona-preview-${currentCollaborator.id}`,
-      title: `${currentCollaborator.name} Preview`,
-      artist: currentCollaborator.name,
-      audio_url: currentCollaborator.audio_preview_url,
-      album_artwork_url: currentCollaborator.avatar_url || '',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      order_index: 0,
-      is_public: true,
-      playlist_id: 'preview',
-      duration: 0,
-      persona_id: currentCollaborator.id
-    };
-    
-    return track;
-  }, [currentCollaborator?.id, currentCollaborator?.name, currentCollaborator?.audio_preview_url, currentCollaborator?.avatar_url]);
-  
-  // Handle audio playback toggle
-  const handleAudioToggle = (e?: React.MouseEvent) => {
-    if (e) {
-      e.stopPropagation();
-    }
-    
-    if (!currentCollaborator?.audio_preview_url) {
-      toast({
-        description: "This persona doesn't have an audio preview yet."
-      });
-      return;
-    }
-    
-    if (!audioPreviewTrack) {
-      toast({
-        description: "Unable to create audio preview track."
-      });
-      return;
-    }
-    
-    if (isPlaying && isAudioPreviewing) {
-      setIsPlaying(false);
-      setIsAudioPreviewing(false);
-    } else {
-      // Test if the audio URL is valid and accessible
-      fetch(currentCollaborator.audio_preview_url, { method: 'HEAD' })
-        .then(response => {
-          if (response.ok) {
-            handlePlayTrack(audioPreviewTrack);
-            setIsAudioPreviewing(true);
-          } else {
-            toast({
-              description: `Audio file could not be accessed (${response.status})`,
-              variant: "destructive"
-            });
-          }
-        })
-        .catch(err => {
-          toast({
-            description: "Error accessing audio file",
-            variant: "destructive"
-          });
-        });
-    }
-  };
-  
-  // Clean up audio when component unmounts
-  useEffect(() => {
-    return () => {
-      if (isAudioPreviewing) {
-        setIsPlaying(false);
-      }
-    };
-  }, [isAudioPreviewing, setIsPlaying]);
   const [automation, setAutomation] = useState<AutomationState>({
     read: false,
     write: false,
@@ -281,11 +199,11 @@ export const ChannelStrip = ({
   
   const availablePlugins: Plugin[] = [
     { id: 'eq-1', name: 'Parametric EQ', type: 'eq', icon: <Sliders className="h-4 w-4" />, isActive: false },
-    { id: 'comp-1', name: 'Compressor', type: 'comp', icon: <Activity className="h-4 w-4" />, isActive: false },
+    { id: 'comp-1', name: 'Compressor', type: 'comp', icon: <Waveform className="h-4 w-4" />, isActive: false },
     { id: 'reverb-1', name: 'Studio Reverb', type: 'reverb', icon: <Settings className="h-4 w-4" />, isActive: false },
     { id: 'delay-1', name: 'Analog Delay', type: 'delay', icon: <Settings className="h-4 w-4" />, isActive: false },
     { id: 'eq-2', name: 'Graphic EQ', type: 'eq', icon: <Sliders className="h-4 w-4" />, isActive: false },
-    { id: 'comp-2', name: 'Multiband Compressor', type: 'comp', icon: <Activity className="h-4 w-4" />, isActive: false },
+    { id: 'comp-2', name: 'Multiband Compressor', type: 'comp', icon: <Waveform className="h-4 w-4" />, isActive: false },
   ];
   
   const handleAddPlugin = (pluginId: string) => {
@@ -322,55 +240,122 @@ export const ChannelStrip = ({
       <ContextMenuTrigger>
         <motion.div 
           className={cn(
-            "flex flex-col items-center gap-1 rounded-none transition-all duration-200 shadow-lg",
-            "bg-black backdrop-blur-xl",
-            "shadow-black/50",
-            isSelected
-              ? 'ring-1 ring-white/20'
-              : 'hover:ring-1 hover:ring-white/10',
+            "flex flex-col items-center gap-2 p-2 rounded-lg border transition-all duration-200 shadow-lg",
+            "bg-gradient-to-b from-black/90 to-black/70 backdrop-blur-xl",
+            "shadow-black/30 hover:shadow-konform-neon-blue/10",
+            isSelected 
+              ? 'border-konform-neon-orange ring-1 ring-konform-neon-orange/30' 
+              : type === 'master'
+                ? 'border-konform-neon-orange/20 hover:border-konform-neon-orange/40'
+                : type === 'bus'
+                  ? 'border-konform-neon-blue/20 hover:border-konform-neon-blue/40'
+                  : 'border-konform-neon-blue/10 hover:border-konform-neon-blue/30',
             className,
             isDisabled ? 'opacity-50' : '',
-            viewMode === 'large' ? 'w-[140px]' :
-            viewMode === 'normal' ? 'w-[120px]' :
-            'w-[100px]'
+            viewMode === 'large' ? 'w-48' :
+            viewMode === 'normal' ? 'w-32' :
+            'w-24'
           )}
           onClick={onSelect}
           whileHover={{ y: -2 }}
           transition={{ type: "spring", stiffness: 500, damping: 30 }}
         >
-          {/* Instrument/Module Name in Green */}
-          <div className="w-full relative">
-            <Button
-              variant="ghost"
-              className="w-full py-3 font-medium text-white bg-green-500 hover:bg-green-600 rounded-none"
-            >
-              {currentCollaborator ? currentCollaborator.name : isMaster ? "Master" : type === 'bus' ? "Bus " + channelNumber : "Channel " + channelNumber}
-            </Button>
-            
-            {currentCollaborator?.audio_preview_url && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleAudioToggle}
-                className="absolute right-1 top-1/2 transform -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white h-8 w-8 rounded-full"
+          <div className="w-full flex justify-between items-center px-2">
+            <span className="text-xs text-konform-neon-blue">
+              {isMaster ? "MASTER" : `CH ${channelNumber}`}
+            </span>
+            <div className="flex gap-1">
+              {!isMaster && (
+                <>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-6 w-6 p-0 hover:text-konform-neon-orange"
+                    onClick={onDuplicate}
+                  >
+                    <Copy className="h-3 w-3" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-6 w-6 p-0 hover:text-red-500"
+                    onClick={onDelete}
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
+                </>
+              )}
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className={`h-6 w-6 p-0 ${isDisabled ? 'text-red-500' : 'text-konform-neon-blue'}`}
+                onClick={handleDisable}
               >
-                {isPlaying && isAudioPreviewing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                <Power className="h-3 w-3" />
               </Button>
-            )}
+            </div>
           </div>
 
-          {/* Stereo Output Section */}
-          <div className="w-full py-2 px-4 flex items-center justify-between bg-zinc-900 text-white text-sm">
-            <span>Stereo</span>
-            <span>Output</span>
-            {/* Output select arrow */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-5 w-5 p-0 text-white"
-            >
-              <ChevronDown className="h-3 w-3" />
-            </Button>
+          <div className="w-full flex flex-col items-center gap-2 border-b border-konform-neon-blue/10 pb-2">
+            <DropdownMenu open={showPersonasDropdown} onOpenChange={setShowPersonasDropdown}>
+              <DropdownMenuTrigger asChild>
+                {currentCollaborator ? (
+                  <Avatar 
+                    className="h-12 w-12 cursor-pointer hover:ring-2 hover:ring-konform-neon-blue/50 transition-all"
+                  >
+                    <AvatarImage src={currentCollaborator.avatar_url} />
+                    <AvatarFallback>{currentCollaborator.name?.[0]}</AvatarFallback>
+                  </Avatar>
+                ) : (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-12 w-12 rounded-full border-2 border-dashed border-konform-neon-blue/20 hover:border-konform-neon-blue/50"
+                    onDoubleClick={handleDoubleClick}
+                  >
+                    <UserPlus2 className="h-6 w-6 text-konform-neon-blue/50" />
+                  </Button>
+                )}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                className="w-56 bg-[#1A1F2C] border border-konform-neon-blue/20"
+              >
+                <DropdownMenuLabel>
+                  {currentCollaborator ? "Change Persona" : "Add Persona"}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <div className="max-h-[300px] overflow-y-auto scrollbar-thin scrollbar-thumb-konform-neon-blue/20 scrollbar-track-black/20">
+                  {isLoadingPersonas ? (
+                    <DropdownMenuItem disabled>
+                      Loading personas...
+                    </DropdownMenuItem>
+                  ) : filteredPersonas.length === 0 ? (
+                    <DropdownMenuItem disabled>
+                      No personas available
+                    </DropdownMenuItem>
+                  ) : (
+                    filteredPersonas.map(persona => (
+                      <DropdownMenuItem 
+                        key={persona.id}
+                        className="flex items-center gap-2 cursor-pointer hover:bg-konform-neon-blue/10 transition-colors"
+                        onClick={() => setCurrentCollaborator(persona)}
+                      >
+                        <Avatar className="h-6 w-6">
+                          <AvatarImage src={persona.avatar_url} />
+                          <AvatarFallback>{persona.name[0]}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col">
+                          <span className="text-sm">{persona.name}</span>
+                          <span className="text-xs text-gray-400">
+                            {persona.type.replace('AI_', '')}
+                          </span>
+                        </div>
+                      </DropdownMenuItem>
+                    ))
+                  )}
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {!isMaster && (
@@ -528,8 +513,8 @@ export const ChannelStrip = ({
                 <span>-48</span>
               </div>
 
-              <div className="h-full w-3 bg-gradient-to-b from-black/80 to-black/60 rounded-sm overflow-hidden backdrop-blur-sm border border-konform-neon-blue/10">
-                <div className="w-full h-full bg-black/40" />
+              <div className="h-full w-3 bg-gradient-to-b from-black/60 to-black/40 rounded-sm overflow-hidden backdrop-blur-sm border border-konform-neon-blue/5">
+                <div className="w-full h-full bg-black/20" />
               </div>
 
               <div className="flex-1 h-full flex justify-center items-center">
@@ -540,11 +525,11 @@ export const ChannelStrip = ({
                         height: 40px;
                         width: 24px;
                         border-radius: 1px;
-                        background: linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(0,0,0,0.9));
+                        background: linear-gradient(to bottom, #2d2d2d, #1d1d1d);
                         border: 1px solid #00D1FF;
-                        box-shadow:
-                          0 2px 10px rgba(0,209,255,0.3),
-                          inset 0 1px rgba(255,255,255,0.05);
+                        box-shadow: 
+                          0 2px 8px rgba(0,209,255,0.2),
+                          inset 0 1px rgba(255,255,255,0.1);
                         transform: translateX(-50%);
                         position: relative;
                       }
@@ -557,7 +542,7 @@ export const ChannelStrip = ({
                         width: 16px;
                         height: 2px;
                         background: #00D1FF;
-                        box-shadow: 0 0 6px rgba(0,209,255,0.8);
+                        box-shadow: 0 0 4px rgba(0,209,255,0.5);
                       }
                       [class*="Slider"] [role="slider"]::before {
                         content: '';
@@ -568,8 +553,8 @@ export const ChannelStrip = ({
                         width: 12px;
                         height: 2px;
                         background: #00D1FF;
-                        box-shadow: 0 0 6px rgba(0,209,255,0.8);
-                        opacity: 0.7;
+                        box-shadow: 0 0 4px rgba(0,209,255,0.5);
+                        opacity: 0.5;
                       }
                     `}
                   </style>
@@ -584,8 +569,8 @@ export const ChannelStrip = ({
                 </div>
               </div>
 
-              <div className="h-full w-3 bg-gradient-to-b from-black/80 to-black/60 rounded-sm overflow-hidden backdrop-blur-sm border border-konform-neon-blue/10">
-                <div className="w-full h-full bg-black/40" />
+              <div className="h-full w-3 bg-black/40 rounded-sm overflow-hidden">
+                <div className="w-full h-full bg-black/20" />
               </div>
             </div>
           </div>
@@ -595,10 +580,10 @@ export const ChannelStrip = ({
               <Button 
                 variant="outline" 
                 size="sm" 
-                className={`h-6 text-xs bg-black/70 w-full transition-colors duration-150 backdrop-blur-sm
-                  ${isMuted
-                    ? 'border-[#00D1FF] bg-[#00D1FF]/20 text-[#00D1FF] hover:bg-[#00D1FF]/30 shadow-[0_0_8px_rgba(0,209,255,0.3)]'
-                    : 'border-konform-neon-blue/20 hover:bg-transparent hover:border-konform-neon-blue hover:shadow-[0_0_8px_rgba(0,209,255,0.2)]'
+                className={`h-6 text-xs bg-black/40 w-full transition-colors duration-150
+                  ${isMuted 
+                    ? 'border-[#00D1FF] bg-[#00D1FF]/20 text-[#00D1FF] hover:bg-[#00D1FF]/30' 
+                    : 'border-konform-neon-blue/20 hover:bg-transparent hover:border-konform-neon-blue'
                   }`}
                 onClick={() => setIsMuted(!isMuted)}
               >
@@ -607,10 +592,10 @@ export const ChannelStrip = ({
               <Button 
                 variant="outline" 
                 size="sm" 
-                className={`h-6 text-xs bg-black/70 w-full transition-colors duration-150 backdrop-blur-sm
-                  ${isSolo
-                    ? 'border-konform-neon-orange bg-konform-neon-orange/20 text-konform-neon-orange hover:bg-konform-neon-orange/30 hover:border-konform-neon-orange shadow-[0_0_8px_rgba(255,100,0,0.3)]'
-                    : 'border-konform-neon-blue/20 hover:bg-transparent hover:border-konform-neon-blue hover:shadow-[0_0_8px_rgba(0,209,255,0.2)]'
+                className={`h-6 text-xs bg-black/40 w-full transition-colors duration-150
+                  ${isSolo 
+                    ? 'border-konform-neon-orange bg-konform-neon-orange/20 text-konform-neon-orange hover:bg-konform-neon-orange/30 hover:border-konform-neon-orange' 
+                    : 'border-konform-neon-blue/20 hover:bg-transparent hover:border-konform-neon-blue'
                   }`}
                 onClick={() => setIsSolo(!isSolo)}
               >
@@ -625,7 +610,7 @@ export const ChannelStrip = ({
             <Input
               value={trackName}
               onChange={(e) => setTrackName(e.target.value)}
-              className="h-7 text-xs bg-black/70 border-konform-neon-blue/20 text-center backdrop-blur-sm hover:border-konform-neon-blue/40 focus:border-konform-neon-blue focus:ring-1 focus:ring-konform-neon-blue/30 focus:shadow-[0_0_8px_rgba(0,209,255,0.2)]"
+              className="h-7 text-xs bg-black/20 border-konform-neon-blue/20 text-center"
               placeholder="Track Name"
             />
             
@@ -633,7 +618,7 @@ export const ChannelStrip = ({
               <Mic className="h-4 w-4 text-konform-neon-blue opacity-50" />
             </div>
           </div>
-        </motion.div>
+        </div>
       </ContextMenuTrigger>
       
       <ContextMenuContent 

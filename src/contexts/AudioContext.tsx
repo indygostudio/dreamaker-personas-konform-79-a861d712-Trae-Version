@@ -416,56 +416,15 @@ export const AudioProvider = ({ children }: AudioProviderProps) => {
   
   // Play method
   const play = useCallback(async (track?: Track) => {
-    console.log('[DEBUG] AudioContext play method called', {
-      trackProvided: !!track,
-      trackDetails: track ? {
-        id: track.id,
-        title: track.title,
-        url: track.audio_url,
-        personaId: track.persona_id
-      } : 'none',
-      hasAudioElement: !!audioElementRef.current,
-      audioContextState: audioContextRef.current?.state || 'none'
-    });
-    
     // Resume audio context if suspended
     if (audioContextRef.current?.state === 'suspended') {
-      console.log('[DEBUG] Resuming suspended audio context');
-      try {
-        await audioContextRef.current.resume();
-        console.log('[DEBUG] Audio context resumed successfully');
-      } catch (err) {
-        console.error('[DEBUG] Failed to resume audio context:', err);
-      }
+      await audioContextRef.current.resume();
     }
     
-    if (!audioElementRef.current) {
-      console.error('[DEBUG] No audio element ref found, cannot play');
-      return;
-    }
+    if (!audioElementRef.current) return;
     
     // If track provided, load and play it
     if (track) {
-      console.log('[DEBUG] Setting up new track for playback');
-      
-      // Validate that the audio URL is accessible
-      try {
-        const response = await fetch(track.audio_url, { method: 'HEAD' });
-        console.log('[DEBUG] Audio URL validation result:', {
-          url: track.audio_url,
-          status: response.status,
-          ok: response.ok,
-          contentType: response.headers.get('content-type')
-        });
-        
-        if (!response.ok) {
-          console.error('[DEBUG] Audio URL is not accessible:', response.status);
-          return;
-        }
-      } catch (err) {
-        console.error('[DEBUG] Error validating audio URL:', err);
-      }
-      
       setState(current => ({
         ...current,
         currentTrack: track,
@@ -479,7 +438,6 @@ export const AudioProvider = ({ children }: AudioProviderProps) => {
       
       // Find track in playlist
       const trackIndex = state.playlist.tracks.findIndex(t => t.id === track.id);
-      console.log('[DEBUG] Track index in playlist:', trackIndex);
       if (trackIndex !== -1) {
         setState(current => ({
           ...current,
@@ -491,89 +449,26 @@ export const AudioProvider = ({ children }: AudioProviderProps) => {
       }
       
       try {
-        console.log('[DEBUG] Setting audio source and loading', {
-          url: track.audio_url,
-          audioElementReadyState: audioElementRef.current.readyState
-        });
-        
         audioElementRef.current.src = track.audio_url;
-        
-        // Add one-time event listeners for better debugging
-        const onCanPlay = () => {
-          console.log('[DEBUG] Audio canplay event fired');
-          audioElementRef.current?.removeEventListener('canplay', onCanPlay);
-        };
-        
-        const onLoadedData = () => {
-          console.log('[DEBUG] Audio loadeddata event fired');
-          audioElementRef.current?.removeEventListener('loadeddata', onLoadedData);
-        };
-        
-        const onError = (e: Event) => {
-          console.error('[DEBUG] Audio error during load:', audioElementRef.current?.error);
-          audioElementRef.current?.removeEventListener('error', onError);
-        };
-        
-        audioElementRef.current.addEventListener('canplay', onCanPlay);
-        audioElementRef.current.addEventListener('loadeddata', onLoadedData);
-        audioElementRef.current.addEventListener('error', onError);
-        
         audioElementRef.current.load();
-        console.log('[DEBUG] Audio load() called');
-        
-        console.log('[DEBUG] Attempting to play audio');
-        const playPromise = audioElementRef.current.play();
-        await playPromise;
-        console.log('[DEBUG] Play successful');
+        await audioElementRef.current.play();
       } catch (error) {
-        console.error('[DEBUG] Failed to play track:', error);
-        // Try one more time with a delay
-        try {
-          console.log('[DEBUG] Retrying playback after error');
-          await new Promise(resolve => setTimeout(resolve, 500));
-          await audioElementRef.current.play();
-          console.log('[DEBUG] Retry successful');
-        } catch (retryError) {
-          console.error('[DEBUG] Retry also failed:', retryError);
-          
-          setState(current => ({
-            ...current,
-            playbackState: {
-              ...current.playbackState,
-              status: 'error'
-            }
-          }));
-        }
+        console.error('Failed to play track:', error);
+        setState(current => ({
+          ...current,
+          playbackState: {
+            ...current.playbackState,
+            status: 'error'
+          }
+        }));
       }
-    }
+    } 
     // Otherwise resume current track
     else if (state.currentTrack) {
-      console.log('[DEBUG] Resuming existing track', {
-        currentTrack: state.currentTrack?.title,
-        audioElementPaused: audioElementRef.current.paused,
-        audioElementReadyState: audioElementRef.current.readyState
-      });
-      
       try {
-        const playPromise = audioElementRef.current.play();
-        await playPromise;
-        console.log('[DEBUG] Resume successful');
+        await audioElementRef.current.play();
       } catch (error) {
-        console.error('[DEBUG] Failed to resume playback:', error);
-        
-        // Check if this is an autoplay policy error
-        if (error instanceof DOMException && error.name === 'NotAllowedError') {
-          console.log('[DEBUG] Detected autoplay policy restriction, trying with user interaction');
-          
-          // We need user interaction - update the UI to show this
-          setState(current => ({
-            ...current,
-            playbackState: {
-              ...current.playbackState,
-              status: 'paused'
-            }
-          }));
-        }
+        console.error('Failed to resume playback:', error);
       }
     }
   }, [state.currentTrack, state.playlist]);
