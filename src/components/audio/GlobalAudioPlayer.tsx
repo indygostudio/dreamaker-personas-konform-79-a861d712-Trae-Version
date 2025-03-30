@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { AudioVisualizerContainer } from './visualizers/AudioVisualizerContainer';
 import { useAudio, VisualizationMode } from '@/contexts/AudioContext';
+// This component provides the main audio player interface that appears at the bottom of the screen
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import {

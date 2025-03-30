@@ -54,6 +54,8 @@ export function PersonaStats({
       {hasAudioPreview && (
         <Button
           onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
             console.log('Audio button clicked in PersonaStats');
             console.log('hasAudioPreview:', hasAudioPreview);
             console.log('isAudioPlaying:', isAudioPlaying);

@@ -4,7 +4,7 @@ import WaveSurfer from 'wavesurfer.js';
 import { Play, Pause, SkipBack, SkipForward, Repeat, X, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-// Extend Window interface to include audioContext
+// Extend Window interface to include audioContext for cross-component access
 declare global {
   interface Window {
     audioContext?: AudioContext;

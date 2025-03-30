@@ -12,7 +12,7 @@ import type { Track } from '@/types/track';
 // Visualization modes
 export type VisualizationMode = 'waveform' | 'spectrum' | 'minimal' | 'artwork';
 
-// Audio quality settings
+// Note: Audio quality settings are shown in UI but not fully implemented
 export type AudioQuality = 'low' | 'medium' | 'high' | 'lossless';
 
 // Playback states

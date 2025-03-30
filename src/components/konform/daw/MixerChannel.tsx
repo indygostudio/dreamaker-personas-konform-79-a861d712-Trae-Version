@@ -109,7 +109,7 @@ export const MixerChannel = ({
             <div className="mb-4 flex justify-center">
               <Avatar className="h-16 w-16 ring-2 ring-konform-neon-blue/30">
                 {persona?.avatarUrl ? (
-                  <AvatarImage src={persona.avatarUrl} alt={persona.name} />
+                  <AvatarImage src={persona.avatarUrl} alt={persona.name} className="object-cover" />
                 ) : (
                   <AvatarFallback className="bg-black/60">
                     <UserRound className="h-8 w-8 text-konform-neon-blue" />

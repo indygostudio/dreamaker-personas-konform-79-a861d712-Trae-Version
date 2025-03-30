@@ -8,6 +8,9 @@ import type { Track } from '@/types/track';
  * 
  * This hook provides an API that matches the existing implementations
  * while leveraging the new unified audio architecture underneath.
+ * 
+ * Note: This hook simplifies interaction with the AudioContext and 
+ * ensures backward compatibility with older components.
  */
 export const useAudioPlayer = () => {
   const {

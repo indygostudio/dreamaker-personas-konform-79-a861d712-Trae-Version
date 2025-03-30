@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAudio } from "@/contexts/AudioContext";
 import { useAudioPlayer } from "@/hooks/use-audio-player";
 import { WaveformVisualizer } from "@/components/audio/visualizers/WaveformVisualizer";

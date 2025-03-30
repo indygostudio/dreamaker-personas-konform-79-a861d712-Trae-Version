@@ -125,7 +125,7 @@ export function PersonaCard({
   const handleAudioToggle = (e?: React.MouseEvent) => {
     console.log(`[DEBUG] Audio toggle for ${persona.name}`, {
       sourceElement: e?.target,
-      buttonPressed: e?.currentTarget.tagName,
+      buttonPressed: e?.currentTarget?.tagName,
       eventType: e?.type
     });
     
@@ -186,29 +186,9 @@ export function PersonaCard({
       setIsAudioPreviewing(false);
     } else {
       console.log('[DEBUG] Playing track on button click:', audioPreviewTrack);
-      
-      // Test if the audio URL is valid and accessible
-      fetch(persona.audio_preview_url, { method: 'HEAD' })
-        .then(response => {
-          if (response.ok) {
-            console.log('[DEBUG] Audio URL is valid and accessible');
-            handlePlayTrack(audioPreviewTrack);
-            setIsAudioPreviewing(true);
-          } else {
-            console.error('[DEBUG] Audio URL returned error status:', response.status);
-            toast({
-              description: `Audio file could not be accessed (${response.status})`,
-              variant: "destructive"
-            });
-          }
-        })
-        .catch(err => {
-          console.error('[DEBUG] Error checking audio URL:', err);
-          toast({
-            description: "Error accessing audio file",
-            variant: "destructive"
-          });
-        });
+      // Directly play the track instead of checking URL first
+      handlePlayTrack(audioPreviewTrack);
+      setIsAudioPreviewing(true);
     }
   };
 
