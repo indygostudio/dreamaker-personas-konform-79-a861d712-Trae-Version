@@ -1,257 +1,180 @@
-
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useState } from "react";
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
-import type { Track } from "../daw/Track";
-import { MixerChannel } from "../daw/MixerChannel";
-import { MasterVolume } from "../mixer/MasterVolume";
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
-import { SortableContext, horizontalListSortingStrategy } from "@dnd-kit/sortable";
+import { DndContext, DragEndEvent, closestCenter, PointerSensor, KeyboardSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortable';
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Channel, SortableChannel } from "../mixer/MixerView";
 
 export const MixbaseView = () => {
-  const [tracks, setTracks] = useState<Track[]>([{
-    id: 1,
-    name: 'Master',
-    volume: 80,
-    isMuted: false,
-    mode: 'master',
-    clips: [],
-  }, {
-    id: 2,
-    name: 'Bus 1',
-    volume: 75,
-    isMuted: false,
-    mode: 'bus',
-    clips: [],
-  }, {
-    id: 3,
-    name: 'Bus 2',
-    volume: 75,
-    isMuted: false,
-    mode: 'bus',
-    clips: [],
-  }, {
-    id: 4,
-    name: 'Track 1',
-    volume: 75,
-    isMuted: false,
-    mode: 'ai-audio',
-    clips: [],
-  }]);
-
-  const [masterVolume, setMasterVolume] = useState(80);
-  const [viewMode, setViewMode] = useState<'large' | 'normal' | 'compact'>('normal');
+  const [channels, setChannels] = useState<Channel[]>(() => [
+    {
+      id: 'master',
+      number: 0,
+      name: 'Master',
+      volume: 80,
+      pan: 0,
+      isMuted: false,
+      isSolo: false,
+      type: 'master'
+    },
+    {
+      id: 'bus-1',
+      number: 1,
+      name: 'Bus 1',
+      volume: 75,
+      pan: 0,
+      isMuted: false,
+      isSolo: false,
+      type: 'bus'
+    },
+    {
+      id: 'default-audio',
+      number: 1,
+      name: 'Track 1',
+      volume: 75,
+      pan: 0,
+      isMuted: false,
+      isSolo: false,
+      type: 'audio'
+    }
+  ]);
+  const [selectedChannels, setSelectedChannels] = useState<Set<string>>(new Set());
 
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor)
   );
 
-  const handleAddTrack = () => {
-    const audioTracks = tracks.filter(t => t.mode === 'ai-audio');
-    const newTrack: Track = {
-      id: Math.max(...tracks.map(t => t.id)) + 1,
-      name: `Track ${audioTracks.length + 1}`,
-      volume: 75,
-      isMuted: false,
-      mode: 'ai-audio',
-      clips: [],
-    };
-    setTracks([...tracks, newTrack]);
-  };
-
-  const handleDeleteTrack = (trackId: number) => {
-    const track = tracks.find(t => t.id === trackId);
-    if (track?.mode === 'master' || track?.mode === 'bus') return;
-    setTracks(tracks => tracks.filter(track => track.id !== trackId));
-  };
-
-  const handleDuplicateTrack = (trackId: number) => {
-    const trackToDuplicate = tracks.find(track => track.id === trackId);
-    if (!trackToDuplicate || trackToDuplicate.mode === 'master' || trackToDuplicate.mode === 'bus') return;
-
-    const newTrack = {
-      ...trackToDuplicate,
-      id: Math.max(...tracks.map(t => t.id)) + 1,
-      name: `${trackToDuplicate.name} (Copy)`,
-      clips: []
-    };
-
-    setTracks([...tracks, newTrack]);
+  const handleSelect = (id: string, multiSelect: boolean) => {
+    setSelectedChannels(prev => {
+      const newSelection = new Set(multiSelect ? prev : []);
+      if (prev.has(id)) {
+        newSelection.delete(id);
+      } else {
+        newSelection.add(id);
+      }
+      return newSelection;
+    });
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    if (!over || active.id === over.id) return;
+    
+    if (!over || active.id === over.id) {
+      return;
+    }
 
-    setTracks(tracks => {
-      const oldIndex = tracks.findIndex(t => t.id === active.id);
-      const newIndex = tracks.findIndex(t => t.id === over.id);
-      
-      const track = tracks[oldIndex];
-      if (track.mode === 'master' || track.mode === 'bus') return tracks;
+    setChannels(prev => {
+      const oldIndex = prev.findIndex(channel => channel.id === active.id);
+      const newIndex = prev.findIndex(channel => channel.id === over.id);
 
-      const masterBusCount = tracks.filter(t => t.mode === 'master' || t.mode === 'bus').length;
-      if (newIndex < masterBusCount) return tracks;
+      if (prev[oldIndex].type !== 'audio') return prev;
+      const masterBusCount = prev.filter(c => c.type === 'master' || c.type === 'bus').length;
+      if (newIndex < masterBusCount) return prev;
 
-      const newTracks = [...tracks];
-      const [removed] = newTracks.splice(oldIndex, 1);
-      newTracks.splice(newIndex, 0, removed);
+      const newChannels = [...prev];
+      const [removed] = newChannels.splice(oldIndex, 1);
+      newChannels.splice(newIndex, 0, removed);
 
-      return newTracks;
+      return newChannels;
     });
   };
 
-  // Separate tracks by type
-  const masterTracks = tracks.filter(t => t.mode === 'master');
-  const busTracks = tracks.filter(t => t.mode === 'bus');
-  const audioTracks = tracks.filter(t => t.mode === 'ai-audio');
-
-  // Render a mixer channel with the new UI based on the image
-  const renderMixerChannel = (track: Track, index: number) => {
-    return (
-      <div key={track.id} className={`flex-shrink-0 ${viewMode === 'large' ? 'w-96' : viewMode === 'normal' ? 'w-64' : 'w-48'}`}>
-        <div className="bg-black/80 rounded-lg border border-konform-neon-blue/30 overflow-hidden">
-          {/* Channel Header */}
-          <div className="p-2 border-b border-konform-neon-blue/20 flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <span className="text-konform-neon-blue text-xs">CH {index}</span>
-            </div>
-            <div className="flex space-x-1">
-              <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/></svg>
-              </Button>
-              <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-              </Button>
-              <Button variant="ghost" size="icon" className="h-6 w-6 text-konform-neon-blue hover:text-konform-neon-orange">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 20V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v14"/><path d="M2 20h20"/><path d="M14 12v.01"/></svg>
-              </Button>
-            </div>
-          </div>
-          
-          {/* Plugin Section */}
-          <div className="p-2 border-b border-konform-neon-blue/20">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-konform-neon-blue">Plugin</span>
-              <Button variant="ghost" size="icon" className="h-5 w-5 text-konform-neon-blue hover:text-konform-neon-orange">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-              </Button>
-            </div>
-            <Button variant="outline" size="sm" className="w-full text-xs h-8 border-konform-neon-blue/30 text-white bg-black/60 hover:bg-black/80 hover:text-konform-neon-blue">
-              Add Plugin
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><path d="m6 9 6 6 6-6"/></svg>
-            </Button>
-          </div>
-          
-          {/* Output Section */}
-          <div className="p-2 border-b border-konform-neon-blue/20">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-konform-neon-blue">Output</span>
-              <span className="text-xs text-konform-neon-orange">Φ</span>
-            </div>
-            <Button variant="outline" size="sm" className="w-full text-xs h-8 border-konform-neon-blue/30 text-white bg-black/60 hover:bg-black/80 hover:text-konform-neon-blue">
-              Select...
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><path d="m6 9 6 6 6-6"/></svg>
-            </Button>
-          </div>
-          
-          {/* Volume Slider */}
-          <div className="p-2 flex flex-col items-center">
-            <div className="w-full flex justify-between text-xs text-gray-400 mb-1">
-              <span>+12</span>
-            </div>
-            <div className="h-48 w-full flex justify-center mb-2">
-              <Slider
-                orientation="vertical"
-                value={[track.volume]}
-                onValueChange={([value]) => {
-                  setTracks(tracks.map(t =>
-                    t.id === track.id ? { ...t, volume: value } : t
-                  ));
-                }}
-                max={100}
-                step={1}
-                className="h-full"
-              />
-            </div>
-            <div className="w-full flex justify-between text-xs text-gray-400 mb-1">
-              <span>-48</span>
-            </div>
-            <div className="flex w-full justify-center space-x-2 mt-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className={`text-xs h-6 w-6 border-konform-neon-blue/30 ${track.isMuted ? 'bg-konform-neon-blue text-black' : 'bg-black/60'} hover:bg-konform-neon-blue hover:text-black`}
-                onClick={() => {
-                  setTracks(tracks.map(t =>
-                    t.id === track.id ? { ...t, isMuted: !t.isMuted } : t
-                  ));
-                }}
-              >
-                M
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className={`text-xs h-6 w-6 border-konform-neon-blue/30 ${track.isSolo ? 'bg-konform-neon-orange text-black' : 'bg-black/60'} hover:bg-konform-neon-orange hover:text-black`}
-                onClick={() => {
-                  setTracks(tracks.map(t =>
-                    t.id === track.id ? { ...t, isSolo: !t.isSolo } : t
-                  ));
-                }}
-              >
-                S
-              </Button>
-            </div>
-            <div className="text-xs text-konform-neon-blue mt-2">
-              0.0 dB
-            </div>
-          </div>
-          
-          {/* Track Name */}
-          <div className="p-2 border-t border-konform-neon-blue/20 flex justify-center">
-            <Button variant="ghost" className="text-xs text-white hover:text-konform-neon-blue">
-              {track.name}
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><path d="M12 19c-4.3 0-7.8-3.4-7.8-7.7 0-2 .8-3.8 2-5.1.5-.5 1.3-.5 1.8 0l.5.5c.3.3.3.8 0 1.1-.8.9-1.2 2-1.2 3.4 0 2.8 2.2 5 5 5s5-2.2 5-5c0-1.4-.4-2.6-1.2-3.4-.3-.3-.3-.8 0-1.1l.5-.5c.5-.5 1.3-.5 1.8 0 1.2 1.3 2 3.1 2 5.1-.3 4.3-3.8 7.7-8.2 7.7z"/><path d="M12 5v8"/></svg>
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
+  const handleDeleteChannel = (channelId: string) => {
+    if (channels.find(c => c.id === channelId)?.type === 'master' || channels.find(c => c.id === channelId)?.type === 'bus') return;
+    
+    setChannels(prev => prev.filter(c => c.id !== channelId));
+    setSelectedChannels(prev => {
+      const newSelection = new Set(prev);
+      newSelection.delete(channelId);
+      return newSelection;
+    });
   };
 
+  const handleDuplicateChannel = (channelId: string) => {
+    const channelToDuplicate = channels.find(c => c.id === channelId);
+    if (!channelToDuplicate || channelToDuplicate.type === 'master' || channelToDuplicate.type === 'bus') return;
+    
+    const newChannel = {
+      ...channelToDuplicate,
+      id: `channel-${Date.now()}`,
+      name: `${channelToDuplicate.name} (Copy)`,
+    };
+
+    setChannels(prev => [...prev, newChannel]);
+  };
+
+  const masterChannels = channels.filter(c => c.type === 'master');
+  const busChannels = channels.filter(c => c.type === 'bus');
+  const audioChannels = channels.filter(c => c.type === 'audio');
+
   return (
-    <div className="h-[calc(100vh-200px)] bg-black/40 rounded-lg p-4 flex flex-col">
+    <div className="h-full bg-black/40 rounded-lg p-4 flex flex-col">
       <div className="mt-auto border-t border-konform-neon-blue/10 pt-4">
         <ScrollArea className="w-full" type="scroll" scrollHideDelay={0}>
-          <div className="flex gap-4 p-2 min-w-max">
-            {/* Master Track */}
-            <div className="flex items-end gap-2 bg-gradient-to-b from-konform-neon-orange/5 to-transparent p-4 rounded-lg border border-konform-neon-orange/10">
-              {masterTracks.map((track, index) => renderMixerChannel(track, index))}
-            </div>
+          <DndContext 
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <div className="flex gap-4 p-2 relative min-w-max">
+              <div className="flex items-end gap-2 bg-gradient-to-b from-konform-neon-orange/5 to-transparent p-4 rounded-lg border border-konform-neon-orange/10">
+                <SortableContext 
+                  items={masterChannels.map(c => c.id)}
+                  strategy={horizontalListSortingStrategy}
+                >
+                  {masterChannels.map((channel) => (
+                    <SortableChannel
+                      key={channel.id}
+                      channel={channel}
+                      isSelected={selectedChannels.has(channel.id)}
+                      onSelect={handleSelect}
+                      onDelete={() => handleDeleteChannel(channel.id)}
+                      onDuplicate={() => handleDuplicateChannel(channel.id)}
+                      viewMode="compact"
+                    />
+                  ))}
+                </SortableContext>
+              </div>
 
-            {/* Bus Tracks */}
-            <div className="flex items-end gap-2 bg-gradient-to-b from-konform-neon-blue/5 to-transparent p-4 rounded-lg border border-konform-neon-blue/10">
-              {busTracks.map((track, index) => renderMixerChannel(track, index))}
-            </div>
+              <div className="flex items-end gap-2 bg-gradient-to-b from-konform-neon-blue/5 to-transparent p-4 rounded-lg border border-konform-neon-blue/10">
+                <SortableContext 
+                  items={busChannels.map(c => c.id)}
+                  strategy={horizontalListSortingStrategy}
+                >
+                  {busChannels.map((channel) => (
+                    <SortableChannel
+                      key={channel.id}
+                      channel={channel}
+                      isSelected={selectedChannels.has(channel.id)}
+                      onSelect={handleSelect}
+                      onDelete={() => handleDeleteChannel(channel.id)}
+                      onDuplicate={() => handleDuplicateChannel(channel.id)}
+                      viewMode="compact"
+                    />
+                  ))}
+                </SortableContext>
+              </div>
 
-            {/* Audio Tracks */}
-            <div className="flex items-end gap-2 bg-gradient-to-b from-konform-neon-blue/5 to-transparent p-4 rounded-lg border border-konform-neon-blue/10">
-              {audioTracks.map((track, index) => renderMixerChannel(track, index))}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleAddTrack}
-                className="h-12 w-12 rounded-full bg-black/60 border border-konform-neon-blue/30 hover:border-konform-neon-blue text-konform-neon-blue hover:text-konform-neon-orange transition-colors"
-              >
-                <Plus className="h-6 w-6" />
-              </Button>
+              <div className="flex items-end gap-2 bg-gradient-to-b from-konform-neon-blue/5 to-transparent p-4 rounded-lg border border-konform-neon-blue/10">
+                <SortableContext 
+                  items={audioChannels.map(c => c.id)}
+                  strategy={horizontalListSortingStrategy}
+                >
+                  {audioChannels.map((channel) => (
+                    <SortableChannel
+                      key={channel.id}
+                      channel={channel}
+                      isSelected={selectedChannels.has(channel.id)}
+                      onSelect={handleSelect}
+                      onDelete={() => handleDeleteChannel(channel.id)}
+                      onDuplicate={() => handleDuplicateChannel(channel.id)}
+                      viewMode="compact"
+                    />
+                  ))}
+                </SortableContext>
+              </div>
             </div>
-          </div>
-          <ScrollBar orientation="horizontal" />
+          </DndContext>
         </ScrollArea>
       </div>
     </div>
