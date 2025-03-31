@@ -28,7 +28,7 @@ export const VideoHeader = () => {
       <video 
         ref={videoRef}
         className="absolute inset-0 w-full h-full object-cover"
-        src="/Videos/Eyeoftheunivers_01.mp4"
+        src="/Videos/Gen-3 Alpha 1222913568, Dreamlike clouds in , imagepng, M 5.mp4"
         muted
         loop
         playsInline
