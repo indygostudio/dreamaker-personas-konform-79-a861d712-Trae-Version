@@ -5,7 +5,7 @@ import { KonformBanner } from "./KonformBanner";
 import { useHeaderStore } from "./store/headerStore";
 import { TrackItem, type Track, type TrackMode } from "./daw/Track";
 import { DndContext, DragEndEvent, closestCenter } from "@dnd-kit/core";
-import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { SortableContext, horizontalListSortingStrategy } from "@dnd-kit/sortable";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 export const MixerView = () => {
@@ -70,7 +70,7 @@ export const MixerView = () => {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto bg-[#131415] h-full">
+    <div className="flex-1 overflow-x-auto bg-[#131415] h-full">
       <KonformBanner 
         title="MIXER" 
         description="Mix and arrange your tracks with precision"
@@ -78,21 +78,23 @@ export const MixerView = () => {
         onCollapsedChange={setMixerHeaderCollapsed}
       />
       <div className="p-6 h-[calc(100vh-8rem)]">
-        <ScrollArea className="h-full">
-          <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCenter}>
-            <SortableContext items={tracks.map(t => t.id)} strategy={verticalListSortingStrategy}>
-              {tracks.map((track) => (
-                <TrackItem
-                  key={track.id}
-                  track={track}
-                  onDelete={handleDeleteTrack}
-                  onDuplicate={handleDuplicateTrack}
-                  onModeChange={handleModeChange}
-                  onMuteToggle={handleMuteToggle}
-                />
-              ))}
-            </SortableContext>
-          </DndContext>
+        <ScrollArea className="w-full" orientation="horizontal">
+          <div className="flex space-x-4">
+            <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCenter}>
+              <SortableContext items={tracks.map(t => t.id)} strategy={horizontalListSortingStrategy}>
+                {tracks.map((track) => (
+                  <TrackItem
+                    key={track.id}
+                    track={track}
+                    onDelete={handleDeleteTrack}
+                    onDuplicate={handleDuplicateTrack}
+                    onModeChange={handleModeChange}
+                    onMuteToggle={handleMuteToggle}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
+          </div>
         </ScrollArea>
       </div>
     </div>

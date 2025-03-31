@@ -64,9 +64,50 @@ export const TrackItem = ({ track, onDelete, onDuplicate, onModeChange, onMuteTo
     <div
       ref={setNodeRef}
       style={style}
-      className="relative group h-full"
+      className="relative group w-48 h-full bg-black/40 backdrop-blur-xl p-4 rounded-lg border border-konform-neon-blue/30"
+      {...attributes}
+      {...listeners}
     >
-      <div className="flex-1 flex flex-col">
+      <div className="flex flex-col space-y-4">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium text-white">{track.name}</span>
+          <Button
+            variant="ghost"
+            size="icon"
+            className={`${track.isMuted ? 'text-red-500' : 'text-gray-400'} hover:text-konform-neon-orange`}
+            onClick={() => onMuteToggle(track.id)}
+          >
+            {track.isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+          </Button>
+        </div>
+        <Slider
+          orientation="vertical"
+          value={[track.volume]}
+          onValueChange={([value]) => {
+            // Handle volume change
+          }}
+          max={100}
+          step={1}
+          className="h-32"
+        />
+        <div className="flex justify-between">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-konform-neon-blue hover:text-konform-neon-orange"
+            onClick={() => onDuplicate(track.id)}
+          >
+            <Disc className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-konform-neon-orange hover:text-konform-neon-blue"
+            onClick={() => onDelete(track.id)}
+          >
+            <Music2 className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );

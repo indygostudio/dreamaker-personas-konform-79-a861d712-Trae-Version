@@ -348,6 +348,8 @@ export const EditProfileDialog = ({
             </div>
           )}
           
+          {/* Remove the existing subtype selection code */}
+          
           <div className="flex justify-end gap-4">
             <Button
               type="button"

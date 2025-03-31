@@ -23,6 +23,7 @@ import {
   Wand2,
   Speaker
 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface ProfileFormProps {
   username: string;
@@ -49,6 +50,8 @@ interface ProfileFormProps {
   setGenre: (value: string[]) => void;
   location: string;
   setLocation: (value: string) => void;
+  selectedSubtype: string | null;
+  setSelectedSubtype: (value: string | null) => void;
 }
 
 const PERSONA_TYPES: { type: PersonaType; icon: React.ReactNode; label: string }[] = [
@@ -96,6 +99,8 @@ export const ProfileForm = ({
   setGenre,
   location,
   setLocation,
+  selectedSubtype,
+  setSelectedSubtype,
 }: ProfileFormProps) => {
   const handleFileSelect = () => {
     const input = document.createElement('input');
@@ -124,6 +129,41 @@ export const ProfileForm = ({
       setGenre(genre.filter(g => g !== value));
     } else {
       setGenre([...genre, value]);
+    }
+  };
+
+  const getSubtypeOptions = (type: PersonaType | null) => {
+    switch (type) {
+      case "AI_CHARACTER":
+        return [
+          { label: "All Characters", value: null },
+          { label: "Ordinary Human", value: "Ordinary Human" },
+          { label: "Superhuman", value: "Superhuman" },
+          // ... other character subtypes ...
+        ];
+      case "AI_VOCALIST":
+        return [
+          { label: "All Voice Types", value: null },
+          { label: "Bass", value: "Bass" },
+          { label: "Baritone", value: "Baritone" },
+          // ... other vocalist subtypes ...
+        ];
+      case "AI_INSTRUMENTALIST":
+        return [
+          { label: "All Instruments", value: null },
+          { label: "Drums", value: "Drums" },
+          { label: "Guitar", value: "Guitar" },
+          // ... other instrumentalist subtypes ...
+        ];
+      case "AI_EFFECT":
+        return [
+          { label: "All Effects", value: null },
+          { label: "Reverb", value: "Reverb" },
+          { label: "Delay", value: "Delay" },
+          // ... other effect subtypes ...
+        ];
+      default:
+        return [];
     }
   };
 
@@ -286,6 +326,57 @@ export const ProfileForm = ({
             className="bg-black/50 border-dreamaker-purple/30 min-h-[100px]"
           />
         </div>
+        
+        <div>
+          <Label htmlFor="profileType">Profile Type</Label>
+          <div className="flex flex-wrap gap-2">
+            {PERSONA_TYPES.map(({ type, icon, label }) => (
+              <TooltipProvider key={type}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant={profileType.includes(type) ? "default" : "outline"}
+                      size="sm"
+                      className={`flex items-center gap-2 ${profileType.includes(type) ? "bg-dreamaker-purple" : "bg-black/50 border-dreamaker-purple/30"}`}
+                      onClick={() => handleTypeChange(type)}
+                    >
+                      {icon}
+                      {label}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{label}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            ))}
+          </div>
+        </div>
+        
+        {profileType.length > 0 && getSubtypeOptions(profileType[0]).length > 0 && (
+          <div>
+            <Label htmlFor="subtype" className="text-white">Subtype</Label>
+            <Select
+              value={selectedSubtype || ""}
+              onValueChange={(value) => setSelectedSubtype(value || null)}
+            >
+              <SelectTrigger className="bg-black/50 border-dreamaker-purple/30 text-white">
+                <SelectValue placeholder="Select a subtype" />
+              </SelectTrigger>
+              <SelectContent className="bg-black/90 border-dreamaker-purple/20 text-white">
+                {getSubtypeOptions(profileType[0]).map((option) => (
+                  <SelectItem 
+                    key={option.label} 
+                    value={option.value || ""}
+                    className="text-white hover:bg-dreamaker-purple/20"
+                  >
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
     </ScrollArea>
   );
