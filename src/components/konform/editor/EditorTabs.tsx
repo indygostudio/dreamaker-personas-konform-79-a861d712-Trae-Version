@@ -50,7 +50,7 @@ export const EditorTabs = () => {
     { id: 'guitarbase', value: 'guitarbase', label: 'Guitarbase', icon: <Music2 className="h-4 w-4 mr-2" /> },
     { id: 'lyricbase', value: 'lyricbase', label: 'Lyricbase', icon: <FileText className="h-4 w-4 mr-2" /> },
     { id: 'mixbase', value: 'mixbase', label: 'Mixbase', icon: <Sliders className="h-4 w-4 mr-2" /> },
-    { id: 'supabase', value: 'supabase', label: 'Subase', icon: <Database className="h-4 w-4 mr-2" /> },
+    { id: 'subase', value: 'subase', label: 'Subase', icon: <Music2 className="h-4 w-4 mr-2" /> },
     { id: 'voxbase', value: 'voxbase', label: 'Voxbase', icon: <Mic className="h-4 w-4 mr-2" /> },
   ]);
 
