@@ -1,7 +1,10 @@
 
 import { ParticleEffect } from "@/components/effects/ParticleEffect";
+import { useAuth } from "@/hooks/use-auth";
+import { Button } from "@/components/ui/button";
 
 export const VideoHeader = () => {
+  const { isAuthenticated } = useAuth();
   return (
     <div className="relative h-[60vh] overflow-hidden">
       <div className="absolute inset-0 z-0">
@@ -26,8 +29,22 @@ export const VideoHeader = () => {
         />
       </div>
       
-      <div className="absolute inset-0 flex items-center justify-center z-20">
+      <div className="absolute inset-0 flex flex-col items-center justify-center z-20 space-y-6">
         <h1 className="text-6xl font-bold text-white font-syne">DREAMAKER</h1>
+        {!isAuthenticated && (
+          <>
+            <p className="text-xl text-white/90 max-w-2xl text-center px-4">
+              Experience the future of music creation with our AI-powered tools and virtual artists
+            </p>
+            <Button 
+              variant="outline" 
+              size="lg"
+              className="bg-white/10 hover:bg-white/20 border-white/20 text-white"
+            >
+              Join Waitlist
+            </Button>
+          </>
+        )}
       </div>
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-dreamaker-bg z-0" />
     </div>
