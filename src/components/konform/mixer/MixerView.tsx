@@ -233,13 +233,18 @@ export const MixerView = () => {
     });
   };
 
-  const handleAddChannel = () => {
+  const handleAddChannel = (type: 'bus' | 'audio') => {
     setChannels(prev => [
       ...prev,
       {
         id: `channel-${Date.now()}`,
-        number: prev.filter(c => c.type === 'audio').length + 1,
-        type: 'audio'
+        number: prev.filter(c => c.type === type).length + 1,
+        name: type === 'bus' ? `Bus ${prev.filter(c => c.type === 'bus').length + 1}` : `Track ${prev.filter(c => c.type === 'audio').length + 1}`,
+        volume: 75,
+        pan: 0,
+        isMuted: false,
+        isSolo: false,
+        type: type
       }
     ]);
   };
@@ -356,6 +361,14 @@ export const MixerView = () => {
                     />
                   ))}
                 </SortableContext>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleAddChannel('bus')}
+                  className="h-12 w-12 rounded-full bg-black/60 border border-konform-neon-blue/30 hover:border-konform-neon-blue text-konform-neon-blue hover:text-konform-neon-orange transition-colors"
+                >
+                  <Plus className="h-6 w-6" />
+                </Button>
               </div>
 
               <div className="flex items-end gap-2 bg-gradient-to-b from-konform-neon-blue/5 to-transparent p-4 rounded-lg border border-konform-neon-blue/10">
@@ -378,7 +391,7 @@ export const MixerView = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={handleAddChannel}
+                  onClick={() => handleAddChannel('audio')}
                   className="h-12 w-12 rounded-full bg-black/60 border border-konform-neon-blue/30 hover:border-konform-neon-blue text-konform-neon-blue hover:text-konform-neon-orange transition-colors"
                 >
                   <Plus className="h-6 w-6" />
