@@ -121,8 +121,8 @@ export const KonformTabs = () => {
               className="flex-1 min-width-[120px] px-6 py-3 rounded-full transition-all duration-300 font-medium uppercase border 
               text-white/80 data-[state=active]:bg-[#0EA5E9]/10 data-[state=active]:text-white data-[state=active]:border-[#0EA5E9]/20 data-[state=active]:shadow-[0_4px_20px_rgba(14,165,233,0.3)] data-[state=active]:-translate-y-0.5 bg-black/20 border-white/10 hover:bg-[#0EA5E9]/10 hover:text-white hover:border-[#0EA5E9]/20 hover:shadow-[0_4px_20px_rgba(14,165,233,0.3)] hover:-translate-y-0.5 text-center"
             >
-              <FileText className="w-4 h-4 mr-2" />
-              EDITOR
+              <Settings className="w-4 h-4 mr-2" />
+              SETTINGS
             </TabsTrigger>
           </TabsList>
 

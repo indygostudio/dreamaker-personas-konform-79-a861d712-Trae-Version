@@ -14,7 +14,7 @@ export const TrainingToggle = () => {
     <Button
       variant="outline"
       size="sm"
-      className={`relative ${isTrainingEnabled ? 'bg-red-600 border-red-600 shadow-[0_0_15px_rgba(255,0,0,0.3)] training-mode-enabled' : 'bg-black/20 border-white/20 hover:bg-black/40'} text-white rounded-full transition-all duration-300`}
+      className={`relative bg-black/20 border-white/20 hover:bg-black/40 text-white rounded-full transition-all duration-300 ${isTrainingEnabled ? 'border-konform-neon-blue bg-konform-neon-blue/10 shadow-[0_0_15px_rgba(0,255,255,0.3)] training-mode-enabled' : ''}`}
       onClick={() => {
         setIsAnimating(true);
         setTimeout(() => setIsAnimating(false), 1000);
