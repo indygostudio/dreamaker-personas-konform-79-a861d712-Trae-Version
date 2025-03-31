@@ -1,4 +1,14 @@
 
+export interface ProjectFile {
+  id: string;
+  name: string;
+  type: 'audio' | 'midi' | 'lyrics' | 'other';
+  path: string;
+  size: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface KonformProject {
   id: string;
   user_id: string;
@@ -8,6 +18,7 @@ export interface KonformProject {
   mixer_state: any;
   editor_state: any;
   lyrics_state: any;
+  project_files: ProjectFile[];
   created_at: string;
   updated_at: string;
   last_opened_at: string;

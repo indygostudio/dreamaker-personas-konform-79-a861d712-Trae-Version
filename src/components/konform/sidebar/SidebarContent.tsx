@@ -3,10 +3,11 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { AgentPanel } from "../AgentPanel";
+import { FolderClosed } from "lucide-react";
 
 interface SidebarContentProps {
-  currentView?: 'dashboard' | 'mixer' | 'drumpad' | 'keypad' | 'files' | 'effects' | 'daw' | 'lyrics';
-  onViewChange?: (view: 'dashboard' | 'mixer' | 'drumpad' | 'keypad' | 'files' | 'effects' | 'daw' | 'lyrics') => void;
+  currentView?: 'dashboard' | 'mixer' | 'drumpad' | 'keypad' | 'files' | 'effects' | 'daw' | 'lyrics' | 'projects';
+  onViewChange?: (view: 'dashboard' | 'mixer' | 'drumpad' | 'keypad' | 'files' | 'effects' | 'daw' | 'lyrics' | 'projects') => void;
   onSettingsClick: () => void;
 }
 
@@ -61,6 +62,15 @@ export const SidebarContent = ({ currentView = 'dashboard', onViewChange, onSett
               )}
             >
               <FileAudio className="w-5 h-5" />
+            </button>
+            <button 
+              onClick={() => onViewChange?.('projects')}
+              className={cn(
+                "w-10 h-10 rounded-lg bg-[#1A1A1A] text-[#00D1FF] hover:bg-[#2A2A2A] transition-colors flex items-center justify-center",
+                currentView === 'projects' && "bg-[#245A5A] text-[#1A1A1A]"
+              )}
+            >
+              <FolderClosed className="w-5 h-5" />
             </button>
           </div>
         </div>

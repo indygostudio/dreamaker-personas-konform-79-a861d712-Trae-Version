@@ -54,14 +54,9 @@ export const EditorTabs = () => {
     { id: 'voxbase', value: 'voxbase', label: 'Voxbase', icon: <Mic className="h-4 w-4 mr-2" /> },
   ]);
 
-  // Save tabs order to localStorage
+  // Auto-save tabs order to localStorage
   const saveTabsOrder = () => {
     localStorage.setItem('konform-tabs-order', JSON.stringify(tabs.map(tab => tab.id)));
-    toast({
-      title: "Tab order saved",
-      description: "Your current tab arrangement will be applied next time",
-      variant: "default"
-    });
   };
 
   // Load tabs order from localStorage on component mount
@@ -106,8 +101,10 @@ export const EditorTabs = () => {
       setTabs((items) => {
         const oldIndex = items.findIndex((item) => item.id === active.id);
         const newIndex = items.findIndex((item) => item.id === over.id);
-        
-        return arrayMove(items, oldIndex, newIndex);
+        const newItems = arrayMove(items, oldIndex, newIndex);
+        // Auto-save whenever order changes
+        localStorage.setItem('konform-tabs-order', JSON.stringify(newItems.map(tab => tab.id)));
+        return newItems;
       });
     }
   };
@@ -133,16 +130,7 @@ export const EditorTabs = () => {
             </TabsList>
           </DndContext>
           
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="mt-2 bg-black/20 border-white/20 hover:bg-black/40 text-white rounded-full w-full"
-            onClick={saveTabsOrder}
-            title="Save current tab arrangement"
-          >
-            <Save className="w-4 h-4 mr-2" />
-            Save Order
-          </Button>
+
         </div>
 
         <TabsContent value="trackEditor" className="flex-1 p-0 m-0">
