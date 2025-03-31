@@ -62,19 +62,20 @@ export const MixbaseView = () => {
     if (!over || active.id === over.id) {
       return;
     }
-
+  
     setChannels(prev => {
       const oldIndex = prev.findIndex(channel => channel.id === active.id);
       const newIndex = prev.findIndex(channel => channel.id === over.id);
-
-      if (prev[oldIndex].type !== 'audio') return prev;
-      const masterBusCount = prev.filter(c => c.type === 'master' || c.type === 'bus').length;
-      if (newIndex < masterBusCount) return prev;
-
+      const activeChannel = prev[oldIndex];
+      const overChannel = prev[newIndex];
+  
+      // Ensure channels are only reordered within their respective types
+      if (activeChannel.type !== overChannel.type) return prev;
+  
       const newChannels = [...prev];
       const [removed] = newChannels.splice(oldIndex, 1);
       newChannels.splice(newIndex, 0, removed);
-
+  
       return newChannels;
     });
   };
@@ -107,8 +108,39 @@ export const MixbaseView = () => {
   const busChannels = channels.filter(c => c.type === 'bus');
   const audioChannels = channels.filter(c => c.type === 'audio');
 
+  const handleAddChannel = (type: 'bus' | 'audio') => {
+    const existingChannelsOfType = channels.filter(c => c.type === type);
+    const newChannelNumber = existingChannelsOfType.length + 1;
+    const newChannel: Channel = {
+      id: `${type}-${Date.now()}`,
+      number: newChannelNumber,
+      name: `${type === 'bus' ? 'Bus' : 'Track'} ${newChannelNumber}`,
+      volume: 75,
+      pan: 0,
+      isMuted: false,
+      isSolo: false,
+      type: type,
+    };
+  
+    setChannels(prev => {
+      const masterIndex = prev.findIndex(c => c.type === 'master');
+      const lastBusIndex = prev.findLastIndex(c => c.type === 'bus');
+      const insertIndex = type === 'bus' 
+        ? (lastBusIndex !== -1 ? lastBusIndex + 1 : masterIndex + 1) 
+        : prev.length; // Append audio channels to the end
+        
+      const updatedChannels = [...prev];
+      updatedChannels.splice(insertIndex, 0, newChannel);
+      return updatedChannels;
+    });
+  };
+
   return (
     <div className="h-full bg-black/40 rounded-lg p-4 flex flex-col">
+      <div className="mb-4 flex justify-end">
+        <button onClick={() => handleAddChannel('bus')} className="mr-2 px-4 py-2 bg-konform-neon-blue text-white rounded">Add Bus</button>
+        <button onClick={() => handleAddChannel('audio')} className="px-4 py-2 bg-konform-neon-orange text-white rounded">Add Audio Track</button>
+      </div>
       <div className="mt-auto border-t border-konform-neon-blue/10 pt-4">
         <ScrollArea className="w-full" type="scroll" scrollHideDelay={0}>
           <DndContext 
@@ -116,8 +148,8 @@ export const MixbaseView = () => {
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
           >
-            <div className="flex gap-4 p-2 relative min-w-max">
-              <div className="flex items-end gap-2 bg-gradient-to-b from-konform-neon-orange/5 to-transparent p-4 rounded-lg border border-konform-neon-orange/10">
+            <div className="flex gap-4 p-2 relative min-w-max overflow-x-auto">
+              <div className="flex-shrink-0 flex items-end gap-2 bg-gradient-to-b from-konform-neon-orange/5 to-transparent p-4 rounded-lg border border-konform-neon-orange/10">
                 <SortableContext 
                   items={masterChannels.map(c => c.id)}
                   strategy={horizontalListSortingStrategy}
@@ -136,7 +168,7 @@ export const MixbaseView = () => {
                 </SortableContext>
               </div>
 
-              <div className="flex items-end gap-2 bg-gradient-to-b from-konform-neon-blue/5 to-transparent p-4 rounded-lg border border-konform-neon-blue/10">
+              <div className="flex-shrink-0 flex items-end gap-2 bg-gradient-to-b from-konform-neon-blue/5 to-transparent p-4 rounded-lg border border-konform-neon-blue/10">
                 <SortableContext 
                   items={busChannels.map(c => c.id)}
                   strategy={horizontalListSortingStrategy}
@@ -155,7 +187,7 @@ export const MixbaseView = () => {
                 </SortableContext>
               </div>
 
-              <div className="flex items-end gap-2 bg-gradient-to-b from-konform-neon-blue/5 to-transparent p-4 rounded-lg border border-konform-neon-blue/10">
+              <div className="flex-shrink-0 flex items-end gap-2 bg-gradient-to-b from-konform-neon-blue/5 to-transparent p-4 rounded-lg border border-konform-neon-blue/10">
                 <SortableContext 
                   items={audioChannels.map(c => c.id)}
                   strategy={horizontalListSortingStrategy}
