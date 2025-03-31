@@ -142,71 +142,65 @@ export const MixbaseView = () => {
         <button onClick={() => handleAddChannel('audio')} className="px-4 py-2 bg-konform-neon-orange text-white rounded">Add Audio Track</button>
       </div>
       <div className="mt-auto border-t border-konform-neon-blue/10 pt-4">
-        <ScrollArea className="w-full" type="scroll" scrollHideDelay={0}>
-          <DndContext 
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <div className="flex gap-4 p-2 relative min-w-max overflow-x-auto">
-              <div className="flex-shrink-0 flex items-end gap-2 bg-gradient-to-b from-konform-neon-orange/5 to-transparent p-4 rounded-lg border border-konform-neon-orange/10">
-                <SortableContext 
-                  items={masterChannels.map(c => c.id)}
-                  strategy={horizontalListSortingStrategy}
-                >
-                  {masterChannels.map((channel) => (
-                    <SortableChannel
-                      key={channel.id}
-                      channel={channel}
-                      isSelected={selectedChannels.has(channel.id)}
-                      onSelect={handleSelect}
-                      onDelete={() => handleDeleteChannel(channel.id)}
-                      onDuplicate={() => handleDuplicateChannel(channel.id)}
-                      viewMode="compact"
-                    />
-                  ))}
-                </SortableContext>
-              </div>
-
-              <div className="flex-shrink-0 flex items-end gap-2 bg-gradient-to-b from-konform-neon-blue/5 to-transparent p-4 rounded-lg border border-konform-neon-blue/10">
-                <SortableContext 
-                  items={busChannels.map(c => c.id)}
-                  strategy={horizontalListSortingStrategy}
-                >
-                  {busChannels.map((channel) => (
-                    <SortableChannel
-                      key={channel.id}
-                      channel={channel}
-                      isSelected={selectedChannels.has(channel.id)}
-                      onSelect={handleSelect}
-                      onDelete={() => handleDeleteChannel(channel.id)}
-                      onDuplicate={() => handleDuplicateChannel(channel.id)}
-                      viewMode="compact"
-                    />
-                  ))}
-                </SortableContext>
-              </div>
-
-              <div className="flex-shrink-0 flex items-end gap-2 bg-gradient-to-b from-konform-neon-blue/5 to-transparent p-4 rounded-lg border border-konform-neon-blue/10">
-                <SortableContext 
-                  items={audioChannels.map(c => c.id)}
-                  strategy={horizontalListSortingStrategy}
-                >
-                  {audioChannels.map((channel) => (
-                    <SortableChannel
-                      key={channel.id}
-                      channel={channel}
-                      isSelected={selectedChannels.has(channel.id)}
-                      onSelect={handleSelect}
-                      onDelete={() => handleDeleteChannel(channel.id)}
-                      onDuplicate={() => handleDuplicateChannel(channel.id)}
-                      viewMode="compact"
-                    />
-                  ))}
-                </SortableContext>
-              </div>
+        <ScrollArea className="w-full overflow-x-auto" type="scroll" scrollHideDelay={0}>
+          <div className="inline-flex gap-4 p-2">
+            <div className="flex-shrink-0 flex items-end gap-2 bg-gradient-to-b from-konform-neon-orange/5 to-transparent p-4 rounded-lg border border-konform-neon-orange/10 whitespace-nowrap">
+              <SortableContext 
+                items={masterChannels.map(c => c.id)}
+                strategy={horizontalListSortingStrategy}
+              >
+                {masterChannels.map((channel) => (
+                  <SortableChannel
+                    key={channel.id}
+                    channel={channel}
+                    isSelected={selectedChannels.has(channel.id)}
+                    onSelect={handleSelect}
+                    onDelete={() => handleDeleteChannel(channel.id)}
+                    onDuplicate={() => handleDuplicateChannel(channel.id)}
+                    viewMode="compact"
+                  />
+                ))}
+              </SortableContext>
             </div>
-          </DndContext>
+
+            <div className="flex-shrink-0 flex items-end gap-2 bg-gradient-to-b from-konform-neon-blue/5 to-transparent p-4 rounded-lg border border-konform-neon-blue/10 whitespace-nowrap">
+              <SortableContext 
+                items={busChannels.map(c => c.id)}
+                strategy={horizontalListSortingStrategy}
+              >
+                {busChannels.map((channel) => (
+                  <SortableChannel
+                    key={channel.id}
+                    channel={channel}
+                    isSelected={selectedChannels.has(channel.id)}
+                    onSelect={handleSelect}
+                    onDelete={() => handleDeleteChannel(channel.id)}
+                    onDuplicate={() => handleDuplicateChannel(channel.id)}
+                    viewMode="compact"
+                  />
+                ))}
+              </SortableContext>
+            </div>
+
+            <div className="flex-shrink-0 flex items-end gap-2 bg-gradient-to-b from-konform-neon-blue/5 to-transparent p-4 rounded-lg border border-konform-neon-blue/10 whitespace-nowrap">
+              <SortableContext 
+                items={audioChannels.map(c => c.id)}
+                strategy={horizontalListSortingStrategy}
+              >
+                {audioChannels.map((channel) => (
+                  <SortableChannel
+                    key={channel.id}
+                    channel={channel}
+                    isSelected={selectedChannels.has(channel.id)}
+                    onSelect={handleSelect}
+                    onDelete={() => handleDeleteChannel(channel.id)}
+                    onDuplicate={() => handleDuplicateChannel(channel.id)}
+                    viewMode="compact"
+                  />
+                ))}
+              </SortableContext>
+            </div>
+          </div>
         </ScrollArea>
       </div>
     </div>

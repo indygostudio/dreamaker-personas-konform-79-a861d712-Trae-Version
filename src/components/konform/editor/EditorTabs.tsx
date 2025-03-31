@@ -10,7 +10,7 @@ import { DrumPadView } from "../DrumPadView";
 import { LyricbaseView } from "../views/LyricbaseView";
 import { MixbaseView } from "../views/MixbaseView";
 import { VoxbaseView } from "../views/VoxbaseView";
-import { SupabaseView } from "../views/SupabaseView";
+import { SubaseView } from "../views/SubaseView";
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -160,7 +160,7 @@ export const EditorTabs = () => {
         </TabsContent>
 
         <TabsContent value="supabase" className="flex-1 p-0 m-0">
-          <SupabaseView />
+          <SubaseView />
         </TabsContent>
 
         <TabsContent value="voxbase" className="flex-1 p-0 m-0">
