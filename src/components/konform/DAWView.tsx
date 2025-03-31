@@ -19,6 +19,7 @@ export const DAWView = ({
   onPersonaUpdate,
 }: DAWViewProps) => {
   const [channels, setChannels] = useState<Persona[]>([]);
+  const [selectedChannelIndex, setSelectedChannelIndex] = useState<number | null>(null);
   const { toast } = useToast();
 
   const { data: personas } = useQuery({
@@ -62,6 +63,31 @@ export const DAWView = ({
       toast({
         title: "Error",
         description: "Failed to add channel. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handlePersonaSelect = (index: number) => {
+    setSelectedChannelIndex(index);
+  };
+
+  const handleUpdateChannelPersona = async (channelIndex: number, newPersona: Persona) => {
+    try {
+      const updatedChannels = [...channels];
+      updatedChannels[channelIndex] = newPersona;
+      setChannels(updatedChannels);
+      setSelectedChannelIndex(null);
+
+      toast({
+        title: "Persona updated",
+        description: `Updated channel ${channelIndex + 1} with ${newPersona.name}`,
+      });
+    } catch (error) {
+      console.error("Error updating channel persona:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update channel persona. Please try again.",
         variant: "destructive",
       });
     }
@@ -121,6 +147,7 @@ export const DAWView = ({
                       onMuteToggle={() => {}}
                       onTypeChange={() => {}}
                       onGenerate={() => {}}
+                      onPersonaSelect={() => handlePersonaSelect(index)}
                     />
                   </div>
                   

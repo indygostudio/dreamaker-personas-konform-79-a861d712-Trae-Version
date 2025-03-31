@@ -35,6 +35,7 @@ export interface MixerChannelProps {
   onMuteToggle: () => void;
   onTypeChange: (type: TrackMode) => void;
   onGenerate: () => void;
+  onPersonaSelect?: () => void;
 }
 
 export const MixerChannel = ({ 
@@ -151,6 +152,16 @@ export const MixerChannel = ({
                 >
                   <Wand2 className="h-4 w-4" />
                 </Button>
+                {onPersonaSelect && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-konform-neon-blue hover:text-konform-neon-orange"
+                    onClick={onPersonaSelect}
+                  >
+                    <UserRound className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
             </div>
           </CollapsibleContent>
