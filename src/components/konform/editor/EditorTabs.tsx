@@ -8,7 +8,7 @@ import { KeybaseView } from "../views/KeybaseView";
 import { TrackEditor } from "./TrackEditor";
 import { DrumPadView } from "../DrumPadView";
 import { LyricbaseView } from "../views/LyricbaseView";
-import { MixabaseView } from "../views/MixabaseView";
+import { MixbaseView } from "../views/MixbaseView";
 import { VoxbaseView } from "../views/VoxbaseView";
 import { SupabaseView } from "../views/SupabaseView";
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
@@ -49,7 +49,7 @@ export const EditorTabs = () => {
     { id: 'drumpad', value: 'drumpad', label: 'Drumbase', icon: <Grid3x3 className="h-4 w-4 mr-2" /> },
     { id: 'guitarbase', value: 'guitarbase', label: 'Guitarbase', icon: <Music2 className="h-4 w-4 mr-2" /> },
     { id: 'lyricbase', value: 'lyricbase', label: 'Lyricbase', icon: <FileText className="h-4 w-4 mr-2" /> },
-    { id: 'mixabase', value: 'mixabase', label: 'Mixbase', icon: <Sliders className="h-4 w-4 mr-2" /> },
+    { id: 'mixbase', value: 'mixbase', label: 'Mixbase', icon: <Sliders className="h-4 w-4 mr-2" /> },
     { id: 'supabase', value: 'supabase', label: 'Subase', icon: <Database className="h-4 w-4 mr-2" /> },
     { id: 'voxbase', value: 'voxbase', label: 'Voxbase', icon: <Mic className="h-4 w-4 mr-2" /> },
   ]);
@@ -155,8 +155,8 @@ export const EditorTabs = () => {
           <LyricbaseView />
         </TabsContent>
 
-        <TabsContent value="mixabase" className="flex-1 p-0 m-0">
-          <MixabaseView />
+        <TabsContent value="mixbase" className="flex-1 p-0 m-0">
+          <MixbaseView />
         </TabsContent>
 
         <TabsContent value="supabase" className="flex-1 p-0 m-0">

@@ -3,6 +3,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
 import type { Track } from "../daw/Track";
 import { MixerChannel } from "../daw/MixerChannel";
 import { MasterVolume } from "../mixer/MasterVolume";
@@ -223,71 +224,35 @@ export const MixbaseView = () => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#131415]">
-      <div className="p-4 border-b border-konform-neon-blue/20 bg-black/60 backdrop-blur-xl">
-        <div className="flex items-center justify-between">
-          <div className="flex gap-2">
-            <Button
-              variant={viewMode === 'large' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setViewMode('large')}
-              className="text-konform-neon-blue"
-            >
-              Large
-            </Button>
-            <Button
-              variant={viewMode === 'normal' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setViewMode('normal')}
-              className="text-konform-neon-blue"
-            >
-              Normal
-            </Button>
-            <Button
-              variant={viewMode === 'compact' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setViewMode('compact')}
-              className="text-konform-neon-blue"
-            >
-              Compact
-            </Button>
-          </div>
-        </div>
-      </div>
-      <div className="p-6 h-[calc(100vh-8rem)] flex">
-        <ScrollArea className="flex-1 h-full">
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <div className="flex items-stretch space-x-4 min-h-[500px]">
-              {/* Render all tracks in the new mixer channel UI */}
-              {tracks.map((track, index) => renderMixerChannel(track, index))}
-              
-              <div className="flex-shrink-0 w-24 flex items-center justify-center">
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  onClick={handleAddTrack}
-                  className="w-12 h-12 rounded-full bg-black/60 border border-konform-neon-blue/30 hover:border-konform-neon-blue text-konform-neon-blue hover:text-konform-neon-orange transition-colors"
-                >
-                  <Plus className="w-6 h-6" />
-                </Button>
-              </div>
+    <div className="h-[calc(100vh-200px)] bg-black/40 rounded-lg p-4 flex flex-col">
+      <div className="mt-auto border-t border-konform-neon-blue/10 pt-4">
+        <ScrollArea className="w-full" type="scroll" scrollHideDelay={0}>
+          <div className="flex gap-4 p-2 min-w-max">
+            {/* Master Track */}
+            <div className="flex items-end gap-2 bg-gradient-to-b from-konform-neon-orange/5 to-transparent p-4 rounded-lg border border-konform-neon-orange/10">
+              {masterTracks.map((track, index) => renderMixerChannel(track, index))}
             </div>
-          </DndContext>
-          <ScrollBar orientation="horizontal" className="bg-konform-neon-blue/20" />
+
+            {/* Bus Tracks */}
+            <div className="flex items-end gap-2 bg-gradient-to-b from-konform-neon-blue/5 to-transparent p-4 rounded-lg border border-konform-neon-blue/10">
+              {busTracks.map((track, index) => renderMixerChannel(track, index))}
+            </div>
+
+            {/* Audio Tracks */}
+            <div className="flex items-end gap-2 bg-gradient-to-b from-konform-neon-blue/5 to-transparent p-4 rounded-lg border border-konform-neon-blue/10">
+              {audioTracks.map((track, index) => renderMixerChannel(track, index))}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleAddTrack}
+                className="h-12 w-12 rounded-full bg-black/60 border border-konform-neon-blue/30 hover:border-konform-neon-blue text-konform-neon-blue hover:text-konform-neon-orange transition-colors"
+              >
+                <Plus className="h-6 w-6" />
+              </Button>
+            </div>
+          </div>
+          <ScrollBar orientation="horizontal" />
         </ScrollArea>
-        <MasterVolume volume={masterVolume} onVolumeChange={setMasterVolume} />
-      </div>
-      <div className="h-16 border-t border-konform-neon-blue/20 bg-black/60 backdrop-blur-xl">
-        <div className="flex items-center justify-between px-6 h-full">
-          <div className="flex items-center space-x-4">
-            {/* Transport controls */}
-          </div>
-          <div className="flex items-center space-x-4 text-konform-neon-blue">
-            <span>120 BPM</span>
-            <span>4/4</span>
-            <span>C Maj</span>
-          </div>
-        </div>
       </div>
     </div>
   );
