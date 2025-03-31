@@ -1,10 +1,11 @@
 
 import { Button } from "@/components/ui/button";
-import { Edit, ChevronDown, ChevronRight } from "lucide-react";
+import { Edit, ChevronDown, ChevronRight, Shuffle, ArrowUpDown } from "lucide-react";
 import { Track } from "@/types/track";
 import { Playlist } from "@/types/playlist";
 import { AudioUploadSection } from "@/components/artist-profile/form/AudioUploadSection";
 import { TrackList } from "./TrackList";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface PlaylistItemProps {
   playlist: Playlist;
@@ -20,6 +21,8 @@ interface PlaylistItemProps {
   onTrackArtworkEdit: (track: Track) => void;
   onAudioUploadSuccess: (url: string, playlistId: string) => void;
   onTrackDragEnd: (event: any, playlistId: string) => void;
+  onShuffleTracks?: () => void;
+  onSortTracks?: (sortBy: 'name' | 'date' | 'duration') => void;
 }
 
 export const PlaylistItem = ({
@@ -85,7 +88,42 @@ export const PlaylistItem = ({
 
       {expanded && (
         <div className="space-y-4 mb-6">
-          <div className="flex justify-end mb-2">
+          <div className="flex justify-between items-center mb-2">
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onShuffleTracks}
+                className="text-gray-300 hover:text-white"
+                title="Shuffle tracks"
+              >
+                <Shuffle className="h-4 w-4" />
+              </Button>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-gray-300 hover:text-white"
+                  >
+                    <ArrowUpDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={() => onSortTracks?.('name')}>
+                    Sort by Name
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onSortTracks?.('date')}>
+                    Sort by Date Added
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onSortTracks?.('duration')}>
+                    Sort by Duration
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+
             <AudioUploadSection 
               audioUrl="" 
               profileId={playlist.id} 

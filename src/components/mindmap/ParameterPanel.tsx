@@ -4,6 +4,8 @@ import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Node } from "@xyflow/react";
 import { NodeData, NodeParameter } from "@/types/mindmap";
+import { useSession } from '@supabase/auth-helpers-react';
+import { Button } from '@/components/ui/button';
 
 interface ParameterPanelProps {
   open: boolean;
@@ -18,6 +20,23 @@ export const ParameterPanel = ({
   selectedNode, 
   onParameterChange 
 }: ParameterPanelProps) => {
+  const session = useSession();
+
+  if (!session) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Sign in to access Mindmap</DialogTitle>
+          </DialogHeader>
+          <div className="flex justify-center py-4">
+            <Button variant="outline">Sign In</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   if (!selectedNode) return null;
 
   // Default parameters if none exist

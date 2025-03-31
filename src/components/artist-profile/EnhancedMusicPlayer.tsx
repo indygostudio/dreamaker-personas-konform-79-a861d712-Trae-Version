@@ -1,9 +1,10 @@
 
 import { useState, useEffect, useRef, RefObject } from 'react';
-import { Play, Pause, Volume2, VolumeX, X } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, X, Repeat, FastForward } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { WaveformPlayer } from './WaveformPlayer';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface EnhancedMusicPlayerProps {
   audioUrl: string | null;
@@ -36,6 +37,8 @@ export const EnhancedMusicPlayer = ({
   const [isMuted, setIsMuted] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [displayMode, setDisplayMode] = useState<'standard' | 'waveform'>('standard');
+  const [isRepeat, setIsRepeat] = useState(false);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
   
   if (!audioUrl) {
     return null;
@@ -76,7 +79,58 @@ export const EnhancedMusicPlayer = ({
     if (!audioRef.current) return;
     
     audioRef.current.volume = isMuted ? 0 : volume;
-  }, [volume, isMuted, audioRef]);
+    audioRef.current.playbackRate = playbackSpeed;
+  }, [volume, isMuted, audioRef, playbackSpeed]);
+
+  // Add keyboard shortcuts
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      
+      switch(e.code) {
+        case 'Space':
+          e.preventDefault();
+          onPlayPause();
+          break;
+        case 'KeyM':
+          toggleMute();
+          break;
+        case 'KeyR':
+          setIsRepeat(!isRepeat);
+          break;
+        case 'ArrowLeft':
+          if (audioRef.current) {
+            audioRef.current.currentTime = Math.max(0, audioRef.current.currentTime - 5);
+          }
+          break;
+        case 'ArrowRight':
+          if (audioRef.current) {
+            audioRef.current.currentTime = Math.min(duration, audioRef.current.currentTime + 5);
+          }
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [onPlayPause, isRepeat, duration]);
+
+  // Handle track end
+  useEffect(() => {
+    if (!audioRef.current) return;
+
+    const handleEnded = () => {
+      if (isRepeat && audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play();
+      } else {
+        onPlayPause();
+      }
+    };
+
+    audioRef.current.addEventListener('ended', handleEnded);
+    return () => audioRef.current?.removeEventListener('ended', handleEnded);
+  }, [isRepeat, onPlayPause, audioRef]);
   
   const formatTime = (time: number): string => {
     const minutes = Math.floor(time / 60);
@@ -164,6 +218,33 @@ export const EnhancedMusicPlayer = ({
               </div>
             </div>
             
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-gray-300 hover:text-white"
+              onClick={() => setIsRepeat(!isRepeat)}
+              title={isRepeat ? "Disable repeat" : "Enable repeat"}
+            >
+              <Repeat className={`h-4 w-4 ${isRepeat ? 'text-dreamaker-purple' : ''}`} />
+            </Button>
+
+            <Select
+              value={playbackSpeed.toString()}
+              onValueChange={(value) => setPlaybackSpeed(parseFloat(value))}
+            >
+              <SelectTrigger className="w-[85px] h-8 text-xs bg-transparent border-0 text-gray-300 hover:text-white">
+                <FastForward className="h-4 w-4 mr-1" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {[0.5, 0.75, 1, 1.25, 1.5, 2].map((speed) => (
+                  <SelectItem key={speed} value={speed.toString()}>
+                    {speed}x
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
             <Button
               variant="ghost"
               size="icon"

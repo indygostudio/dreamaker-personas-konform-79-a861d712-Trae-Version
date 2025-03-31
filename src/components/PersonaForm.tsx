@@ -16,8 +16,11 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
+import { Slider } from "@/components/ui/slider";
 import { DeleteConfirmationDialog } from "@/components/persona/card/dialogs/DeleteConfirmationDialog";
 import { usePersonaDelete } from "@/components/persona/hooks/usePersonaDelete";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
 
 import { personaFormSchema, type PersonaFormValues } from "@/lib/validations/persona";
 
@@ -51,6 +54,15 @@ export function PersonaForm({ defaultValues, onSubmit, onCancel, isSubmitting = 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const { handleDeletePersona } = usePersonaDelete();
   const [audioPreviewUrl, setAudioPreviewUrl] = useState<string | null>(defaultValues.audio_preview_url || null);
+  const [selectedVoiceModel, setSelectedVoiceModel] = useState(defaultValues.voice_model || null);
+  const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
+
+  const voiceModels = [
+    { id: "model1", name: "Natural Voice 1" },
+    { id: "model2", name: "Natural Voice 2" },
+    { id: "model3", name: "Character Voice 1" },
+    { id: "model4", name: "Character Voice 2" }
+  ];
 
   const isExistingPersona = Boolean(defaultValues.id);
 
@@ -59,7 +71,67 @@ export function PersonaForm({ defaultValues, onSubmit, onCancel, isSubmitting = 
       setAudioPreviewUrl(defaultValues.audio_preview_url);
       form.setValue('audio_preview_url', defaultValues.audio_preview_url);
     }
-  }, [defaultValues.audio_preview_url, form]);
+    if (defaultValues.voice_model) {
+      setSelectedVoiceModel(defaultValues.voice_model);
+      form.setValue('voice_model', defaultValues.voice_model);
+    }
+  }, [defaultValues.audio_preview_url, defaultValues.voice_model, form]);
+
+  const handleVoiceModelChange = (modelId: string) => {
+    const model = voiceModels.find(m => m.id === modelId);
+    if (model) {
+      setSelectedVoiceModel({
+        id: model.id,
+        name: model.name,
+        parameters: {
+          pitch: 0,
+          speed: 1.0,
+          energy: 1.0,
+          clarity: 0.75
+        }
+      });
+      form.setValue('voice_model', {
+        id: model.id,
+        name: model.name,
+        parameters: {
+          pitch: 0,
+          speed: 1.0,
+          energy: 1.0,
+          clarity: 0.75
+        }
+      });
+    }
+  };
+
+  const handleParameterChange = (parameter: string, value: number) => {
+    if (selectedVoiceModel) {
+      const updatedModel = {
+        ...selectedVoiceModel,
+        parameters: {
+          ...selectedVoiceModel.parameters,
+          [parameter]: value
+        }
+      };
+      setSelectedVoiceModel(updatedModel);
+      form.setValue('voice_model', updatedModel);
+    }
+  };
+
+  const generatePreview = async () => {
+    if (!selectedVoiceModel) return;
+    
+    setIsGeneratingPreview(true);
+    try {
+      // TODO: Implement voice synthesis API call here
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulated delay
+      toast.success("Preview generated successfully");
+    } catch (error) {
+      toast.error("Failed to generate preview");
+      console.error("Preview generation error:", error);
+    } finally {
+      setIsGeneratingPreview(false);
+    }
+  };
 
   const ensureAudioBucketExists = async (): Promise<boolean> => {
     try {
@@ -267,6 +339,92 @@ export function PersonaForm({ defaultValues, onSubmit, onCancel, isSubmitting = 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+          {form.watch("type") === "AI_VOCALIST" && (
+            <Card className="p-4 bg-black/20 border-dreamaker-purple/20">
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Voice Model</Label>
+                  <Select
+                    value={selectedVoiceModel?.id}
+                    onValueChange={handleVoiceModelChange}
+                  >
+                    <SelectTrigger className="bg-black/50 border-dreamaker-purple/30">
+                      <SelectValue placeholder="Select voice model" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-black/90 border-dreamaker-purple/20">
+                      {voiceModels.map((model) => (
+                        <SelectItem key={model.id} value={model.id}>
+                          {model.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {selectedVoiceModel && (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Pitch ({selectedVoiceModel.parameters.pitch})</Label>
+                      <Slider
+                        value={[selectedVoiceModel.parameters.pitch]}
+                        min={-12}
+                        max={12}
+                        step={1}
+                        onValueChange={([value]) => handleParameterChange('pitch', value)}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Speed ({selectedVoiceModel.parameters.speed}x)</Label>
+                      <Slider
+                        value={[selectedVoiceModel.parameters.speed]}
+                        min={0.5}
+                        max={2.0}
+                        step={0.1}
+                        onValueChange={([value]) => handleParameterChange('speed', value)}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Energy ({selectedVoiceModel.parameters.energy})</Label>
+                      <Slider
+                        value={[selectedVoiceModel.parameters.energy]}
+                        min={0}
+                        max={2.0}
+                        step={0.1}
+                        onValueChange={([value]) => handleParameterChange('energy', value)}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Clarity ({selectedVoiceModel.parameters.clarity})</Label>
+                      <Slider
+                        value={[selectedVoiceModel.parameters.clarity]}
+                        min={0}
+                        max={1.0}
+                        step={0.05}
+                        onValueChange={([value]) => handleParameterChange('clarity', value)}
+                      />
+                    </div>
+
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={generatePreview}
+                      disabled={isGeneratingPreview}
+                      className="w-full"
+                    >
+                      {isGeneratingPreview ? (
+                        <>Generating Preview...</>
+                      ) : (
+                        <>Generate Preview</>
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-6">
             <PersonaBasicInfo form={form} />

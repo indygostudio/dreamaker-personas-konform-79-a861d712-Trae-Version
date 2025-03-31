@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { v4 as uuidv4 } from 'uuid';
 
-type StorageBucket = 'audio_files' | 'profile_assets' | 'ai_images' | 'persona_media' | 'voice_samples';
+type StorageBucket = 'audio_files' | 'profile_assets' | 'ai_images' | 'persona_media' | 'voice_samples' | 'artwork_images';
 
 interface UploadOptions {
   /**

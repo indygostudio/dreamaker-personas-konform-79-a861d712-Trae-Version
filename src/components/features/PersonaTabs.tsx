@@ -2,6 +2,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
 import { Mic2, User, Image, FileText, Wand2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { VoiceCloning } from "@/components/persona/profile/voice-design/VoiceCloning";
 
 interface TabContentProps {
   title: string;
@@ -152,10 +153,11 @@ export const PersonaTabs = () => {
 
         <div className="mt-2">
           <TabsContent value="voice-cloning">
-            <VoiceCloningContent 
-              title="Voice Cloning Technology" 
-              description="Our advanced voice cloning technology allows you to create incredibly realistic AI voices that capture the nuance and character of any vocal style. Upload samples, train models, and fine-tune every aspect of your persona's voice."
-            />
+            <div className="glass-panel p-6 rounded-xl">
+              <h2 className="text-3xl font-bold text-white mb-4">Voice Cloning Technology</h2>
+              <p className="text-gray-300 mb-6">Our advanced voice cloning technology allows you to create incredibly realistic AI voices that capture the nuance and character of any vocal style. Upload samples, train models, and fine-tune every aspect of your persona's voice.</p>
+              <VoiceCloning personaId="default" />
+            </div>
           </TabsContent>
           <TabsContent value="character-development">
             <CharacterDevelopmentContent 

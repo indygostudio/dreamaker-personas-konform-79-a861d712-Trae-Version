@@ -335,16 +335,10 @@ export const AudioSection = ({ persona, selectedModel }: AudioSectionProps) => {
     if (!currentEditTrack || !trackArtworkFile) return;
 
     try {
-      const fileName = `track_${currentEditTrack.id}_${Date.now()}.${trackArtworkFile.name.split('.').pop()}`;
-      const { error: uploadError } = await supabase.storage
-        .from('audio-previews')
-        .upload(fileName, trackArtworkFile);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('audio-previews')
-        .getPublicUrl(fileName);
+      const { publicUrl } = await storageService.uploadFile(trackArtworkFile, 'artwork_images', {
+        fileName: `track_${currentEditTrack.id}_${Date.now()}`,
+        folder: 'tracks'
+      });
 
       const { error } = await supabase
         .from('tracks')

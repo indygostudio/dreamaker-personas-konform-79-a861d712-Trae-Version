@@ -93,8 +93,6 @@ export const PersonaFilterSection = ({
     <div className="flex items-center justify-between mb-4">
       <div className="flex-1">
         <FilterBar
-          searchQuery={searchQuery}
-          onSearchChange={onSearchChange}
           sortBy={sortBy}
           onSortChange={onSortChange}
           onClearFilters={onClearFilters}

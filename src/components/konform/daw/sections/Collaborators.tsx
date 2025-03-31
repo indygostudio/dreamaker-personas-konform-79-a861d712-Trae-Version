@@ -69,7 +69,7 @@ export const Collaborators = ({ sessionId }: { sessionId: string }) => {
 
   const handleClearCollaborators = async () => {
     try {
-      // Clear both personas and percentage splits
+      // Clear personas, percentage splits, and any other related data
       const { error } = await supabase
         .from('collaboration_sessions')
         .update({ 
@@ -77,35 +77,35 @@ export const Collaborators = ({ sessionId }: { sessionId: string }) => {
           style_blend_settings: {
             ...session?.style_blend_settings,
             percentage_splits: {}
-          }
+          },
+          // Add any other fields that need to be cleared
         })
         .eq('id', sessionId);
 
       if (error) throw error;
 
+      // Invalidate all relevant queries
       await queryClient.invalidateQueries({
         queryKey: ['collaboration_session', sessionId]
       });
-      
-      // Invalidate persona queries to refresh the updated type
-      await queryClient.invalidateQueries({
-        queryKey: ['persona', personaId]
-      });
-      
-      // Also invalidate the percentage splits query
       await queryClient.invalidateQueries({
         queryKey: ['collaboration_session_splits', sessionId]
       });
+      // Invalidate any other related queries
+
+      // Clear local state if any
+      // For example, if you're using a local state for selected personas:
+      // setSelectedPersonas([]);
 
       toast({
-        title: "Collaborators Cleared",
-        description: "All collaborators and percentage splits have been removed",
+        title: "Project Cleared",
+        description: "All collaborators, percentage splits, and related data have been removed from the project.",
       });
     } catch (error) {
-      console.error('Error clearing collaborators:', error);
+      console.error('Error clearing project data:', error);
       toast({
         title: "Error",
-        description: "Failed to clear collaborators",
+        description: "Failed to clear project data. Please try again.",
         variant: "destructive",
       });
     }

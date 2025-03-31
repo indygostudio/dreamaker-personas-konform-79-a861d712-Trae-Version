@@ -26,6 +26,35 @@ export const MindMap = ({ persona, personas = [] }: MindMapProps) => {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [parameters, setParameters] = useState<{[key: string]: NodeParameter}>({});
+
+  const handleParameterChange = (nodeId: string, paramName: string, value: number | string) => {
+    setParameters(prev => ({
+      ...prev,
+      [nodeId]: {
+        ...(prev[nodeId] || {}),
+        [paramName]: value
+      }
+    }));
+
+    setNodes(nds => 
+      nds.map(node => {
+        if (node.id === nodeId) {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              parameters: {
+                ...(node.data.parameters || {}),
+                [paramName]: value
+              }
+            }
+          };
+        }
+        return node;
+      })
+    );
+  };
 
   // Generate a mindmap network based on personas
   useEffect(() => {
@@ -43,6 +72,60 @@ export const MindMap = ({ persona, personas = [] }: MindMapProps) => {
     }
 
     const allPersonas = persona ? [persona, ...(personas || [])] : [...(personas || [])];
+
+    // Create brain section nodes
+    const brainSections = [
+      {
+        id: 'voice-section',
+        label: 'Voice Processing',
+        color: 'rgba(255, 99, 132, 0.8)',
+        position: { x: -200, y: -150 }
+      },
+      {
+        id: 'writing-section',
+        label: 'Writing Style',
+        color: 'rgba(75, 192, 192, 0.8)',
+        position: { x: 200, y: -150 }
+      },
+      {
+        id: 'image-section',
+        label: 'Image Processing',
+        color: 'rgba(153, 102, 255, 0.8)',
+        position: { x: -200, y: 150 }
+      },
+      {
+        id: 'personality-section',
+        label: 'Personality Traits',
+        color: 'rgba(255, 159, 64, 0.8)',
+        position: { x: 200, y: 150 }
+      }
+    ];
+
+    const brainSectionNodes: Node[] = brainSections.map(section => {
+      const savedParameters = parameters[section.id] || {
+        "Intelligence": 70,
+        "Creativity": 65,
+        "Emotion": 80,
+        "Logic": 75,
+        "Memory": 60
+      };
+
+      return {
+        id: section.id,
+        type: 'default',
+        position: section.position,
+        data: { 
+          label: section.label,
+          connectionType: 'brain-section',
+          parameters: savedParameters
+        },
+        className: 'rounded-lg bg-black/80 border-2 shadow-lg p-2 text-white text-sm font-medium',
+        style: {
+          borderColor: section.color,
+          boxShadow: `0 0 20px ${section.color}`
+        }
+      };
+    });
 
     // Create the central node
     const centralNode: Node = {
@@ -117,6 +200,69 @@ export const MindMap = ({ persona, personas = [] }: MindMapProps) => {
           boxShadow: '0 0 10px rgba(255, 255, 255, 0.3)'
         }
       };
+    });
+
+    // Create connections from brain sections to central node
+    const brainSectionEdges: Edge[] = brainSections.map(section => ({
+      id: `e-${section.id}-central`,
+      source: section.id,
+      target: 'central',
+      animated: true,
+      style: { 
+        stroke: section.color,
+        strokeWidth: 3,
+        opacity: 0.6
+      }
+    }));
+
+    // Connect personas to relevant brain sections based on their type
+    const personaToBrainEdges: Edge[] = allPersonas.flatMap(p => {
+      const edges: Edge[] = [];
+      const type = p.type || 'AI_CHARACTER';
+
+      // Connect to voice section if persona has voice capabilities
+      if (type.includes('VOICE') || type.includes('MUSICIAN')) {
+        edges.push({
+          id: `e-${p.id}-voice`,
+          source: p.id,
+          target: 'voice-section',
+          animated: true,
+          style: { stroke: brainSections[0].color, strokeWidth: 1, opacity: 0.4 }
+        });
+      }
+
+      // Connect to writing section if persona has writing capabilities
+      if (type.includes('WRITER') || type.includes('POET')) {
+        edges.push({
+          id: `e-${p.id}-writing`,
+          source: p.id,
+          target: 'writing-section',
+          animated: true,
+          style: { stroke: brainSections[1].color, strokeWidth: 1, opacity: 0.4 }
+        });
+      }
+
+      // Connect to image section if persona has visual capabilities
+      if (type.includes('VISUAL') || type.includes('ARTIST')) {
+        edges.push({
+          id: `e-${p.id}-image`,
+          source: p.id,
+          target: 'image-section',
+          animated: true,
+          style: { stroke: brainSections[2].color, strokeWidth: 1, opacity: 0.4 }
+        });
+      }
+
+      // All personas connect to personality section
+      edges.push({
+        id: `e-${p.id}-personality`,
+        source: p.id,
+        target: 'personality-section',
+        animated: true,
+        style: { stroke: brainSections[3].color, strokeWidth: 1, opacity: 0.4 }
+      });
+
+      return edges;
     });
 
     // Create connections from each persona to the central node
@@ -229,8 +375,8 @@ export const MindMap = ({ persona, personas = [] }: MindMapProps) => {
       });
     }
 
-    setNodes([centralNode, ...personaNodes, ...neuronNodes]);
-    setEdges([...personaEdges, ...typeConnections, ...neuronEdges]);
+    setNodes([centralNode, ...brainSectionNodes, ...personaNodes, ...neuronNodes]);
+    setEdges([...brainSectionEdges, ...personaToBrainEdges, ...personaEdges, ...typeConnections, ...neuronEdges]);
     setIsLoading(false);
   }, [persona, personas]);
 

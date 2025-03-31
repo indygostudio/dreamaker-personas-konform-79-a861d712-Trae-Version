@@ -10,8 +10,7 @@ import { LyricsEditor } from "./LyricsEditor";
 import { TrackContent } from "./TrackContent";
 import { TrackLyrics } from "./TrackLyrics";
 import { useTrackLyrics } from "./hooks/useTrackLyrics";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { ImageUploadDialog } from "./ImageUploadDialog";
 import { Button } from "@/components/ui/button";
 
 interface TrackItemProps {
@@ -96,17 +95,15 @@ export const TrackItem = ({
     setIsArtworkDialogOpen(true);
   };
 
-  const handleArtworkSave = () => {
-    if (onUpdateArtwork && newArtworkUrl) {
-      onUpdateArtwork(trackState.id, newArtworkUrl);
+  const handleImageUploaded = (imageUrl: string) => {
+    if (onUpdateArtwork) {
+      onUpdateArtwork(trackState.id, imageUrl);
       
       // Update local state immediately for better UX
       setTrackState({
         ...trackState,
-        album_artwork_url: newArtworkUrl
+        album_artwork_url: imageUrl
       });
-      
-      setIsArtworkDialogOpen(false);
     }
   };
 
@@ -191,54 +188,12 @@ export const TrackItem = ({
       />
 
       {/* Artwork Upload Dialog */}
-      <Dialog open={isArtworkDialogOpen} onOpenChange={setIsArtworkDialogOpen}>
-        <DialogContent className="bg-[#1A1F2C] border-dreamaker-purple/30 max-w-md mx-auto">
-          <DialogHeader>
-            <DialogTitle className="text-white">Update Track Artwork</DialogTitle>
-          </DialogHeader>
-          
-          <div className="space-y-4 mt-2">
-            <div className="flex justify-center">
-              <div className="w-32 h-32 bg-gray-800 rounded overflow-hidden">
-                <img 
-                  src={newArtworkUrl || '/placeholder.svg'} 
-                  alt="Track Artwork Preview" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
-            
-            <div>
-              <label htmlFor="artwork-url" className="text-sm text-gray-300 mb-1 block">
-                Artwork URL
-              </label>
-              <Input
-                id="artwork-url"
-                value={newArtworkUrl}
-                onChange={(e) => setNewArtworkUrl(e.target.value)}
-                placeholder="Enter image URL"
-                className="bg-gray-800 border-dreamaker-purple/30 text-white"
-              />
-              <p className="text-xs text-gray-400 mt-1">
-                Enter a URL for the track artwork image
-              </p>
-            </div>
-          </div>
-          
-          <div className="flex justify-end gap-2 mt-4">
-            <Button variant="outline" onClick={() => setIsArtworkDialogOpen(false)} className="bg-transparent">
-              Cancel
-            </Button>
-            <Button 
-              onClick={handleArtworkSave} 
-              className="bg-dreamaker-purple hover:bg-dreamaker-purple/90"
-              disabled={!newArtworkUrl}
-            >
-              Save Artwork
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ImageUploadDialog
+        isOpen={isArtworkDialogOpen}
+        onOpenChange={setIsArtworkDialogOpen}
+        onImageUploaded={handleImageUploaded}
+        currentImageUrl={trackState.album_artwork_url}
+      />
     </>
   );
 };

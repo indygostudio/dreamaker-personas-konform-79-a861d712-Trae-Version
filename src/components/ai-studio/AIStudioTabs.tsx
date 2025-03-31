@@ -8,6 +8,8 @@ import { VideoGenerationTab } from './VideoGenerationTab';
 import { AvatarGenerationTab } from './AvatarGenerationTab';
 import { MusicGenerationTab } from './MusicGenerationTab';
 import { GenerationHistory } from './GenerationHistory';
+import { useSession } from '@supabase/auth-helpers-react';
+import { Button } from '@/components/ui/button';
 
 interface AIStudioTabsProps {
   persona: any;
@@ -15,7 +17,17 @@ interface AIStudioTabsProps {
 
 export default function AIStudioTabs({ persona }: AIStudioTabsProps) {
   const [selectedTab, setSelectedTab] = useState("text");
+  const session = useSession();
   
+  if (!session) {
+    return (
+      <div className="flex flex-col items-center justify-center h-96 space-y-4">
+        <h2 className="text-2xl font-bold text-white">Sign in to access AI Studio</h2>
+        <Button variant="outline">Sign In</Button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <Tabs 

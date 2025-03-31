@@ -39,11 +39,30 @@ export const personaFormSchema = z.object({
   voice_type: z.string()
     .min(2, "Voice type must be at least 2 characters")
     .max(50, "Voice type cannot exceed 50 characters")
+    .refine(val => val !== undefined, "Voice type is required for AI vocalists")
     .optional(),
   vocal_style: z.string()
     .min(2, "Vocal style must be at least 2 characters")
     .max(100, "Vocal style cannot exceed 100 characters")
+    .refine(val => val !== undefined, "Vocal style is required for AI vocalists")
     .optional(),
+  voice_model: z.object({
+    id: z.string().min(1, "Voice model must be selected"),
+    name: z.string().min(1, "Voice model name is required"),
+    parameters: z.object({
+      pitch: z.number().min(-12).max(12).default(0),
+      speed: z.number().min(0.5).max(2.0).default(1.0),
+      energy: z.number().min(0).max(2.0).default(1.0),
+      clarity: z.number().min(0).max(1.0).default(0.75)
+    })
+  }).optional().superRefine((val, ctx) => {
+    if (ctx.parent.type === "AI_VOCALIST" && !val) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Voice model is required for AI vocalists"
+      });
+    }
+  }),
   artist_category: z.string()
     .min(2, "Artist category must be at least 2 characters")
     .max(50, "Artist category cannot exceed 50 characters")
