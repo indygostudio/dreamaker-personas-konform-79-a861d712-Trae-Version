@@ -116,111 +116,89 @@ export const PersonaSpecificFields = ({ form }: PersonaSpecificFieldsProps) => {
     </div>
   );
 
+  const getFieldConfig = () => {
+    const baseConfig = {
+      style: {
+        label: type === "AI_CHARACTER" ? "Traits" : "Genre",
+        tooltip: type === "AI_CHARACTER"
+          ? "Select the primary personality trait that defines your AI character"
+          : "Choose the primary musical genre that defines your AI persona's artistic direction",
+        options: type === "AI_CHARACTER" ? characterTraits : styles,
+        placeholder: type === "AI_CHARACTER" ? "Select trait" : "Select genre"
+      },
+      age: {
+        label: "Age Group",
+        tooltip: "Select the age group that best represents your AI persona",
+        options: ageGroups,
+        placeholder: "Select age group"
+      }
+    };
+
+    const typeSpecificConfig = {
+      AI_INSTRUMENTALIST: {
+        instrument: {
+          label: "Instrument",
+          tooltip: "Select the primary instrument this AI persona specializes in",
+          options: instruments,
+          placeholder: "Select instrument"
+        }
+      },
+      AI_VOCALIST: {
+        voice_type: {
+          label: "Voice Type",
+          tooltip: "Select the vocal range and classification of your AI vocalist",
+          options: voiceTypes,
+          placeholder: "Select voice type"
+        },
+        vocal_style: {
+          label: "Vocal Style",
+          tooltip: "Choose the primary singing style of your AI vocalist",
+          options: vocalStyles,
+          placeholder: "Select vocal style"
+        }
+      }
+    };
+
+    return { ...baseConfig, ...(typeSpecificConfig[type as keyof typeof typeSpecificConfig] || {}) };
+  };
+
+  const renderField = (name: string, config: any) => (
+    <FormField
+      key={name}
+      control={form.control}
+      name={name as any}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>
+            <LabelWithTooltip 
+              label={config.label}
+              tooltip={config.tooltip}
+            />
+          </FormLabel>
+          <Select onValueChange={field.onChange} value={field.value}>
+            <FormControl>
+              <SelectTrigger className="bg-black/50 border-dreamaker-purple/30">
+                <SelectValue placeholder={config.placeholder} />
+              </SelectTrigger>
+            </FormControl>
+            <SelectContent className="bg-black/90 border-dreamaker-purple/20">
+              {config.options.map((option: string) => (
+                <SelectItem key={option} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </FormItem>
+      )}
+    />
+  );
+
+  const fieldConfig = getFieldConfig();
+
   return (
     <div className="space-y-4">
-      {/* Instrument field (only for instrumentalists) */}
-      {type === "AI_INSTRUMENTALIST" && (
-        <FormField
-          control={form.control}
-          name="instrument"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                <LabelWithTooltip 
-                  label="Instrument" 
-                  tooltip="Select the primary instrument this AI persona specializes in"
-                />
-              </FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
-                <FormControl>
-                  <SelectTrigger className="bg-black/50 border-dreamaker-purple/30">
-                    <SelectValue placeholder="Select instrument" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent className="bg-black/90 border-dreamaker-purple/20">
-                  {instruments.map((instrument) => (
-                    <SelectItem key={instrument} value={instrument}>
-                      {instrument}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormItem>
-          )}
-        />
-      )}
-
-      {/* Genre/Traits field */}
-      <FormField
-        control={form.control}
-        name="style"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>
-              <LabelWithTooltip 
-                label={type === "AI_CHARACTER" ? "Traits" : "Genre"}
-                tooltip={type === "AI_CHARACTER" 
-                  ? "Select the primary personality trait that defines your AI character"
-                  : "Choose the primary musical genre that defines your AI persona's artistic direction"
-                }
-              />
-            </FormLabel>
-            <Select onValueChange={field.onChange} value={field.value}>
-              <FormControl>
-                <SelectTrigger className="bg-black/50 border-dreamaker-purple/30">
-                  <SelectValue placeholder={type === "AI_CHARACTER" ? "Select trait" : "Select genre"} />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent className="bg-black/90 border-dreamaker-purple/20">
-                {type === "AI_CHARACTER" 
-                  ? characterTraits.map((trait) => (
-                      <SelectItem key={trait} value={trait}>
-                        {trait}
-                      </SelectItem>
-                    ))
-                  : styles.map((style) => (
-                      <SelectItem key={style} value={style}>
-                        {style}
-                      </SelectItem>
-                    ))
-                }
-              </SelectContent>
-            </Select>
-          </FormItem>
-        )}
-      />
-
-      {/* Age field */}
-      <FormField
-        control={form.control}
-        name="age"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>
-              <LabelWithTooltip 
-                label="Age Group" 
-                tooltip="Select the age range that best represents your AI persona's maturity and characteristics"
-              />
-            </FormLabel>
-            <Select onValueChange={field.onChange} value={field.value}>
-              <FormControl>
-                <SelectTrigger className="bg-black/50 border-dreamaker-purple/30">
-                  <SelectValue placeholder="Select age group" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent className="bg-black/90 border-dreamaker-purple/20">
-                {ageGroups.map((age) => (
-                  <SelectItem key={age} value={age}>
-                    {age}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </FormItem>
-        )}
-      />
-
-      {/* Voice type field (only for vocalists) */}
+      {Object.entries(fieldConfig).map(([name, config]) => renderField(name, config))}
       {type === "AI_VOCALIST" && (
         <>
           <FormField
@@ -262,8 +240,6 @@ export const PersonaSpecificFields = ({ form }: PersonaSpecificFieldsProps) => {
               </FormItem>
             )}
           />
-
-          {/* Vocal Styling field (only for vocalists) */}
           <FormField
             control={form.control}
             name="vocal_style"
