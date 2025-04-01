@@ -127,45 +127,47 @@ export const DAWView = ({
         {/* Main Arrangement View */}
         <div className="flex-1 flex flex-col">
           <ScrollArea className="flex-1">
-            <div className="min-h-full p-4 space-y-2">
-              {channels.map((persona, index) => (
-                <div key={`${persona.id}-${index}`} className="flex">
-                  {/* Track Header */}
-                  <div className="w-48 pr-4">
-                    <MixerChannel
-                      id={persona.id}
-                      index={index}
-                      name={persona.name}
-                      type={(persona.type as TrackMode) || 'ai-audio'}
-                      volume={75}
-                      isMuted={false}
-                      persona={{
-                        name: persona.name,
-                        avatarUrl: persona.avatar_url
-                      }}
-                      onVolumeChange={() => {}}
-                      onMuteToggle={() => {}}
-                      onTypeChange={() => {}}
-                      onGenerate={() => {}}
-                      onPersonaSelect={() => handlePersonaSelect(index)}
-                    />
+            <div className="min-h-full p-4">
+              <div className="flex flex-row gap-4 min-w-max">
+                {channels.map((persona, index) => (
+                  <div key={`${persona.id}-${index}`} className="flex-none w-64">
+                    {/* Track Header */}
+                    <div className="mb-4">
+                      <MixerChannel
+                        id={persona.id}
+                        index={index}
+                        name={persona.name}
+                        type={(persona.type as TrackMode) || 'ai-audio'}
+                        volume={75}
+                        isMuted={false}
+                        persona={{
+                          name: persona.name,
+                          avatarUrl: persona.avatar_url
+                        }}
+                        onVolumeChange={() => {}}
+                        onMuteToggle={() => {}}
+                        onTypeChange={() => {}}
+                        onGenerate={() => {}}
+                        onPersonaSelect={() => handlePersonaSelect(index)}
+                      />
+                    </div>
+                    
+                    {/* Track Timeline */}
+                    <div className="h-[calc(100vh-24rem)] bg-black/40 rounded-lg border border-konform-neon-blue/20 relative">
+                      {/* Example region - you would generate these from actual track data */}
+                      <TimelineRegionComponent
+                        region={{
+                          id: `region-${index}`,
+                          startTime: 10,
+                          duration: 30,
+                          name: "Region 1",
+                          color: "rgba(74, 222, 128, 0.5)"
+                        }}
+                      />
+                    </div>
                   </div>
-                  
-                  {/* Track Timeline */}
-                  <div className="flex-1 h-32 bg-black/40 rounded-lg border border-konform-neon-blue/20 relative">
-                    {/* Example region - you would generate these from actual track data */}
-                    <TimelineRegionComponent
-                      region={{
-                        id: `region-${index}`,
-                        startTime: 10,
-                        duration: 30,
-                        name: "Region 1",
-                        color: "rgba(74, 222, 128, 0.5)"
-                      }}
-                    />
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </ScrollArea>
 

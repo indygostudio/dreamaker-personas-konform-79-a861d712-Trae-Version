@@ -28,21 +28,7 @@ export const KonformTabs = () => {
   const urlTab = searchParams.get('tab');
   const [activeTab, setActiveTab] = useState(urlTab || "editor");
 
-  // Save video tab state
-  const saveVideoTabState = () => {
-    // This is a placeholder for future video tab state
-    // Currently just saving a flag that the button was clicked
-    localStorage.setItem('konform-video-state', JSON.stringify({
-      savedAt: new Date().toISOString(),
-      // Add more video-specific state here in the future
-    }));
-    
-    toast({
-      title: "Video tab state saved",
-      description: "Your current video settings will be applied next time",
-      variant: "default"
-    });
-  };
+
 
   useEffect(() => {
     // Update active tab when URL query parameter changes
@@ -133,17 +119,6 @@ export const KonformTabs = () => {
             <TabsContent value="video">
               <div className="min-h-[calc(100vh-180px)] bg-black/40 rounded-lg relative">
                 {/* Empty container for future video content */}
-                <div className="absolute top-4 right-4">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="bg-black/20 border-white/20 hover:bg-black/40 text-white rounded-full"
-                    onClick={saveVideoTabState}
-                    title="Save current video settings"
-                  >
-                    <Save className="w-4 h-4" />
-                  </Button>
-                </div>
               </div>
             </TabsContent>
             <TabsContent value="settings">

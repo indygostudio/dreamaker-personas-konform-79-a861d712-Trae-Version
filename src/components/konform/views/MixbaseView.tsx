@@ -12,6 +12,15 @@ export type Channel = {
   isMuted: boolean;
   isSolo: boolean;
   type: 'master' | 'bus' | 'audio';
+  persona?: {
+    id: string;
+    name: string;
+    avatarUrl?: string;
+  };
+  instrument?: {
+    name: string;
+    type: string;
+  };
 };
 
 export const MixbaseView = () => {
@@ -69,9 +78,37 @@ export const MixbaseView = () => {
       pan: 0,
       isMuted: false,
       isSolo: false,
-      type
+      type,
+      instrument: type === 'audio' ? {
+        name: 'VST Instrument',
+        type: 'synth'
+      } : undefined
     };
     setChannels(prev => [...prev, newChannel]);
+  };
+
+  const handleDuplicateChannel = (channelId: string) => {
+    const channelToDuplicate = channels.find(c => c.id === channelId);
+    if (channelToDuplicate) {
+      const newChannel = {
+        ...channelToDuplicate,
+        id: `${channelToDuplicate.type}-${Date.now()}`,
+        name: `${channelToDuplicate.name} (Copy)`,
+      };
+      setChannels(prev => [...prev, newChannel]);
+    }
+  };
+
+  const handleDeleteChannel = (channelId: string) => {
+    setChannels(prev => prev.filter(channel => channel.id !== channelId));
+  };
+
+  const handleRenameChannel = (channelId: string, newName: string) => {
+    setChannels(prev =>
+      prev.map(channel =>
+        channel.id === channelId ? { ...channel, name: newName } : channel
+      )
+    );
   };
 
   const masterChannels = channels.filter(c => c.type === 'master');
@@ -95,48 +132,62 @@ export const MixbaseView = () => {
         </Button>
       </div>
 
-      <ScrollArea className="w-full h-[calc(100%-4rem)]" type="scroll" scrollHideDelay={0}>
-        <div className="flex gap-8 p-2">
-          <div className="flex-shrink-0 flex gap-4">
-            {masterChannels.map(channel => (
-              <ChannelStrip
-                key={channel.id}
-                channel={channel}
-                onVolumeChange={(value) => handleVolumeChange(channel.id, value)}
-                onPanChange={(value) => handlePanChange(channel.id, value)}
-                onMute={() => handleMute(channel.id)}
-                onSolo={() => handleSolo(channel.id)}
-              />
-            ))}
-          </div>
+      <div className="w-full h-[calc(100%-4rem)]">
+        <ScrollArea className="h-full w-full overflow-x-auto" type="always" orientation="horizontal">
+          <div className="flex gap-4 p-2 min-w-max">
+            <div className="flex gap-4 bg-gradient-to-b from-konform-neon-orange/5 to-transparent p-4 rounded-lg border border-konform-neon-orange/10 relative">
+              <div className="text-sm font-medium text-white/60 absolute -top-6 left-2">Master</div>
+              {masterChannels.map(channel => (
+                <ChannelStrip
+                  key={channel.id}
+                  channel={channel}
+                  onVolumeChange={(value) => handleVolumeChange(channel.id, value)}
+                  onPanChange={(value) => handlePanChange(channel.id, value)}
+                  onMute={() => handleMute(channel.id)}
+                  onSolo={() => handleSolo(channel.id)}
+                  onDuplicate={() => handleDuplicateChannel(channel.id)}
+                  onDelete={() => handleDeleteChannel(channel.id)}
+                  onRename={(newName) => handleRenameChannel(channel.id, newName)}
+                />
+              ))}
+            </div>
 
-          <div className="flex-shrink-0 flex gap-4">
-            {busChannels.map(channel => (
-              <ChannelStrip
-                key={channel.id}
-                channel={channel}
-                onVolumeChange={(value) => handleVolumeChange(channel.id, value)}
-                onPanChange={(value) => handlePanChange(channel.id, value)}
-                onMute={() => handleMute(channel.id)}
-                onSolo={() => handleSolo(channel.id)}
-              />
-            ))}
-          </div>
+            <div className="flex gap-4 bg-gradient-to-b from-konform-neon-blue/5 to-transparent p-4 rounded-lg border border-konform-neon-blue/10 relative">
+              <div className="text-sm font-medium text-white/60 absolute -top-6 left-2">Bus Tracks</div>
+              {busChannels.map(channel => (
+                <ChannelStrip
+                  key={channel.id}
+                  channel={channel}
+                  onVolumeChange={(value) => handleVolumeChange(channel.id, value)}
+                  onPanChange={(value) => handlePanChange(channel.id, value)}
+                  onMute={() => handleMute(channel.id)}
+                  onSolo={() => handleSolo(channel.id)}
+                  onDuplicate={() => handleDuplicateChannel(channel.id)}
+                  onDelete={() => handleDeleteChannel(channel.id)}
+                  onRename={(newName) => handleRenameChannel(channel.id, newName)}
+                />
+              ))}
+            </div>
 
-          <div className="flex-shrink-0 flex gap-4">
-            {audioChannels.map(channel => (
-              <ChannelStrip
-                key={channel.id}
-                channel={channel}
-                onVolumeChange={(value) => handleVolumeChange(channel.id, value)}
-                onPanChange={(value) => handlePanChange(channel.id, value)}
-                onMute={() => handleMute(channel.id)}
-                onSolo={() => handleSolo(channel.id)}
-              />
-            ))}
+            <div className="flex gap-4 bg-gradient-to-b from-konform-neon-orange/5 to-transparent p-4 rounded-lg border border-konform-neon-orange/10 relative">
+              <div className="text-sm font-medium text-white/60 absolute -top-6 left-2">Audio Tracks</div>
+              {audioChannels.map(channel => (
+                <ChannelStrip
+                  key={channel.id}
+                  channel={channel}
+                  onVolumeChange={(value) => handleVolumeChange(channel.id, value)}
+                  onPanChange={(value) => handlePanChange(channel.id, value)}
+                  onMute={() => handleMute(channel.id)}
+                  onSolo={() => handleSolo(channel.id)}
+                  onDuplicate={() => handleDuplicateChannel(channel.id)}
+                  onDelete={() => handleDeleteChannel(channel.id)}
+                  onRename={(newName) => handleRenameChannel(channel.id, newName)}
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      </ScrollArea>
+        </ScrollArea>
+      </div>
     </div>
   );
 };
