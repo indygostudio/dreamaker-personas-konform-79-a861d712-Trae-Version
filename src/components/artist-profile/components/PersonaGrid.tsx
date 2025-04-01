@@ -78,30 +78,18 @@ export const PersonaGrid = ({ personas, zoomLevel, onPersonaSelect }: PersonaGri
     setFilteredPersonas(sorted);
   }, [personas, searchQuery, sortBy]);
 
-  // Early return for empty persona list
-  if (filteredPersonas.length === 0) {
-    return (
-      <div className="flex-1 flex flex-col space-y-4">
-        <PersonaControls
-          viewMode={viewMode}
-          sortBy={sortBy}
-          searchQuery={searchQuery}
-          onViewModeChange={setViewMode}
-          onSortChange={setSortBy}
-          onSearchChange={setSearchQuery}
-        />
-        <div className="flex-1 flex items-center justify-center p-8 text-center text-gray-400">
-          <div>
-            <p className="text-xl mb-2">No personas found</p>
-            <p className="text-sm opacity-70">Try adjusting your filters or create a new persona</p>
-          </div>
-        </div>
+  // Component for empty state message
+  const EmptyState = () => (
+    <div className="flex-1 flex items-center justify-center p-8 text-center text-gray-400">
+      <div>
+        <p className="text-xl mb-2">No personas found</p>
+        <p className="text-sm opacity-70">Try adjusting your filters or create a new persona</p>
       </div>
-    );
-  }
+    </div>
+  );
 
   return (
-    <div className="flex-1 overflow-hidden flex flex-col space-y-4">
+    <div className="flex-1 overflow-hidden flex flex-col">
       <PersonaControls
         viewMode={viewMode}
         sortBy={sortBy}
@@ -110,7 +98,7 @@ export const PersonaGrid = ({ personas, zoomLevel, onPersonaSelect }: PersonaGri
         onSortChange={setSortBy}
         onSearchChange={setSearchQuery}
       />
-      <ScrollArea className="h-full min-h-[calc(100vh-300px)]">
+      <ScrollArea className="h-full min-h-[calc(100vh-300px)] pt-0">
         <AnimatePresence mode="wait">
           <motion.div
             key={viewMode}
@@ -118,7 +106,7 @@ export const PersonaGrid = ({ personas, zoomLevel, onPersonaSelect }: PersonaGri
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
-            className={viewMode === "grid" ? `grid grid-cols-1 ${gridClasses} gap-4 pb-6` : "flex flex-col space-y-4 pb-6"}
+            className={viewMode === "grid" ? `grid grid-cols-1 ${gridClasses} gap-2 pt-2 pb-4` : "flex flex-col space-y-2 pb-4"}
           >
             {filteredPersonas.map((persona) => (
               <motion.div

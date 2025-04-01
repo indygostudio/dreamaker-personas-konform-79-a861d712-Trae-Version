@@ -352,15 +352,6 @@ export const EditProfileDialog = ({
           
           <div className="flex justify-end gap-4">
             <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isSubmitting}
-              className="border-dreamaker-purple/50"
-            >
-              Cancel
-            </Button>
-            <Button
               type="submit"
               disabled={isSubmitting}
               className="bg-dreamaker-purple hover:bg-dreamaker-purple/90"

@@ -10,7 +10,16 @@ interface TrackProps {
   onVolumeChange: (value: number[], index: number) => void;
 }
 
-export const Track = ({ id, index, volume, onVolumeChange }: TrackProps) => {
+interface TrackProps {
+  id: string;
+  index: number;
+  volume: number;
+  color?: string;
+  onVolumeChange: (value: number[], index: number) => void;
+  onColorChange?: (color: string) => void;
+}
+
+export const Track = ({ id, index, volume, color = '#FF5F1F', onVolumeChange, onColorChange }: TrackProps) => {
   const {
     attributes,
     listeners,
@@ -31,11 +40,23 @@ export const Track = ({ id, index, volume, onVolumeChange }: TrackProps) => {
       ref={setNodeRef}
       style={style}
       className={`relative group h-full w-24 flex-shrink-0 ${isDragging ? 'z-50' : 'z-0'}`}
+      style={{
+        ...style,
+        '--track-color': color
+      } as React.CSSProperties}
     >
-      <div className="absolute -inset-0.5 bg-gradient-to-r from-konform-neon-blue to-konform-neon-orange opacity-30 blur group-hover:opacity-50 transition-opacity rounded-lg" />
+      <div 
+        className="absolute -inset-0.5 opacity-30 blur group-hover:opacity-50 transition-opacity rounded-lg"
+        style={{ background: `linear-gradient(to right, ${color}, ${color}88)` }}
+      />
       <div className={`relative h-full bg-black/40 backdrop-blur-xl rounded-lg border ${
         isDragging ? 'border-konform-neon-blue' : 'border-konform-neon-blue/30'
       } p-4 select-none transition-colors flex flex-col`}>
+        <button
+          onClick={() => onColorChange?.(color)}
+          className="absolute top-2 right-2 w-4 h-4 rounded-full border border-white/20 hover:border-white/40 transition-colors"
+          style={{ backgroundColor: color }}
+        />
         <div className="flex items-center justify-between mb-4">
           <button
             {...attributes}

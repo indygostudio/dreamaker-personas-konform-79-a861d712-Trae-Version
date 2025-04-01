@@ -28,7 +28,7 @@ export function ThemeSettings() {
   } = useThemeStore()
 
   return (
-    <div className="space-y-6 p-4 bg-black/40 backdrop-blur-xl rounded-lg border border-konform-neon-blue/20">
+    <div className="space-y-6 p-4 bg-[#1A1A1A] rounded-lg border border-konform-neon-blue/20">
       <div className="space-y-2">
         <Label>Font Type</Label>
         <Select value={fontType} onValueChange={setFontType}>

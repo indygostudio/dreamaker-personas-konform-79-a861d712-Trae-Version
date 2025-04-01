@@ -33,7 +33,34 @@ export const MixbaseView = () => {
       pan: 0,
       isMuted: false,
       isSolo: false,
-      type: 'master'
+      type: 'master',
+      color: '#FF5F1F'
+    },
+    {
+      id: 'bus-1',
+      number: 1,
+      name: 'Bus 1',
+      volume: 75,
+      pan: 0,
+      isMuted: false,
+      isSolo: false,
+      type: 'bus',
+      color: '#3B82F6'
+    },
+    {
+      id: 'audio-1',
+      number: 1,
+      name: 'Track 1',
+      volume: 75,
+      pan: 0,
+      isMuted: false,
+      isSolo: false,
+      type: 'audio',
+      color: '#FF5F1F',
+      instrument: {
+        name: 'VST Instrument',
+        type: 'synth'
+      }
     }
   ]);
 
@@ -111,31 +138,31 @@ export const MixbaseView = () => {
     );
   };
 
+  const handleColorChange = (channelId: string, color: string) => {
+    setChannels(prev =>
+      prev.map(channel =>
+        channel.id === channelId ? { ...channel, color } : channel
+      )
+    );
+  };
+
   const masterChannels = channels.filter(c => c.type === 'master');
   const busChannels = channels.filter(c => c.type === 'bus');
   const audioChannels = channels.filter(c => c.type === 'audio');
 
-  return (
-    <div className="h-full bg-black/40 rounded-lg p-4">
-      <div className="flex gap-4 mb-4">
-        <Button
-          onClick={() => handleAddChannel('bus')}
-          className="bg-konform-neon-blue hover:bg-konform-neon-blue/80"
-        >
-          Add Bus
-        </Button>
-        <Button
-          onClick={() => handleAddChannel('audio')}
-          className="bg-konform-neon-orange hover:bg-konform-neon-orange/80"
-        >
-          Add Track
-        </Button>
-      </div>
+  const totalChannels = channels.length;
+  const showScroll = totalChannels > 8;
 
-      <div className="w-full h-[calc(100%-4rem)]">
-        <ScrollArea className="h-full w-full overflow-x-auto" type="always" orientation="horizontal">
-          <div className="flex gap-4 p-2 min-w-max">
-            <div className="flex gap-4 bg-gradient-to-b from-konform-neon-orange/5 to-transparent p-4 rounded-lg border border-konform-neon-orange/10 relative">
+  return (
+    <div className="h-full bg-black/40 rounded-lg p-4 flex flex-col max-w-[1440px] mx-auto">
+      <div className="flex-1 min-h-0 w-full">
+        <ScrollArea 
+          className={`h-full w-full ${showScroll ? 'overflow-x-auto' : 'overflow-x-hidden'}`} 
+          type={showScroll ? "always" : "never"} 
+          orientation="horizontal"
+        >
+          <div className="flex gap-4 p-2" style={{ width: showScroll ? 'max-content' : '100%' }}>
+            <div className="flex gap-4 bg-gradient-to-b from-konform-neon-orange/5 to-transparent p-4 rounded-lg border border-konform-neon-orange/10 relative overflow-y-auto max-h-[70vh]">
               <div className="text-sm font-medium text-white/60 absolute -top-6 left-2">Master</div>
               {masterChannels.map(channel => (
                 <ChannelStrip
@@ -148,11 +175,14 @@ export const MixbaseView = () => {
                   onDuplicate={() => handleDuplicateChannel(channel.id)}
                   onDelete={() => handleDeleteChannel(channel.id)}
                   onRename={(newName) => handleRenameChannel(channel.id, newName)}
+                  onColorChange={(color) => handleColorChange(channel.id, color)}
+                  onColorChange={(color) => handleColorChange(channel.id, color)}
+                  onColorChange={(color) => handleColorChange(channel.id, color)}
                 />
               ))}
             </div>
 
-            <div className="flex gap-4 bg-gradient-to-b from-konform-neon-blue/5 to-transparent p-4 rounded-lg border border-konform-neon-blue/10 relative">
+            <div className="flex gap-4 bg-gradient-to-b from-konform-neon-blue/5 to-transparent p-4 rounded-lg border border-konform-neon-blue/10 relative overflow-y-auto max-h-[70vh]">
               <div className="text-sm font-medium text-white/60 absolute -top-6 left-2">Bus Tracks</div>
               {busChannels.map(channel => (
                 <ChannelStrip
@@ -165,11 +195,14 @@ export const MixbaseView = () => {
                   onDuplicate={() => handleDuplicateChannel(channel.id)}
                   onDelete={() => handleDeleteChannel(channel.id)}
                   onRename={(newName) => handleRenameChannel(channel.id, newName)}
+                  onColorChange={(color) => handleColorChange(channel.id, color)}
+                  onColorChange={(color) => handleColorChange(channel.id, color)}
+                  onColorChange={(color) => handleColorChange(channel.id, color)}
                 />
               ))}
             </div>
 
-            <div className="flex gap-4 bg-gradient-to-b from-konform-neon-orange/5 to-transparent p-4 rounded-lg border border-konform-neon-orange/10 relative">
+            <div className="flex gap-4 bg-gradient-to-b from-konform-neon-orange/5 to-transparent p-4 rounded-lg border border-konform-neon-orange/10 relative overflow-y-auto max-h-[70vh]">
               <div className="text-sm font-medium text-white/60 absolute -top-6 left-2">Audio Tracks</div>
               {audioChannels.map(channel => (
                 <ChannelStrip
@@ -182,11 +215,29 @@ export const MixbaseView = () => {
                   onDuplicate={() => handleDuplicateChannel(channel.id)}
                   onDelete={() => handleDeleteChannel(channel.id)}
                   onRename={(newName) => handleRenameChannel(channel.id, newName)}
+                  onColorChange={(color) => handleColorChange(channel.id, color)}
+                  onColorChange={(color) => handleColorChange(channel.id, color)}
+                  onColorChange={(color) => handleColorChange(channel.id, color)}
                 />
               ))}
             </div>
           </div>
         </ScrollArea>
+      </div>
+
+      <div className="h-12 mt-4 bg-gradient-to-r from-konform-neon-blue/20 to-konform-neon-orange/20 rounded-lg border border-konform-neon-blue/10 flex items-center justify-end px-4 gap-4">
+        <Button
+          onClick={() => handleAddChannel('bus')}
+          className="bg-konform-neon-blue hover:bg-konform-neon-blue/80"
+        >
+          Add Bus
+        </Button>
+        <Button
+          onClick={() => handleAddChannel('audio')}
+          className="bg-konform-neon-orange hover:bg-konform-neon-orange/80"
+        >
+          Add Track
+        </Button>
       </div>
     </div>
   );
