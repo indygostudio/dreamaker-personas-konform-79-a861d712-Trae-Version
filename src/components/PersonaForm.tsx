@@ -45,7 +45,33 @@ export function PersonaForm({ defaultValues, onSubmit, onCancel, isSubmitting = 
         y: defaultValues.banner_position?.y ?? 50
       }
     },
+    mode: "onChange",
   });
+
+  // Auto-save functionality
+  const [lastSavedValues, setLastSavedValues] = useState<PersonaFormValues | null>(null);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<"saving" | "saved" | "error" | null>(null);
+
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      const formValues = form.getValues();
+      if (JSON.stringify(formValues) !== JSON.stringify(lastSavedValues)) {
+        const timeoutId = setTimeout(async () => {
+          try {
+            setAutoSaveStatus("saving");
+            await onSubmit(formValues as PersonaFormValues);
+            setLastSavedValues(formValues as PersonaFormValues);
+            setAutoSaveStatus("saved");
+          } catch (error) {
+            setAutoSaveStatus("error");
+            console.error("Auto-save error:", error);
+          }
+        }, 2000);
+        return () => clearTimeout(timeoutId);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form, lastSavedValues, onSubmit]);
 
   const [isGeneratingAvatar, setIsGeneratingAvatar] = useState(false);
   const [isGeneratingBanner, setIsGeneratingBanner] = useState(false);
@@ -58,11 +84,18 @@ export function PersonaForm({ defaultValues, onSubmit, onCancel, isSubmitting = 
   const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
 
   const voiceModels = [
-    { id: "model1", name: "Natural Voice 1" },
-    { id: "model2", name: "Natural Voice 2" },
-    { id: "model3", name: "Character Voice 1" },
-    { id: "model4", name: "Character Voice 2" }
+    { id: "model1", name: "Natural Voice 1", description: "Smooth and natural speaking voice", category: "natural" },
+    { id: "model2", name: "Natural Voice 2", description: "Clear and professional tone", category: "natural" },
+    { id: "model3", name: "Character Voice 1", description: "Expressive and dynamic character voice", category: "character" },
+    { id: "model4", name: "Character Voice 2", description: "Unique and distinctive personality", category: "character" }
   ];
+
+  const voiceCategories = [
+    { id: "natural", name: "Natural Voices", description: "Professional and realistic voice models" },
+    { id: "character", name: "Character Voices", description: "Stylized and expressive voice models" }
+  ];
+
+  const [selectedCategory, setSelectedCategory] = useState(voiceCategories[0].id);
 
   const isExistingPersona = Boolean(defaultValues.id);
 
@@ -80,28 +113,45 @@ export function PersonaForm({ defaultValues, onSubmit, onCancel, isSubmitting = 
   const handleVoiceModelChange = (modelId: string) => {
     const model = voiceModels.find(m => m.id === modelId);
     if (model) {
-      setSelectedVoiceModel({
+      const newModel = {
         id: model.id,
         name: model.name,
+        description: model.description,
+        category: model.category,
         parameters: {
           pitch: 0,
           speed: 1.0,
           energy: 1.0,
-          clarity: 0.75
+          clarity: 0.75,
+          warmth: 0.5,
+          breathiness: 0.3
         }
-      });
-      form.setValue('voice_model', {
-        id: model.id,
-        name: model.name,
-        parameters: {
-          pitch: 0,
-          speed: 1.0,
-          energy: 1.0,
-          clarity: 0.75
-        }
+      };
+      setSelectedVoiceModel(newModel);
+      form.setValue('voice_model', newModel);
+      
+      // Show a preview of the selected voice
+      toast.success(`Selected ${model.name}`, {
+        description: model.description,
+        duration: 3000
       });
     }
   };
+
+  const renderVoiceModelCard = (model: typeof voiceModels[0]) => (
+    <Card key={model.id} className={`p-4 cursor-pointer transition-all duration-200 ${selectedVoiceModel?.id === model.id ? 'border-primary' : 'border-border'}`}
+      onClick={() => handleVoiceModelChange(model.id)}>
+      <CardContent className="p-0">
+        <div className="flex items-center gap-3">
+          <Volume2 className={selectedVoiceModel?.id === model.id ? 'text-primary' : 'text-muted-foreground'} />
+          <div>
+            <h4 className="font-medium">{model.name}</h4>
+            <p className="text-sm text-muted-foreground">{model.description}</p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
 
   const handleParameterChange = (parameter: string, value: number) => {
     if (selectedVoiceModel) {
@@ -114,8 +164,40 @@ export function PersonaForm({ defaultValues, onSubmit, onCancel, isSubmitting = 
       };
       setSelectedVoiceModel(updatedModel);
       form.setValue('voice_model', updatedModel);
+
+      // Provide immediate feedback for parameter changes
+      const feedbackMessages = {
+        pitch: value > 0 ? 'Higher pitch' : value < 0 ? 'Lower pitch' : 'Natural pitch',
+        speed: value > 1 ? 'Faster' : value < 1 ? 'Slower' : 'Normal speed',
+        energy: value > 1 ? 'More energetic' : value < 1 ? 'More calm' : 'Balanced energy',
+        clarity: `Clarity: ${Math.round(value * 100)}%`,
+        warmth: `Warmth: ${Math.round(value * 100)}%`,
+        breathiness: `Breathiness: ${Math.round(value * 100)}%`
+      };
+
+      toast.info(feedbackMessages[parameter as keyof typeof feedbackMessages], {
+        duration: 1000,
+        position: 'bottom-right'
+      });
     }
   };
+
+  const renderParameterControl = (parameter: string, value: number, min: number, max: number, step: number) => (
+    <div className="space-y-2">
+      <div className="flex justify-between items-center">
+        <Label className="capitalize">{parameter}</Label>
+        <span className="text-sm text-muted-foreground">{value.toFixed(2)}</span>
+      </div>
+      <Slider
+        value={[value]}
+        min={min}
+        max={max}
+        step={step}
+        onValueChange={([newValue]) => handleParameterChange(parameter, newValue)}
+        className="w-full"
+      />
+    </div>
+  );
 
   const generatePreview = async () => {
     if (!selectedVoiceModel) return;
