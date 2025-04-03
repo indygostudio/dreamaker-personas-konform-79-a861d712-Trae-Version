@@ -1,30 +1,28 @@
-import React, { useState } from "react";
-import { StoryboardProvider } from "@/contexts/StoryboardContext";
+import React from "react";
+import { StoryboardProvider, useStoryboard } from "@/contexts/StoryboardContext";
 import StoryEditor from "./StoryEditor";
 import { Button } from "@/components/ui/button";
 import { Plus, FolderPlus } from "lucide-react";
 import { toast } from "sonner";
 
-const VideoTab = () => {
-  const [projects, setProjects] = useState<{ id: string; name: string }[]>([]);
-  const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
+// Inner component that uses the StoryboardContext
+const VideoTabContent = () => {
+  const { projects, activeProject, dispatch } = useStoryboard();
 
   // Create a new project
   const handleCreateProject = () => {
     const projectName = `Project ${projects.length + 1}`;
-    const newProject = {
-      id: crypto.randomUUID(),
-      name: projectName
-    };
-    setProjects([...projects, newProject]);
-    setActiveProjectId(newProject.id);
+    const newProjectId = dispatch({
+      type: "ADD_PROJECT",
+      payload: { name: projectName }
+    }) as string;
+    
     toast.success(`Created new project: ${projectName}`);
   };
 
   return (
-    <StoryboardProvider>
-      <div className="min-h-[calc(100vh-180px)] bg-black/40 rounded-lg p-6">
-        {activeProjectId ? (
+    <div className="min-h-[calc(100vh-180px)] bg-black/40 rounded-lg p-6">
+      {activeProject ? (
           <StoryEditor />
         ) : (
           <div className="flex flex-col items-center justify-center h-[calc(100vh-300px)]">
@@ -45,6 +43,14 @@ const VideoTab = () => {
           </div>
         )}
       </div>
+  );
+};
+
+// Wrapper component that provides the StoryboardContext
+const VideoTab = () => {
+  return (
+    <StoryboardProvider>
+      <VideoTabContent />
     </StoryboardProvider>
   );
 };

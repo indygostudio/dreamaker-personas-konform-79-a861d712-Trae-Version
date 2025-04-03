@@ -74,7 +74,10 @@ const StoryEditor = () => {
     };
     dispatch({
       type: "UPDATE_PROJECT",
-      payload: updatedProject
+      payload: {
+        id: activeProject.id,
+        name: trimmedName
+      }
     });
     setActiveProject(updatedProject);
     setIsEditingProjectName(false);
