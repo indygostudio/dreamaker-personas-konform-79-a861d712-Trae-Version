@@ -1,0 +1,305 @@
+
+#root {
+  max-width: 1920px;
+  margin: 0 auto;
+  padding: 0;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #3b82f6aa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+/* New styles for the Runway-inspired UI */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.5rem;
+  background-color: #0c0c10;
+  border-bottom: 1px solid #1a1a22;
+}
+
+.app-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.app-logo span.logo-text {
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: -0.5px;
+}
+
+.logo-text-primary {
+  color: #ffffff;
+}
+
+.logo-text-secondary {
+  color: #ffffff;
+}
+
+.beta-tag {
+  background-color: #3b82f6;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
+  margin-left: 0.5rem;
+}
+
+.app-container {
+  background-color: #0c0c10;
+  min-height: 100vh;
+  padding-bottom: 2rem;
+  width: 100%;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+
+.dark-card {
+  background-color: #121218;
+  border-radius: 8px;
+  border: 1px solid #2a2a36;
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #2a2a36;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card-content {
+  padding: 1.5rem;
+}
+
+.orange-button {
+  background-color: #3b82f6;
+  color: #ffffff;
+  font-weight: 600;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.orange-button:hover {
+  background-color: #2563eb;
+}
+
+.input-dark {
+  background-color: #1a1a22;
+  border: 1px solid #2a2a36;
+  color: #fff;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  width: 100%;
+}
+
+.counter-control {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background-color: #1a1a22;
+  border-radius: 4px;
+  padding: 0.25rem;
+}
+
+.counter-button {
+  background-color: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1.25rem;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.counter-value {
+  font-weight: 500;
+  min-width: 2rem;
+  text-align: center;
+}
+
+.option-pill {
+  background-color: #1a1a22;
+  border: 1px solid #2a2a36;
+  color: #fff;
+  border-radius: 2rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.option-pill.selected {
+  background-color: #3b82f6;
+  color: #ffffff;
+  border-color: #3b82f6;
+}
+
+/* Hide scrollbar but keep functionality */
+.hide-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Resize handle custom styling */
+.resize-handle {
+  background-color: #2a2a36;
+  width: 4px;
+  transition: background-color 0.2s;
+}
+
+.resize-handle:hover {
+  background-color: #3b82f6;
+}
+
+/* Sidebar styles */
+:root {
+  --sidebar-width: 300px;
+  --sidebar-width-collapsed: 80px;
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  flex-shrink: 0;
+  background-color: #0c0c10;
+  border-right: 1px solid #2a2a36;
+  height: 100%;
+  transition: width 0.3s ease;
+  overflow-y: auto;
+}
+
+.sidebar-collapsed {
+  width: var(--sidebar-width-collapsed);
+}
+
+.sidebar-content {
+  padding: 1rem;
+}
+
+.main-content {
+  flex: 1;
+  overflow-x: hidden;
+}
+
+/* Resizable panel styles */
+[data-panel-group-direction="horizontal"] > [data-panel-handle] {
+  width: 2px;
+  background-color: #2a2a36;
+  transition: background-color 0.2s;
+}
+
+[data-panel-group-direction="horizontal"] > [data-panel-handle]:hover,
+[data-panel-group-direction="horizontal"] > [data-panel-handle]:focus-visible {
+  background-color: #3b82f6;
+}
+
+/* Custom grip handle style */
+[data-panel-group-direction="horizontal"] > [data-panel-handle] > div {
+  background-color: #2a2a36;
+  border-color: #2a2a36;
+}
+
+[data-panel-group-direction="horizontal"] > [data-panel-handle]:hover > div {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+/* Timeline layout */
+.timeline-track {
+  background-color: #121218;
+  border: 1px solid #2a2a36;
+  border-radius: 6px;
+  padding: 0.75rem;
+}
+
+.scene-thumbnail {
+  background-color: #1a1a22;
+  border: 1px solid #2a2a36;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.scene-thumbnail.active {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+.action-button {
+  background-color: #121218;
+  border: 1px solid #2a2a36;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+
+.action-button:hover {
+  background-color: #1a1a22;
+}
+
