@@ -1,8 +1,8 @@
 
-import React from "react";
-import { ImageIcon, CircleDot } from "lucide-react";
-import { Scene } from "@/types/storyboardTypes";
+import React from 'react';
+import { Scene } from "../../../types/storyboardTypes";
 import ImageToVideoConverter from "../ImageToVideoConverter";
+import { ImageIcon } from 'lucide-react';
 
 interface ScenePreviewPanelProps {
   scene: Scene;
@@ -14,40 +14,32 @@ const ScenePreviewPanel: React.FC<ScenePreviewPanelProps> = ({
   onVideoGenerated
 }) => {
   return (
-    <div>
-      {scene.imageUrl ? (
-        <div className="aspect-video rounded overflow-hidden bg-black relative">
-          <img 
-            src={scene.imageUrl} 
-            alt={scene.description} 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute top-2 left-2">
-            <CircleDot className="h-4 w-4 text-runway-blue" />
-          </div>
-        </div>
+    <div className="space-y-3">
+      {/* Display Logic: Video > Image > Placeholder */}
+      {scene.videoUrl ? (
+        // Display the generated video
+        <video
+          src={scene.videoUrl}
+          controls
+          className="w-full h-auto rounded-md mb-2 object-cover aspect-video bg-runway-card"
+        />
+      ) : scene.imageUrl ? (
+        // Display the source image if no video yet
+        <img 
+          src={scene.imageUrl} 
+          alt={scene.description || "Scene Preview"} 
+          className="w-full h-auto rounded-md mb-2 object-cover aspect-video bg-runway-card" 
+        />
       ) : (
-        <div className="aspect-video rounded bg-runway-input flex items-center justify-center relative">
-          <div className="text-center">
-            <ImageIcon className="h-10 w-10 mx-auto mb-2 text-gray-600" />
-            <p className="text-gray-400 text-sm">No image yet</p>
-          </div>
-          <div className="absolute top-2 left-2">
-            <CircleDot className="h-4 w-4 text-runway-blue" />
-          </div>
+        // Display placeholder if no image or video
+        <div className="w-full aspect-video bg-runway-card rounded-md flex items-center justify-center mb-2">
+          <ImageIcon className="w-12 h-12 text-gray-500" />
         </div>
       )}
       
-      {scene?.imageUrl && (
-        <div className="mt-4">
-          <ImageToVideoConverter 
-            scene={scene} 
-            onVideoGenerated={onVideoGenerated} 
-          />
-        </div>
-      )}
-    </div>
-  );
-};
+      {/* Render the converter button (it handles its own conditional rendering) */}
+      <ImageToVideoConverter 
+        scene={scene} 
+        onVideoGenerated={onVideoGenerated}
 
 export default ScenePreviewPanel;

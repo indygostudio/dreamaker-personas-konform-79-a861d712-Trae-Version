@@ -16,6 +16,8 @@ import PreviewSection from "./PreviewSection";
 import TimelineSection from "./TimelineSection";
 import SceneControlsSection from "./SceneControlsSection";
 import MediaGallerySection from "./MediaGallerySection";
+import ImageToVideoConverter from "./ImageToVideoConverter"; // Import the converter
+import { ImageIcon } from "lucide-react"; // Import ImageIcon
 
 interface ShotEditorProps {
   onPromptsGenerated?: (prompts: PromptVariation[], basePrompt: string) => void;
@@ -53,7 +55,7 @@ const ShotEditor = ({ onPromptsGenerated, basePrompt = "", promptVariations = []
   const [previewSectionSize, setPreviewSectionSize] = useState(60);
   const [timelineSectionOpen, setTimelineSectionOpen] = useState(true);
   const [sceneControlsOpen, setSceneControlsOpen] = useState(true);
-  const [mediaGalleryOpen, setMediaGalleryOpen] = useState(true);
+  const [mediaGalleryOpen, setMediaGalleryOpen] = useState(false); // Default media
   
   const shotListRef = useRef<HTMLDivElement>(null);
   const audioInputRef = useRef<HTMLInputElement>(null);

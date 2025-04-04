@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2, Wand, Film } from "lucide-react";
+import { Loader2, Wand } from "lucide-react"; // Removed Film icon
 import { toast } from "sonner";
 import { generateVideoFromImage } from "@/services/videoGenerationService";
 import { useAIService } from "@/contexts/AIServiceContext";
@@ -16,7 +16,8 @@ const ImageToVideoConverter = ({ scene, onVideoGenerated }: ImageToVideoConverte
   const { selectedService } = useAIService();
   const [isGenerating, setIsGenerating] = useState(false);
 
-  if (!scene.imageUrl) {
+  // Only render the button if there's an image and no video yet
+  if (!scene.imageUrl || scene.videoUrl) {
     return null;
   }
 
@@ -31,7 +32,7 @@ const ImageToVideoConverter = ({ scene, onVideoGenerated }: ImageToVideoConverte
         selectedService.id
       );
 
-      onVideoGenerated(videoUrl);
+      onVideoGenerated(videoUrl); // Call parent callback
       toast.success("Video generated successfully!");
     } catch (error) {
       console.error("Failed to convert image to video:", error);
@@ -62,20 +63,7 @@ const ImageToVideoConverter = ({ scene, onVideoGenerated }: ImageToVideoConverte
           </>
         )}
       </Button>
-      {scene.videoUrl && (
-        <div className="mt-2 p-2 bg-[#1a1a1a] rounded border border-[#333]">
-          <div className="flex items-center text-sm text-green-400 mb-2">
-            <Film className="h-4 w-4 mr-1" />
-            Video generated
-          </div>
-          <video
-            src={scene.videoUrl}
-            controls
-            className="w-full rounded"
-            height={150}
-          />
-        </div>
-      )}
+      {/* REMOVED the video display section from here */}
     </div>
   );
 };
