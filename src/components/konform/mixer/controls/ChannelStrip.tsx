@@ -237,7 +237,7 @@ export const ChannelStrip = ({
     <ContextMenu>
       <ContextMenuTrigger>
         <div 
-          className={`flex flex-col items-center gap-2 p-2 bg-black/60 rounded-lg border transition-colors ${
+          className={`flex flex-col items-center gap-1 py-1 px-2 bg-black/60 rounded-lg border transition-colors ${
             isSelected 
               ? 'border-konform-neon-orange' 
               : type === 'master'
@@ -288,7 +288,7 @@ export const ChannelStrip = ({
             </div>
           </div>
 
-          <div className="w-full flex flex-col items-center gap-1 border-b border-konform-neon-blue/10 pb-1">
+          <div className="w-full flex flex-col items-center gap-0.5 border-b border-konform-neon-blue/10 pb-0.5">
             <DropdownMenu open={showPersonasDropdown} onOpenChange={setShowPersonasDropdown}>
               <DropdownMenuTrigger asChild>
                 {currentCollaborator ? (
@@ -310,8 +310,13 @@ export const ChannelStrip = ({
                 )}
               </DropdownMenuTrigger>
               <DropdownMenuContent 
-                className="w-56 bg-[#1A1F2C] border border-konform-neon-blue/20"
-                style={{ backgroundColor: "#1A1F2C" }}
+                className="border border-konform-neon-blue/20"
+                style={{ 
+                  backgroundColor: "#1A1F2C", 
+                  backdropFilter: "none",
+                  WebkitBackdropFilter: "none",
+                  opacity: "1"
+                }}
               >
                 <DropdownMenuLabel>
                   {currentCollaborator ? "Change Persona" : "Add Persona"}
@@ -352,13 +357,13 @@ export const ChannelStrip = ({
           </div>
 
           {!isMaster && (
-            <div className="w-full space-y-1 border-b border-konform-neon-blue/10 pb-1 pt-1">
+            <div className="w-full border-b border-konform-neon-blue/10 pb-0 pt-0">
               <div className="flex items-center justify-between px-2">
                 <span className="text-xs text-konform-neon-blue">Sends</span>
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className="h-6 w-6 p-0 relative"
+                  className="h-5 w-5 p-0 relative"
                   onClick={handleAddSend}
                 >
                   <PlusSquare className="h-3 w-3 text-konform-neon-blue" />
@@ -393,7 +398,15 @@ export const ChannelStrip = ({
                         <SelectTrigger className="h-6 text-xs flex-1 bg-black/20">
                           <SelectValue placeholder="Select target" />
                         </SelectTrigger>
-                        <SelectContent className="bg-[#1A1F2C] border border-konform-neon-blue/20">
+                        <SelectContent 
+                          className="border border-konform-neon-blue/20"
+                          style={{ 
+                            backgroundColor: "#1A1F2C", 
+                            backdropFilter: "none",
+                            WebkitBackdropFilter: "none",
+                            opacity: "1"
+                          }}
+                        >
                           {availableSendTargets.map(target => (
                             <SelectItem key={target.id} value={target.id}>
                               {target.name} ({target.type})
@@ -431,19 +444,27 @@ export const ChannelStrip = ({
           )}
 
           {!isMaster && (
-            <div className="w-full space-y-1 border-b border-konform-neon-blue/10 pb-1 pt-1">
+            <div className="w-full border-b border-konform-neon-blue/10 pb-0 pt-0">
               <div className="flex items-center justify-between px-2">
                 <span className="text-xs text-konform-neon-blue">Plugin</span>
-                <Button variant="ghost" size="sm" className="h-6 w-6 p-0 relative">
+                <Button variant="ghost" size="sm" className="h-5 w-5 p-0 relative">
                   <PlusSquare className="h-3 w-3 text-konform-neon-blue" />
                 </Button>
               </div>
               <div className="relative">
                 <Select>
-                  <SelectTrigger className="h-7 text-xs bg-black/20">
+                  <SelectTrigger className="h-6 text-xs bg-black/20">
                     <SelectValue placeholder="Add Plugin" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1A1F2C] border border-konform-neon-blue/20">
+                  <SelectContent 
+                    className="border border-konform-neon-blue/20"
+                    style={{ 
+                      backgroundColor: "#1A1F2C", 
+                      backdropFilter: "none",
+                      WebkitBackdropFilter: "none",
+                      opacity: "1"
+                    }}
+                  >
                     <SelectItem value="comp">Compressor</SelectItem>
                     <SelectItem value="eq">EQ</SelectItem>
                     <SelectItem value="reverb">Reverb</SelectItem>
@@ -453,16 +474,24 @@ export const ChannelStrip = ({
             </div>
           )}
 
-          <div className="w-full space-y-1 border-b border-konform-neon-blue/10 pb-1 pt-1">
+          <div className="w-full border-b border-konform-neon-blue/10 pb-0 pt-0">
             <div className="flex items-center justify-between px-2">
               <span className="text-xs text-konform-neon-blue">Output</span>
               <Volume2 className="h-3 w-3 text-konform-neon-blue" />
             </div>
             <Select>
-              <SelectTrigger className="h-7 text-xs bg-black/20">
+              <SelectTrigger className="h-6 text-xs bg-black/20">
                 <SelectValue placeholder="Select Output" defaultValue="master" />
               </SelectTrigger>
-              <SelectContent className="bg-[#1A1F2C] border border-konform-neon-blue/20">
+              <SelectContent 
+                className="border border-konform-neon-blue/20"
+                style={{ 
+                  backgroundColor: "#1A1F2C", 
+                  backdropFilter: "none",
+                  WebkitBackdropFilter: "none",
+                  opacity: "1"
+                }}
+              >
                 {isMaster ? (
                   hardwareOutputs.map(output => (
                     <SelectItem key={output.id} value={output.id}>
@@ -483,7 +512,7 @@ export const ChannelStrip = ({
             </Select>
           </div>
 
-          <div className="h-[130px] w-full flex items-center gap-2">
+          <div className="h-[64px] w-full flex items-center gap-2">
             <div className="h-full flex-1 flex items-center gap-2">
               <div className="h-full flex flex-col justify-between text-xs text-gray-400 pr-1">
                 <span>+12</span>
@@ -551,12 +580,12 @@ export const ChannelStrip = ({
             </div>
           </div>
 
-          <div className="w-full space-y-2">
+          <div className="w-full space-y-0.5 pt-0.5">
             <div className="grid grid-cols-2 gap-1">
               <Button 
                 variant="outline" 
                 size="sm" 
-                className={`h-6 text-xs bg-black/40 w-full transition-colors duration-150
+                className={`h-5 text-xs bg-black/40 w-full transition-colors duration-150
                   ${isMuted 
                     ? 'border-[#00D1FF] bg-[#00D1FF]/20 text-[#00D1FF] hover:bg-[#00D1FF]/30' 
                     : 'border-konform-neon-blue/20 hover:bg-transparent hover:border-konform-neon-blue'
@@ -568,7 +597,7 @@ export const ChannelStrip = ({
               <Button 
                 variant="outline" 
                 size="sm" 
-                className={`h-6 text-xs bg-black/40 w-full transition-colors duration-150
+                className={`h-5 text-xs bg-black/40 w-full transition-colors duration-150
                   ${isSolo 
                     ? 'border-konform-neon-orange bg-konform-neon-orange/20 text-konform-neon-orange hover:bg-konform-neon-orange/30 hover:border-konform-neon-orange' 
                     : 'border-konform-neon-blue/20 hover:bg-transparent hover:border-konform-neon-blue'
@@ -586,19 +615,25 @@ export const ChannelStrip = ({
             <Input
               value={trackName}
               onChange={(e) => setTrackName(e.target.value)}
-              className="h-7 text-xs bg-black/20 border-konform-neon-blue/20 text-center"
+              className="h-6 text-xs bg-black/20 border-konform-neon-blue/20 text-center"
               placeholder="Track Name"
             />
             
             <div className="flex items-center justify-center">
-              <Mic className="h-4 w-4 text-konform-neon-blue opacity-50" />
+              <Mic className="h-3.5 w-3.5 text-konform-neon-blue opacity-50" />
             </div>
           </div>
         </div>
       </ContextMenuTrigger>
       
       <ContextMenuContent 
-        className="w-56 bg-[#1A1F2C] border border-konform-neon-blue/20"
+        className="w-56 border border-konform-neon-blue/20"
+        style={{ 
+          backgroundColor: "#1A1F2C", 
+          backdropFilter: "none",
+          WebkitBackdropFilter: "none",
+          opacity: "1"
+        }}
       >
         <ContextMenuItem onClick={handleAddToFolder}>
           <FolderPlus className="h-4 w-4 mr-2" />

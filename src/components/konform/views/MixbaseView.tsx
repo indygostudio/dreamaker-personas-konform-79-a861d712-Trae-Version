@@ -167,7 +167,15 @@ const ProjectHeader = () => {
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-black/90 border-konform-neon-blue/30">
+              <DropdownMenuContent 
+                className="border-konform-neon-blue/30"
+                style={{ 
+                  backgroundColor: "#0F0F13", 
+                  backdropFilter: "none",
+                  WebkitBackdropFilter: "none",
+                  opacity: "1"
+                }}
+              >
                 <DropdownMenuItem onClick={handleExport} className="cursor-pointer">
                   <Download className="h-4 w-4 mr-2" />
                   Export Project
@@ -187,37 +195,6 @@ const ProjectHeader = () => {
         </div>
         
         <div className="flex items-center gap-2">
-          {/* Add Track Button - Moved from toolbar */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button className="bg-konform-neon-orange hover:bg-konform-neon-orange/80">
-                Add Track
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-black/90 border border-konform-neon-blue/20">
-              <DropdownMenuItem onClick={() => window.dispatchEvent(new CustomEvent('add-channel', { detail: 'master' }))}>
-                <Music2 className="h-4 w-4 mr-2" />
-                Master Track
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => window.dispatchEvent(new CustomEvent('add-channel', { detail: 'bus' }))}>
-                <SlidersHorizontal className="h-4 w-4 mr-2" />
-                Bus Track
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => window.dispatchEvent(new CustomEvent('add-channel', { detail: 'audio' }))}>
-                <Mic2 className="h-4 w-4 mr-2" />
-                Audio Track
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => window.dispatchEvent(new CustomEvent('add-channel', { detail: 'instrument' }))}>
-                <Piano className="h-4 w-4 mr-2" />
-                Instrument Track
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => window.dispatchEvent(new CustomEvent('add-channel', { detail: 'fx' }))}>
-                <Wand2 className="h-4 w-4 mr-2" />
-                FX Track
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          
           {/* Recent Projects History */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -226,7 +203,16 @@ const ProjectHeader = () => {
                 Recent
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-black/90 border-konform-neon-blue/30 w-72">
+            <DropdownMenuContent 
+              align="end" 
+              className="border-konform-neon-blue/30 w-72"
+              style={{ 
+                backgroundColor: "#0F0F13", 
+                backdropFilter: "none",
+                WebkitBackdropFilter: "none",
+                opacity: "1"
+              }}
+            >
               <h4 className="px-2 py-1.5 text-xs text-gray-400 font-medium">Recent Projects</h4>
               {recentProjects && recentProjects.length > 0 ? (
                 recentProjects.slice(0, 5).map((project) => (
@@ -795,6 +781,45 @@ export const MixbaseView = () => {
             <FolderPlus className="h-4 w-4 mr-2" />
             Group Selected
           </Button>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="bg-konform-neon-orange hover:bg-konform-neon-orange/80">
+                <PlusCircle className="h-4 w-4 mr-2" />
+                Add Track
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent 
+              className="border-konform-neon-blue/20"
+              style={{ 
+                backgroundColor: "#0F0F13", 
+                backdropFilter: "none",
+                WebkitBackdropFilter: "none",
+                opacity: "1"
+              }}
+            >
+              <DropdownMenuItem onClick={() => handleAddChannel('master')}>
+                <Music2 className="h-4 w-4 mr-2" />
+                Master Track
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleAddChannel('bus')}>
+                <SlidersHorizontal className="h-4 w-4 mr-2" />
+                Bus Track
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleAddChannel('audio')}>
+                <Mic2 className="h-4 w-4 mr-2" />
+                Audio Track
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleAddChannel('instrument')}>
+                <Piano className="h-4 w-4 mr-2" />
+                Instrument Track
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleAddChannel('fx')}>
+                <Wand2 className="h-4 w-4 mr-2" />
+                FX Track
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         
         <div className="flex items-center gap-2">
@@ -808,7 +833,15 @@ export const MixbaseView = () => {
                 View Options
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-black/90 border-konform-neon-blue/30">
+            <DropdownMenuContent 
+              className="border-konform-neon-blue/30"
+              style={{ 
+                backgroundColor: "#0F0F13", 
+                backdropFilter: "none",
+                WebkitBackdropFilter: "none",
+                opacity: "1"
+              }}
+            >
               <DropdownMenuLabel>Metering</DropdownMenuLabel>
               <DropdownMenuRadioGroup 
                 value={meteringMode} 
@@ -866,62 +899,60 @@ export const MixbaseView = () => {
             )}
 
             {/* All Channels in a single horizontal row */}
-            <div className="h-full">
-              <div className="text-sm font-medium text-white/60 mb-2">Mixer Channels</div>
-              <div className="flex overflow-x-auto pb-4 h-[calc(100vh-220px)]">
-                {/* Order channels by type: Master first, then buses, FX, instruments, audio */}
-                {[
-                  ...masterChannels,
-                  ...busChannels,
-                  ...channels.filter(c => c.type === 'fx'),
-                  ...channels.filter(c => c.type === 'instrument'),
-                  ...audioChannels
-                ].map(channel => (
-                  <div key={channel.id} className="mr-2 relative h-full">
-                    {/* Optional type indicator badge */}
-                    <div className="absolute top-0 left-0 z-10 px-1.5 py-0.5 text-[10px] rounded-br font-medium" 
-                      style={{ 
-                        backgroundColor: channel.type === 'master' ? 'rgba(255, 98, 0, 0.9)' : 
-                                         channel.type === 'bus' ? 'rgba(0, 209, 255, 0.9)' :
-                                         channel.type === 'fx' ? 'rgba(255, 0, 255, 0.9)' :
-                                         channel.type === 'instrument' ? 'rgba(255, 255, 0, 0.9)' :
-                                         'rgba(0, 255, 0, 0.9)',
-                        color: channel.type === 'instrument' ? '#000' : '#fff'
-                      }}
-                    >
-                      {channel.type.toUpperCase()}
-                    </div>
-                    <ChannelStrip
-                      channel={channel}
-                      onVolumeChange={(value) => handleVolumeChange(channel.id, value)}
-                      onPanChange={(value) => handlePanChange(channel.id, value)}
-                      onMute={() => handleMute(channel.id)}
-                      onSolo={() => handleSolo(channel.id)}
-                      onDuplicate={() => handleDuplicateChannel(channel.id)}
-                      onDelete={() => handleDeleteChannel(channel.id)}
-                      onRename={(newName) => handleRenameChannel(channel.id, newName)}
-                      onColorChange={(color) => handleColorChange(channel.id, color)}
-                      onAssignPersona={(persona) => handleAssignPersona(channel.id, persona)}
-                      meteringMode={channel.meterMode || meteringMode}
-                      preFaderMetering={channel.isPrefaderMetering ?? preFaderMetering}
-                      onMeterModeChange={(mode) => handleMeterModeChange(channel.id, mode)}
-                      onTogglePreFaderMetering={() => handleTogglePreFaderMetering(channel.id)}
-                      sends={channel.sends || []}
-                      onUpdateSend={(index, updates) => handleUpdateSend(channel.id, index, updates)}
-                      onRemoveSend={(index) => handleRemoveSend(channel.id, index)}
-                      onAddSend={(send) => handleAddSend(channel.id, send)}
-                      fxChannels={fxChannels}
-                      busChannels={masterAndBusChannels}
-                      availableSendTargets={[
-                        ...fxChannels.map(c => ({ id: c.id, name: c.name, type: 'fx' as const })),
-                        ...masterAndBusChannels.map(c => ({ id: c.id, name: c.name, type: c.type === 'master' ? 'master' as const : 'bus' as const }))
-                      ]}
-                      consoleMode="large"
-                      style={{ height: '100%' }}
-                    />
+            <div className="text-sm font-medium text-white/60 mb-1">Mixer Channels</div>
+            <div className="flex overflow-x-auto pb-2 h-[calc(100vh-240px)]">
+              {/* Order channels by type: Master first, then buses, FX, instruments, audio */}
+              {[
+                ...masterChannels,
+                ...busChannels,
+                ...channels.filter(c => c.type === 'fx'),
+                ...channels.filter(c => c.type === 'instrument'),
+                ...audioChannels
+              ].map(channel => (
+                <div key={channel.id} className="mr-2 relative h-full">
+                  {/* Optional type indicator badge */}
+                  <div className="absolute top-0 left-0 z-10 px-1.5 py-0.5 text-[10px] rounded-br font-medium" 
+                    style={{ 
+                      backgroundColor: channel.type === 'master' ? 'rgba(255, 98, 0, 0.9)' : 
+                                       channel.type === 'bus' ? 'rgba(0, 209, 255, 0.9)' :
+                                       channel.type === 'fx' ? 'rgba(255, 0, 255, 0.9)' :
+                                       channel.type === 'instrument' ? 'rgba(255, 255, 0, 0.9)' :
+                                       'rgba(0, 255, 0, 0.9)',
+                      color: channel.type === 'instrument' ? '#000' : '#fff'
+                    }}
+                  >
+                    {channel.type.toUpperCase()}
                   </div>
-                ))}
-              </div>
+                  <ChannelStrip
+                    channel={channel}
+                    onVolumeChange={(value) => handleVolumeChange(channel.id, value)}
+                    onPanChange={(value) => handlePanChange(channel.id, value)}
+                    onMute={() => handleMute(channel.id)}
+                    onSolo={() => handleSolo(channel.id)}
+                    onDuplicate={() => handleDuplicateChannel(channel.id)}
+                    onDelete={() => handleDeleteChannel(channel.id)}
+                    onRename={(newName) => handleRenameChannel(channel.id, newName)}
+                    onColorChange={(color) => handleColorChange(channel.id, color)}
+                    onAssignPersona={(persona) => handleAssignPersona(channel.id, persona)}
+                    meteringMode={channel.meterMode || meteringMode}
+                    preFaderMetering={channel.isPrefaderMetering ?? preFaderMetering}
+                    onMeterModeChange={(mode) => handleMeterModeChange(channel.id, mode)}
+                    onTogglePreFaderMetering={() => handleTogglePreFaderMetering(channel.id)}
+                    sends={channel.sends || []}
+                    onUpdateSend={(index, updates) => handleUpdateSend(channel.id, index, updates)}
+                    onRemoveSend={(index) => handleRemoveSend(channel.id, index)}
+                    onAddSend={(send) => handleAddSend(channel.id, send)}
+                    fxChannels={fxChannels}
+                    busChannels={masterAndBusChannels}
+                    availableSendTargets={[
+                      ...fxChannels.map(c => ({ id: c.id, name: c.name, type: 'fx' as const })),
+                      ...masterAndBusChannels.map(c => ({ id: c.id, name: c.name, type: c.type === 'master' ? 'master' as const : 'bus' as const }))
+                    ]}
+                    consoleMode="large"
+                    style={{ height: '100%' }}
+                  />
+                </div>
+              ))}
             </div>
           </div>
         </ScrollArea>

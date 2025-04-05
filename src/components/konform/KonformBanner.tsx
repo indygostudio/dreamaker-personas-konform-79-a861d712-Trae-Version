@@ -1,4 +1,3 @@
-
 import { ChevronDown, ChevronUp, Users, Download, Save, Template, Edit2, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ReactNode, useState } from "react";
@@ -156,22 +155,6 @@ export const KonformBanner = ({
           </div>
           <div className="flex justify-end items-center gap-4">
             <div className={`flex items-center gap-2 ${isCollapsed ? '' : 'transition-opacity duration-300 opacity-100'}`}>
-              <Button
-                variant="outline"
-                size="sm"
-                className={`bg-black/20 border-white/20 hover:bg-black/40 text-white rounded-full transition-all duration-300 ${useTrainingModeStore.getState().isTrainingEnabled ? 'border-konform-neon-blue training-mode-enabled' : ''}`}
-                onClick={() => {
-                  const { isTrainingEnabled, setTrainingEnabled } = useTrainingModeStore.getState();
-                  setTrainingEnabled(!isTrainingEnabled);
-                  toast({
-                    title: isTrainingEnabled ? "Training Mode Disabled" : "Training Mode Enabled",
-                    description: isTrainingEnabled ? "AI training features are now disabled" : "AI training features are now enabled",
-                  });
-                }}
-              >
-                <Brain className="w-4 h-4 mr-2" />
-                Training Mode
-              </Button>
               {rightContent}
             </div>
             <Button
@@ -196,22 +179,6 @@ export const KonformBanner = ({
               {/* Project Actions */}
               {currentProject && (
                 <div className="flex items-center justify-end gap-3 mb-4">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className={`bg-black/20 border-white/20 hover:bg-black/40 text-white rounded-full transition-all duration-300 ${useTrainingModeStore.getState().isTrainingEnabled ? 'border-konform-neon-blue training-mode-enabled' : ''}`}
-                    onClick={() => {
-                      const { isTrainingEnabled, setTrainingEnabled } = useTrainingModeStore.getState();
-                      setTrainingEnabled(!isTrainingEnabled);
-                      toast({
-                        title: isTrainingEnabled ? "Training Mode Disabled" : "Training Mode Enabled",
-                        description: isTrainingEnabled ? "AI training features are now disabled" : "AI training features are now enabled",
-                      });
-                    }}
-                  >
-                    <Brain className="w-4 h-4 mr-2" />
-                    Training Mode
-                  </Button>
                   <Button
                     variant="outline"
                     size="sm"
