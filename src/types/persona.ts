@@ -1,4 +1,3 @@
-
 import type { MediaPosition } from './media';
 
 export type MidjourneyAspectRatio = '1:1' | '16:9' | '9:16' | '4:3' | '3:2';
@@ -7,7 +6,7 @@ export type MidjourneyDimension = 'square' | 'portrait' | 'landscape';
 export type MidjourneyUpscaleIndex = '1' | '2' | '3' | '4' | 'light' | 'beta' | '2x' | '4x' | 'subtle' | 'creative';
 export type MidjourneyVariationIndex = '1' | '2' | '3' | '4' | 'high_variation' | 'low_variation';
 
-export type PersonaType = "AI_CHARACTER" | "AI_VOCALIST" | "AI_INSTRUMENTALIST" | "AI_EFFECT" | "AI_SOUND" | "AI_MIXER" | "AI_WRITER";
+export type PersonaType = "AI_CHARACTER" | "AI_VOCALIST" | "AI_INSTRUMENTALIST" | "AI_EFFECT" | "AI_SOUND" | "AI_MIXER" | "AI_WRITER" | "AI_PRODUCER" | "AI_COMPOSER" | "AI_ARRANGER" | "AI_DJ" | "AI_VISUAL_ARTIST" | "AI_AUDIO_ENGINEER";
 
 export interface Persona {
   id: string;

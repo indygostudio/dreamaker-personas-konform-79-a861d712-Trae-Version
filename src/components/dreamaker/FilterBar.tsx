@@ -1,4 +1,3 @@
-
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SortAsc, Star, Heart, Clock, ZoomIn, ZoomOut, Music, Video, Image, Code, Box, Plug, Album, Save, Plus } from "lucide-react";
@@ -8,7 +7,7 @@ import { toast } from "sonner";
 import { useUIStore } from "@/stores/uiStore";
 
 export type MediaType = 'loop' | 'midi' | 'plugin' | 'patch' | 'album';
-export type PersonaType = 'AI_CHARACTER' | 'AI_VOCALIST' | 'AI_INSTRUMENTALIST' | 'AI_EFFECT' | 'AI_SOUND' | 'AI_MIXER';
+export type PersonaType = 'AI_CHARACTER' | 'AI_VOCALIST' | 'AI_INSTRUMENTALIST' | 'AI_EFFECT' | 'AI_SOUND' | 'AI_MIXER' | 'AI_WRITER' | 'AI_PRODUCER' | 'AI_COMPOSER' | 'AI_ARRANGER' | 'AI_DJ' | 'AI_VISUAL_ARTIST' | 'AI_AUDIO_ENGINEER';
 
 interface FilterBarProps {
   searchQuery: string;
@@ -153,6 +152,12 @@ export const FilterBar = ({
               <SelectItem value="AI_SOUND">Sound</SelectItem>
               <SelectItem value="AI_MIXER">Mixer</SelectItem>
               <SelectItem value="AI_WRITER">Writer</SelectItem>
+              <SelectItem value="AI_PRODUCER">Producer</SelectItem>
+              <SelectItem value="AI_COMPOSER">Composer</SelectItem>
+              <SelectItem value="AI_ARRANGER">Arranger</SelectItem>
+              <SelectItem value="AI_DJ">DJ</SelectItem>
+              <SelectItem value="AI_VISUAL_ARTIST">Visual Artist</SelectItem>
+              <SelectItem value="AI_AUDIO_ENGINEER">Audio Engineer</SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>

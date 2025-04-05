@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { VideoBackground } from "@/components/persona/VideoBackground";
 import { useUser } from "@/hooks/useUser";
@@ -35,6 +34,15 @@ export const PersonaHeader = ({
   const [isLongPressed, setIsLongPressed] = useState(false);
   const { user } = useUser();
   const { isAdmin, isAdminMode } = useAdminMode();
+
+  // Debug info for ownership and admin status
+  console.log("=== Debug Info ===");
+  console.log("Your user ID:", user?.id);
+  console.log("Persona user ID:", persona.user_id);
+  console.log("isAdmin:", isAdmin);
+  console.log("isAdminMode:", isAdminMode);
+  console.log("Edit button visible:", user?.id === persona.user_id || (isAdmin && isAdminMode));
+  console.log("==================")
 
   const handleMouseEnter = () => {
     setIsHovering(true);

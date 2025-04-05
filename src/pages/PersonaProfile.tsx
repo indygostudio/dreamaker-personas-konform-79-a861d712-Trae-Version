@@ -1,8 +1,7 @@
-
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { PersonaHeader } from "@/components/persona/profile/PersonaHeader";
 import { transformPersonaData } from "@/lib/utils/personaTransform";
@@ -14,7 +13,7 @@ import { PersonaSection } from "@/components/persona/profile/PersonaSection";
 import { FeaturedWorks } from "@/components/persona/profile/FeaturedWorks";
 import { Slider } from "@/components/ui/slider";
 import { Card, CardContent } from "@/components/ui/card";
-import { Mic, Music, Star, Clock, Check, Edit2, Save } from "lucide-react";
+import { Mic, Music, Star, Clock, Check, Edit2, Save, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -85,6 +84,7 @@ export default function PersonaProfile({
   const [isEditing, setIsEditing] = useState(false);
   const [isAboutEditing, setIsAboutEditing] = useState(false);
   const [selectedModel, setSelectedModel] = useState("default");
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const navigate = useNavigate();
   const { user } = useUser();
   const [activeTab, setActiveTab] = useState("media");
@@ -146,7 +146,9 @@ export default function PersonaProfile({
   });
 
   const handleEditClick = () => {
+    console.log("Edit button clicked, setting isEditing to true");
     setIsEditing(true);
+    console.log("isEditing after update:", true); // Will always log true
   };
 
   const handleAboutEditClick = () => {
@@ -188,6 +190,28 @@ export default function PersonaProfile({
       }
     }
   }, [activeTab, activeMediaTab]);
+
+  // Handle scroll to top
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  };
+
+  // Show/hide scroll button based on scroll position
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 300) {
+        setShowScrollTop(true);
+      } else {
+        setShowScrollTop(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   if (error) {
     return <div className="min-h-screen bg-dreamaker-bg flex items-center justify-center">
@@ -404,6 +428,20 @@ export default function PersonaProfile({
           setIsEditing(false);
         }}
       />
+
+      {/* Scroll to top button */}
+      {showScrollTop && (
+        <div className="fixed bottom-8 right-8 z-50 animate-fade-in">
+          <Button 
+            size="icon"
+            onClick={scrollToTop}
+            className="w-12 h-12 rounded-full bg-dreamaker-purple/80 hover:bg-dreamaker-purple shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+            aria-label="Scroll to top"
+          >
+            <ChevronUp className="w-6 h-6 text-white" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

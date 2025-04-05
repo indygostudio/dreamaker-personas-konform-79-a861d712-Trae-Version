@@ -29,12 +29,23 @@ interface EditProfileDialogProps {
   onSuccess: () => void;
 }
 
+// Add a custom logging wrapper around Dialog
+const DebugDialog = ({ open, onOpenChange, children, ...props }) => {
+  console.log("DebugDialog rendering with open:", open);
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange} {...props}>
+      {children}
+    </Dialog>
+  );
+};
+
 export const EditProfileDialog = ({
   open,
   onOpenChange,
   profile,
   onSuccess,
 }: EditProfileDialogProps) => {
+  console.log("EditProfileDialog rendered with open:", open, "profile ID:", profile?.id);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [username, setUsername] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
@@ -64,41 +75,108 @@ export const EditProfileDialog = ({
     }
   }, [profile, open]);
   
+  // Map profile_type from database to our app's persona types
+  const mapProfileTypeToPersonaType = (profileType: string | null): PersonaType[] => {
+    switch (profileType) {
+      case "writer":
+        return ["AI_WRITER"];
+      case "mixer":
+        return ["AI_MIXER"];
+      case "musician":
+        return ["AI_INSTRUMENTALIST"]; // Default musician type
+      default:
+        return []; // Empty array if no match
+    }
+  };
+
   // Load profile data when component mounts or dialog opens
   useEffect(() => {
     const fetchProfileData = async () => {
       if (!profile?.id || !open) return;
       
+      console.log("Fetching profile data for ID:", profile.id);
+      
       try {
+        // First, check if the profile exists
         const { data, error } = await supabase
           .from("profiles")
           .select("*")
           .eq("id", profile.id)
           .single();
           
-        if (error) throw error;
+        if (error) {
+          console.error("Error fetching profile data:", error);
+          
+          // Only set default values if it's a "not found" error
+          if (error.code === 'PGRST116') {
+            console.log("No profile found in database - using default values");
+            
+            // Use profile values as defaults
+            setUsername(profile.username || "");
+            setDisplayName(profile.username || "");
+            setAvatarUrl(profile.avatar_url || "");
+            setBannerUrl(profile.banner_url || "");
+            setBio("");
+            setVideoUrl("");
+            setBannerPosition({ x: 50, y: 50 });
+            setDarknessFactor(0);
+            setGenre([]);
+            setLocation("");
+            
+            // If persona_types is provided, use it
+            if (profile.persona_types && profile.persona_types.length > 0) {
+              setProfileType(profile.persona_types);
+            }
+            
+            return;
+          } else {
+            throw error;
+          }
+        }
         
+        // Profile found, map the data
         if (data) {
-          setDisplayName(data.display_name || "");
+          console.log("Profile data fetched from database:", data);
+          
+          setUsername(data.username || profile.username || "");
+          setDisplayName(data.display_name || profile.username || "");
+          setAvatarUrl(data.avatar_url || profile.avatar_url || "");
+          setBannerUrl(data.banner_url || profile.banner_url || "");
           setBio(data.bio || "");
           setVideoUrl(data.video_url || "");
           setBannerPosition(data.banner_position || { x: 50, y: 50 });
           setDarknessFactor(data.darkness_factor || 0);
-          setGenre(data.genres || []);
+          setGenre(data.genre || []);
           setLocation(data.location || "");
+          setIsPublic(data.is_public === true);
+          
+          // Map profile_type to persona type
+          const mappedPersonaTypes = mapProfileTypeToPersonaType(data.profile_type);
+          if (mappedPersonaTypes.length > 0) {
+            setProfileType(mappedPersonaTypes);
+          } else if (profile.persona_types && profile.persona_types.length > 0) {
+            // Fallback to profile.persona_types if mapping fails
+            setProfileType(profile.persona_types);
+          }
         }
       } catch (error) {
-        console.error("Error fetching profile data:", error);
+        console.error("Error in fetchProfileData:", error);
         toast({
           title: "Error",
-          description: "Failed to load profile data",
+          description: "Could not load profile data. Using default values.",
           variant: "destructive"
         });
+        
+        // Set minimal defaults on error
+        setUsername(profile.username || "");
+        setDisplayName(profile.username || "");
+        setAvatarUrl(profile.avatar_url || "");
+        setBannerUrl(profile.banner_url || "");
       }
     };
     
     fetchProfileData();
-  }, [profile?.id, open, toast]);
+  }, [profile, open, toast]);
 
   const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -133,32 +211,72 @@ export const EditProfileDialog = ({
     }
   };
 
+  // Map the persona type to profile type for database
+  const mapPersonaTypeToProfileType = (personaType: PersonaType | null): string => {
+    switch (personaType) {
+      case "AI_WRITER":
+        return "writer";
+      case "AI_MIXER":
+      case "AI_AUDIO_ENGINEER":
+        return "mixer";
+      case "AI_VOCALIST":
+      case "AI_INSTRUMENTALIST":
+      case "AI_PRODUCER":
+      case "AI_COMPOSER":
+      case "AI_ARRANGER":
+      case "AI_DJ":
+      case "AI_SOUND":
+        return "musician";
+      default:
+        return "musician"; // Default value
+    }
+  };
+  
+  const prepareProfileDataForSave = () => {
+    // Get the mapped profile type value for database
+    const profileTypeValue = mapPersonaTypeToProfileType(profileType[0]);
+    
+    return {
+      id: profile.id,
+      username,
+      display_name: displayName,
+      avatar_url: avatarUrl,
+      banner_url: bannerUrl, 
+      banner_position: bannerPosition,
+      darkness_factor: darknessFactor,
+      bio,
+      video_url: videoUrl,
+      is_public: isPublic,
+      profile_type: profileTypeValue,
+      genre: genre,
+      location
+    };
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    console.log("Submitting profile form with ID:", profile.id);
 
     try {
+      // Prepare the data with consistent format
+      const profileData = prepareProfileDataForSave();
+      console.log("Profile data prepared for save:", profileData);
+      
+      // Always update (upsert) the profile
       const { error } = await supabase
         .from("profiles")
-        .update({
-          username,
-          display_name: displayName,
-          avatar_url: avatarUrl,
-          banner_url: bannerUrl,
-          banner_position: bannerPosition,
-          darkness_factor: darknessFactor,
-          bio: bio,
-          video_url: videoUrl,
-          is_public: isPublic,
-          profile_type: profileType[0] || "musician",
-          subtype: selectedSubtype,
-          genres: genre,
-          location: location
-        })
-        .eq("id", profile.id);
+        .upsert(profileData, {
+          onConflict: 'id',
+          ignoreDuplicates: false,
+        });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error saving profile:", error);
+        throw error;
+      }
 
+      console.log("Profile saved successfully");
       toast({
         title: "Success",
         description: "Profile updated successfully",
@@ -166,10 +284,10 @@ export const EditProfileDialog = ({
       onSuccess();
       onOpenChange(false);
     } catch (error) {
-      console.error("Error updating profile:", error);
+      console.error("Error saving profile:", error);
       toast({
         title: "Error",
-        description: "Failed to update profile",
+        description: "Failed to save profile. Please check console for details.",
         variant: "destructive",
       });
     } finally {
@@ -245,12 +363,54 @@ export const EditProfileDialog = ({
           { label: "All Instruments", value: null },
           { label: "Drums", value: "Drums" },
           { label: "Guitar", value: "Guitar" },
+          { label: "Electric Guitar", value: "Electric Guitar" },
+          { label: "Acoustic Guitar", value: "Acoustic Guitar" },
           { label: "Bass", value: "Bass" },
           { label: "Keyboard", value: "Keyboard" },
+          { label: "Piano", value: "Piano" },
+          { label: "Organ", value: "Organ" },
+          { label: "Synth", value: "Synth" },
           { label: "Wind", value: "Wind" },
+          { label: "Saxophone", value: "Saxophone" },
+          { label: "Flute", value: "Flute" },
+          { label: "Clarinet", value: "Clarinet" },
+          { label: "Oboe", value: "Oboe" },
+          { label: "Bassoon", value: "Bassoon" },
+          { label: "Recorder", value: "Recorder" },
           { label: "Brass", value: "Brass" },
+          { label: "Trumpet", value: "Trumpet" },
+          { label: "Trombone", value: "Trombone" },
+          { label: "French Horn", value: "French Horn" },
+          { label: "Tuba", value: "Tuba" },
+          { label: "Cornet", value: "Cornet" },
           { label: "Plucked", value: "Plucked" },
-          { label: "Strings", value: "Strings" }
+          { label: "Harp", value: "Harp" },
+          { label: "Ukulele", value: "Ukulele" },
+          { label: "Banjo", value: "Banjo" },
+          { label: "Mandolin", value: "Mandolin" },
+          { label: "Strings", value: "Strings" },
+          { label: "Violin", value: "Violin" },
+          { label: "Viola", value: "Viola" },
+          { label: "Cello", value: "Cello" },
+          { label: "Double Bass", value: "Double Bass" },
+          { label: "Percussion", value: "Percussion" },
+          { label: "Timpani", value: "Timpani" },
+          { label: "Marimba", value: "Marimba" },
+          { label: "Xylophone", value: "Xylophone" },
+          { label: "Vibraphone", value: "Vibraphone" },
+          { label: "Djembe", value: "Djembe" },
+          { label: "Cajon", value: "Cajon" },
+          { label: "Tabla", value: "Tabla" },
+          { label: "Bongos", value: "Bongos" },
+          { label: "Congas", value: "Congas" },
+          { label: "Theremin", value: "Theremin" },
+          { label: "Accordion", value: "Accordion" },
+          { label: "Harmonica", value: "Harmonica" },
+          { label: "Bagpipes", value: "Bagpipes" },
+          { label: "Sitar", value: "Sitar" },
+          { label: "Erhu", value: "Erhu" },
+          { label: "Koto", value: "Koto" },
+          { label: "Shamisen", value: "Shamisen" }
         ];
       case "AI_EFFECT":
         return [
@@ -264,7 +424,179 @@ export const EditProfileDialog = ({
           { label: "Flanger", value: "Flanger" },
           { label: "Phaser", value: "Phaser" },
           { label: "Harmonizer", value: "Harmonizer" },
-          { label: "Distortion", value: "Distortion" }
+          { label: "Distortion", value: "Distortion" },
+          { label: "Compressor", value: "Compressor" },
+          { label: "EQ", value: "EQ" },
+          { label: "Limiter", value: "Limiter" },
+          { label: "Noise Gate", value: "Noise Gate" },
+          { label: "Pitch Shifter", value: "Pitch Shifter" },
+          { label: "Auto-Tune", value: "Auto-Tune" },
+          { label: "Vocoder", value: "Vocoder" }
+        ];
+      case "AI_SOUND":
+        return [
+          { label: "All Sounds", value: null },
+          { label: "Ambience", value: "Ambience" },
+          { label: "Sound Effects", value: "Sound Effects" },
+          { label: "Foley", value: "Foley" },
+          { label: "Nature", value: "Nature" },
+          { label: "Urban", value: "Urban" },
+          { label: "Mechanical", value: "Mechanical" },
+          { label: "Electronic", value: "Electronic" },
+          { label: "Animal", value: "Animal" },
+          { label: "Human", value: "Human" },
+          { label: "Weather", value: "Weather" },
+          { label: "Industrial", value: "Industrial" },
+          { label: "Sci-Fi", value: "Sci-Fi" },
+          { label: "Fantasy", value: "Fantasy" },
+          { label: "Horror", value: "Horror" }
+        ];
+      case "AI_MIXER":
+        return [
+          { label: "All Mixers", value: null },
+          { label: "Mastering Engineer", value: "Mastering Engineer" },
+          { label: "Recording Engineer", value: "Recording Engineer" },
+          { label: "Mix Engineer", value: "Mix Engineer" },
+          { label: "Vocal Producer", value: "Vocal Producer" },
+          { label: "Tracking Engineer", value: "Tracking Engineer" },
+          { label: "Sound Designer", value: "Sound Designer" },
+          { label: "Audio Restoration", value: "Audio Restoration" },
+          { label: "Film Audio", value: "Film Audio" },
+          { label: "Game Audio", value: "Game Audio" },
+          { label: "Broadcast Engineer", value: "Broadcast Engineer" }
+        ];
+      case "AI_WRITER":
+        return [
+          { label: "All Writers", value: null },
+          { label: "Songwriter", value: "Songwriter" },
+          { label: "Lyricist", value: "Lyricist" },
+          { label: "Composer", value: "Composer" },
+          { label: "Poet", value: "Poet" },
+          { label: "Novelist", value: "Novelist" },
+          { label: "Screenwriter", value: "Screenwriter" },
+          { label: "Playwright", value: "Playwright" },
+          { label: "Journalist", value: "Journalist" },
+          { label: "Blogger", value: "Blogger" },
+          { label: "Technical Writer", value: "Technical Writer" },
+          { label: "Copywriter", value: "Copywriter" },
+          { label: "Ghostwriter", value: "Ghostwriter" }
+        ];
+      case "AI_PRODUCER":
+        return [
+          { label: "All Producers", value: null },
+          { label: "Pop Producer", value: "Pop Producer" },
+          { label: "Hip Hop Producer", value: "Hip Hop Producer" },
+          { label: "EDM Producer", value: "EDM Producer" },
+          { label: "Rock Producer", value: "Rock Producer" },
+          { label: "R&B Producer", value: "R&B Producer" },
+          { label: "Jazz Producer", value: "Jazz Producer" },
+          { label: "Classical Producer", value: "Classical Producer" },
+          { label: "Trap Producer", value: "Trap Producer" },
+          { label: "K-Pop Producer", value: "K-Pop Producer" },
+          { label: "Latin Producer", value: "Latin Producer" },
+          { label: "Reggaeton Producer", value: "Reggaeton Producer" },
+          { label: "Country Producer", value: "Country Producer" },
+          { label: "Indie Producer", value: "Indie Producer" },
+          { label: "Folk Producer", value: "Folk Producer" },
+          { label: "Reggae Producer", value: "Reggae Producer" }
+        ];
+      case "AI_COMPOSER":
+        return [
+          { label: "All Composers", value: null },
+          { label: "Classical Composer", value: "Classical Composer" },
+          { label: "Film Score Composer", value: "Film Score Composer" },
+          { label: "Video Game Composer", value: "Video Game Composer" },
+          { label: "TV Music Composer", value: "TV Music Composer" },
+          { label: "Orchestral Composer", value: "Orchestral Composer" },
+          { label: "Chamber Music Composer", value: "Chamber Music Composer" },
+          { label: "Opera Composer", value: "Opera Composer" },
+          { label: "Ballet Composer", value: "Ballet Composer" },
+          { label: "Choral Composer", value: "Choral Composer" },
+          { label: "Ambient Composer", value: "Ambient Composer" },
+          { label: "Minimalist Composer", value: "Minimalist Composer" },
+          { label: "Jazz Composer", value: "Jazz Composer" },
+          { label: "Neo-Classical Composer", value: "Neo-Classical Composer" },
+          { label: "Electronic Composer", value: "Electronic Composer" },
+          { label: "Experimental Composer", value: "Experimental Composer" }
+        ];
+      case "AI_ARRANGER":
+        return [
+          { label: "All Arrangers", value: null },
+          { label: "Orchestral Arranger", value: "Orchestral Arranger" },
+          { label: "Jazz Arranger", value: "Jazz Arranger" },
+          { label: "Pop Arranger", value: "Pop Arranger" },
+          { label: "Classical Arranger", value: "Classical Arranger" },
+          { label: "Film Score Arranger", value: "Film Score Arranger" },
+          { label: "A Cappella Arranger", value: "A Cappella Arranger" },
+          { label: "Choir Arranger", value: "Choir Arranger" },
+          { label: "Small Ensemble Arranger", value: "Small Ensemble Arranger" },
+          { label: "Big Band Arranger", value: "Big Band Arranger" },
+          { label: "Electronic Arranger", value: "Electronic Arranger" },
+          { label: "Rock Arranger", value: "Rock Arranger" },
+          { label: "Hip Hop Arranger", value: "Hip Hop Arranger" },
+          { label: "World Music Arranger", value: "World Music Arranger" }
+        ];
+      case "AI_DJ":
+        return [
+          { label: "All DJs", value: null },
+          { label: "House DJ", value: "House DJ" },
+          { label: "Techno DJ", value: "Techno DJ" },
+          { label: "EDM DJ", value: "EDM DJ" },
+          { label: "Trance DJ", value: "Trance DJ" },
+          { label: "Hip Hop DJ", value: "Hip Hop DJ" },
+          { label: "Turntablist", value: "Turntablist" },
+          { label: "Open Format DJ", value: "Open Format DJ" },
+          { label: "Mobile DJ", value: "Mobile DJ" },
+          { label: "Radio DJ", value: "Radio DJ" },
+          { label: "Club DJ", value: "Club DJ" },
+          { label: "Festival DJ", value: "Festival DJ" },
+          { label: "Jungle/Drum & Bass DJ", value: "Jungle/Drum & Bass DJ" },
+          { label: "Dubstep DJ", value: "Dubstep DJ" },
+          { label: "Reggae/Dancehall DJ", value: "Reggae/Dancehall DJ" },
+          { label: "Disco DJ", value: "Disco DJ" },
+          { label: "Ambient/Chill DJ", value: "Ambient/Chill DJ" },
+          { label: "Wedding DJ", value: "Wedding DJ" }
+        ];
+      case "AI_VISUAL_ARTIST":
+        return [
+          { label: "All Visual Artists", value: null },
+          { label: "Digital Painter", value: "Digital Painter" },
+          { label: "3D Modeler", value: "3D Modeler" },
+          { label: "Concept Artist", value: "Concept Artist" },
+          { label: "Character Designer", value: "Character Designer" },
+          { label: "Environment Artist", value: "Environment Artist" },
+          { label: "UI/UX Designer", value: "UI/UX Designer" },
+          { label: "Animation Artist", value: "Animation Artist" },
+          { label: "Pixel Artist", value: "Pixel Artist" },
+          { label: "Traditional Painter", value: "Traditional Painter" },
+          { label: "Illustrator", value: "Illustrator" },
+          { label: "Comic Artist", value: "Comic Artist" },
+          { label: "Graphic Designer", value: "Graphic Designer" },
+          { label: "VFX Artist", value: "VFX Artist" },
+          { label: "Motion Graphics Artist", value: "Motion Graphics Artist" },
+          { label: "Photographer", value: "Photographer" },
+          { label: "Photomanipulation Artist", value: "Photomanipulation Artist" },
+          { label: "Street Artist", value: "Street Artist" },
+          { label: "Sculptor", value: "Sculptor" },
+          { label: "Abstract Artist", value: "Abstract Artist" }
+        ];
+      case "AI_AUDIO_ENGINEER":
+        return [
+          { label: "All Audio Engineers", value: null },
+          { label: "Studio Engineer", value: "Studio Engineer" },
+          { label: "Live Sound Engineer", value: "Live Sound Engineer" },
+          { label: "Broadcast Engineer", value: "Broadcast Engineer" },
+          { label: "Acoustic Engineer", value: "Acoustic Engineer" },
+          { label: "System Engineer", value: "System Engineer" },
+          { label: "FOH Engineer", value: "FOH Engineer" },
+          { label: "Monitor Engineer", value: "Monitor Engineer" },
+          { label: "Recording Engineer", value: "Recording Engineer" },
+          { label: "Mixing Engineer", value: "Mixing Engineer" },
+          { label: "Mastering Engineer", value: "Mastering Engineer" },
+          { label: "Post-Production Engineer", value: "Post-Production Engineer" },
+          { label: "Sound Designer", value: "Sound Designer" },
+          { label: "Foley Engineer", value: "Foley Engineer" },
+          { label: "A/V Engineer", value: "A/V Engineer" }
         ];
       default:
         return [];
@@ -287,70 +619,56 @@ export const EditProfileDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="p-0 gap-0 max-w-screen-lg w-[95vw] h-[90vh] overflow-hidden bg-black/95 border-dreamaker-purple/20">
-        <DialogHeader className="p-6 pb-0">
-          <DialogTitle>Edit Profile</DialogTitle>
+    <DebugDialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="p-0 gap-0 max-w-screen-lg w-[95vw] h-[90vh] overflow-auto bg-black/95 border-dreamaker-purple/20 flex flex-col">
+        <DialogHeader className="p-6 pb-2 flex-shrink-0">
+          <DialogTitle className="text-2xl">Edit Profile</DialogTitle>
           <DialogDescription className="text-gray-400">
             Update your profile information and media
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="p-6">
-          <ProfileForm
-            username={username}
-            setUsername={setUsername}
-            displayName={displayName}
-            setDisplayName={setDisplayName}
-            bio={bio}
-            setBio={setBio}
-            avatarUrl={avatarUrl}
-            setAvatarUrl={setAvatarUrl}
-            bannerUrl={bannerUrl}
-            setBannerUrl={setBannerUrl}
-            videoUrl={videoUrl}
-            setVideoUrl={setVideoUrl}
-            isPublic={isPublic}
-            setIsPublic={setIsPublic}
-            profileType={profileType}
-            setProfileType={setProfileType}
-            bannerPosition={bannerPosition}
-            setBannerPosition={setBannerPosition}
-            darknessFactor={darknessFactor}
-            onDarknessChange={setDarknessFactor}
-            genre={genre}
-            setGenre={setGenre}
-            location={location}
-            setLocation={setLocation}
-          />
+        <form onSubmit={handleSubmit} className="p-6 pt-2 flex-1 overflow-hidden flex flex-col">
+          <div className="flex-1 overflow-hidden">
+            <ProfileForm
+              username={username}
+              setUsername={setUsername}
+              displayName={displayName}
+              setDisplayName={setDisplayName}
+              bio={bio}
+              setBio={setBio}
+              avatarUrl={avatarUrl}
+              setAvatarUrl={setAvatarUrl}
+              bannerUrl={bannerUrl}
+              setBannerUrl={setBannerUrl}
+              videoUrl={videoUrl}
+              setVideoUrl={setVideoUrl}
+              isPublic={isPublic}
+              setIsPublic={setIsPublic}
+              profileType={profileType}
+              setProfileType={setProfileType}
+              bannerPosition={bannerPosition}
+              setBannerPosition={setBannerPosition}
+              darknessFactor={darknessFactor}
+              onDarknessChange={setDarknessFactor}
+              genre={genre}
+              setGenre={setGenre}
+              location={location}
+              setLocation={setLocation}
+              selectedSubtype={selectedSubtype}
+              setSelectedSubtype={setSelectedSubtype}
+            />
+          </div>
           
-          {profileType.length > 0 && getSubtypeOptions(profileType[0]).length > 0 && (
-            <div>
-              <Label htmlFor="subtype" className="text-white">Subtype</Label>
-              <Select
-                value={selectedSubtype || ""}
-                onValueChange={(value) => setSelectedSubtype(value || null)}
-              >
-                <SelectTrigger className="bg-black/50 border-dreamaker-purple/30 text-white">
-                  <SelectValue placeholder="Select a subtype" />
-                </SelectTrigger>
-                <SelectContent className="bg-black/90 border-dreamaker-purple/20 text-white">
-                  {getSubtypeOptions(profileType[0]).map((option) => (
-                    <SelectItem 
-                      key={option.label} 
-                      value={option.value || ""}
-                      className="text-white hover:bg-dreamaker-purple/20"
-                    >
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-          
-          {/* Remove the existing subtype selection code */}
-          
-          <div className="flex justify-end gap-4">
+          <div className="flex justify-end gap-4 mt-6 pt-4 border-t border-dreamaker-purple/20 flex-shrink-0">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              className="border-dreamaker-purple/30"
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
             <Button
               type="submit"
               disabled={isSubmitting}
@@ -361,6 +679,6 @@ export const EditProfileDialog = ({
           </div>
         </form>
       </DialogContent>
-    </Dialog>
+    </DebugDialog>
   );
 };

@@ -26,10 +26,10 @@ interface AdminModeProviderProps {
 // List of admin user IDs
 // In a production environment, this would be fetched from the database
 const ADMIN_USER_IDS = [
-  // Admin user IDs
-  "YOUR_USER_ID", // Replace this with your actual user ID when you sign in
-  "IRKO_USER_ID", // IRKO's user ID
-  "ROSS_HOGARTH_USER_ID", // Ross Hogarth's user ID
+  // Add your actual user ID here
+  // You can get it from the browser console by running:
+  // console.log((await supabase.auth.getUser()).data.user?.id)
+  "41bbfeda-29be-49ad-bebd-56f62fcf3e58", // Example ID - replace with your actual ID
   // Add any additional admin user IDs here
 ];
 
