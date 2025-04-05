@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useUser } from '@/hooks/useUser';
 import { useUIStore } from '@/stores/uiStore';
@@ -9,7 +10,6 @@ import { NavigationButton } from '@/components/persona/profile/header/Navigation
 import { VideoBackground } from '@/components/persona/VideoBackground';
 import { HeaderSkeleton } from './header/HeaderSkeleton';
 import { BannerContextMenu } from './header/BannerContextMenu';
-import { FollowerStats } from './header/FollowerStats';
 import type { BannerPosition } from '@/types/types';
 import { BioText } from './header/BioText';
 
@@ -127,16 +127,8 @@ export const ProfileHeader = ({
                 {persona.display_name || persona.username || "Artist"}
               </h1>
               
-              {isHeaderExpanded && (
-                <>
-                  <div className="mb-2">
-                    <FollowerStats userId={persona.id} />
-                  </div>
-                  
-                  {persona.bio && (
-                    <BioText text={persona.bio || persona.user_bio} />
-                  )}
-                </>
+              {isHeaderExpanded && persona.bio && (
+                <BioText text={persona.bio || persona.user_bio} />
               )}
             </div>
           </div>

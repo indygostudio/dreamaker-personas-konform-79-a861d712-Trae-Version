@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSession } from "@supabase/auth-helpers-react";
@@ -18,7 +19,7 @@ export const Hero = () => {
     {
       video: "/Videos/KONFORM_BG_04.mp4",
       title: "DREAMAKER",
-      description: "",
+      description: "Experience the future of music creation with our AI-powered tools and virtual artists",
       sectionId: "dreamaker-section"
     },
     {
@@ -155,6 +156,11 @@ export const Hero = () => {
             )}
           </button>
         ))}
+      </div>
+
+      {/* Action Button */}
+      <div className="relative z-10 container mx-auto px-4 h-full flex flex-col justify-center items-center text-center mt-32">
+        <SubscriptionDialog />
       </div>
     </div>
   );

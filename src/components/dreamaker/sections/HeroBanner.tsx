@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Banner } from "@/types/banner";
@@ -74,7 +75,7 @@ export const HeroBanner = ({
       case "media":
         return "Browse and manage your media collections";
       default:
-        return "";
+        return "Experience the future of music creation with our AI-powered tools and virtual artists";
     }
   };
 
@@ -158,6 +159,9 @@ export const HeroBanner = ({
               <p className={`text-xl mb-6 mx-auto max-w-2xl transition-all duration-300 ${isTransitioning ? 'opacity-0 transform translate-y-4' : 'opacity-100 transform translate-y-0'}`}>
                 {getBannerDescription()}
               </p>
+              <div className={`flex justify-center w-full transition-all duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
+                <SubscriptionDialog />
+              </div>
             </>
           )}
         </div>
