@@ -1,51 +1,27 @@
-import { useState, useEffect, useRef, RefObject } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
-interface Size {
-  width?: number;
-  height?: number;
-}
+type Size = {
+  width: number;
+  height: number;
+};
 
-export function useResizeObserver<T extends HTMLElement = HTMLElement>(
-  ref: RefObject<T>
+export function useResizeObserver<T extends HTMLElement>(
+  ref: React.RefObject<T>
 ): Size {
-  const [size, setSize] = useState<Size>({
-    width: undefined,
-    height: undefined,
-  });
-
-  // Using a ref to store the ResizeObserver instance
-  const observer = useRef<ResizeObserver | null>(null);
+  const [size, setSize] = useState<Size>({ width: 0, height: 0 });
 
   useEffect(() => {
     if (!ref.current) return;
 
-    // Cleanup previous observer
-    if (observer.current) {
-      observer.current.disconnect();
-    }
-
-    // Create a new ResizeObserver
-    observer.current = new ResizeObserver(entries => {
-      const entry = entries[0];
-      const { width, height } = entry.contentRect;
-      
-      // Only update if values have actually changed
-      setSize(prevSize => {
-        if (prevSize.width !== width || prevSize.height !== height) {
-          return { width, height };
-        }
-        return prevSize;
-      });
+    const observer = new ResizeObserver((entries) => {
+      const { width, height } = entries[0].contentRect;
+      setSize({ width, height });
     });
 
-    // Start observing the element
-    observer.current.observe(ref.current);
+    observer.observe(ref.current);
 
-    // Cleanup function
     return () => {
-      if (observer.current) {
-        observer.current.disconnect();
-      }
+      observer.disconnect();
     };
   }, [ref]);
 
