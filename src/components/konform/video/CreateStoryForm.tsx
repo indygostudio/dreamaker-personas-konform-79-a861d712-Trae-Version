@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Wand2, Plus, Sparkles, Clock } from "lucide-react";
+import { Wand2, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useStoryboard } from "@/contexts/StoryboardContext";
 import { generateScenesFromStory } from "@/utils/storyUtils";
@@ -35,12 +35,10 @@ const CreateStoryForm: React.FC<CreateStoryFormProps> = ({ onStoryCreated }) => 
     setIsCreatingStory(true);
     
     try {
-      console.log("Creating story with description:", description.trim());
-      
       // Generate a story ID first
       const storyId = crypto.randomUUID();
       
-      // Dispatch with the ID included
+      // Add the story to the project
       dispatch({
         type: "ADD_STORY",
         payload: {
@@ -51,23 +49,17 @@ const CreateStoryForm: React.FC<CreateStoryFormProps> = ({ onStoryCreated }) => 
         }
       });
       
-      console.log("Story created with ID:", storyId);
-      
+      // Generate scenes from the description
       const durationInMinutes = parseFloat(duration) || 2;
       const scenes = generateScenesFromStory(description.trim(), durationInMinutes);
       
-      console.log("Generated scenes:", scenes);
-      
       if (scenes.length === 0) {
-        console.warn("No scenes were generated from the description");
         toast.warning("No scenes could be generated from your description. Try adding more details.");
       }
       
+      // Add scenes to the story
       for (const scene of scenes) {
         const generatedPrompt = generatePromptForScene(scene.description);
-        
-        console.log("Adding scene:", scene.description);
-        console.log("Generated prompt:", generatedPrompt);
         
         dispatch({
           type: "ADD_SCENE",
@@ -81,6 +73,7 @@ const CreateStoryForm: React.FC<CreateStoryFormProps> = ({ onStoryCreated }) => 
         });
       }
       
+      // Find the newly created story and set it as active
       const newStory = activeProject.stories.find(story => story.id === storyId);
       
       if (newStory) {
@@ -90,11 +83,9 @@ const CreateStoryForm: React.FC<CreateStoryFormProps> = ({ onStoryCreated }) => 
         if (onStoryCreated) {
           onStoryCreated();
         }
-      } else {
-        console.error("Could not find newly created story");
-        toast.error("Error accessing the created story");
       }
 
+      // Reset form
       setTitle("");
       setDescription("");
       setDuration("2");
@@ -115,8 +106,7 @@ const CreateStoryForm: React.FC<CreateStoryFormProps> = ({ onStoryCreated }) => 
     setIsGenerating(true);
     
     try {
-      // This is a simplified version that just generates a basic description
-      // In a real application, this might call an AI service
+      // Simple story generator - in a real app this might call an AI service
       const generatedDescription = `A story about ${title} that unfolds over ${duration} minutes. ` +
         `It begins with an introduction to the main elements, then develops through a series of ` +
         `connected scenes, and concludes with a resolution.`;
@@ -198,7 +188,6 @@ const CreateStoryForm: React.FC<CreateStoryFormProps> = ({ onStoryCreated }) => 
               onChange={(e) => setDuration(e.target.value)}
               className="w-24 bg-black/50 border-white/10 text-white"
             />
-            <Clock className="w-4 h-4 text-gray-400" />
           </div>
           <p className="text-xs text-gray-400 mt-1">
             Recommended: 1-5 minutes for optimal scene generation

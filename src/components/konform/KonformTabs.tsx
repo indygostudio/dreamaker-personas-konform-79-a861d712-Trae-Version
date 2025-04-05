@@ -1,4 +1,3 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { KonformBanner } from "./KonformBanner";
 import { useHeaderStore } from "./store/headerStore";
@@ -13,7 +12,7 @@ import { EditorTabs } from "./editor/EditorTabs";
 import { LyricsView } from "./lyrics/LyricsView";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-
+import VideoTab from "./video/VideoTab";
 
 export const KonformTabs = () => {
   const { toast } = useToast();
@@ -27,8 +26,6 @@ export const KonformTabs = () => {
   // Get the tab from URL query parameters or default to "editor"
   const urlTab = searchParams.get('tab');
   const [activeTab, setActiveTab] = useState(urlTab || "editor");
-
-
 
   useEffect(() => {
     // Update active tab when URL query parameter changes
@@ -117,9 +114,11 @@ export const KonformTabs = () => {
               <EditorTabs />
             </TabsContent>
             <TabsContent value="video">
-              <div className="min-h-[calc(100vh-180px)] bg-black/40 rounded-lg relative">
-                {/* Empty container for future video content */}
-              </div>
+              {activeTab === "video" && (
+                <div key="video-tab-content">
+                  <VideoTab />
+                </div>
+              )}
             </TabsContent>
             <TabsContent value="settings">
               <div className="min-h-[calc(100vh-180px)] bg-black/40 rounded-lg" />

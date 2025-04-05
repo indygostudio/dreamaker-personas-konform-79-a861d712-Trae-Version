@@ -228,3 +228,42 @@ function distributeTimeDifference(scenes: SceneInfo[], difference: number): void
     if (index > scenes.length * 2) break;
   }
 }
+
+// Utility functions for story generation
+
+/**
+ * Generates scenes from a story description, splitting it into smaller parts and assigning durations
+ * @param storyline The full story description
+ * @param totalDurationInMinutes Total duration in minutes for all scenes
+ * @returns Array of scenes with descriptions and durations
+ */
+export const generateScenesFromStory = (storyline: string, totalDurationInMinutes: number) => {
+  // Simple scene generator
+  const sentences = storyline.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  const scenes = [];
+  
+  const minScenesCount = Math.min(sentences.length, 3);
+  const maxScenesCount = Math.min(sentences.length, 8);
+  const scenesCount = Math.floor(Math.random() * (maxScenesCount - minScenesCount + 1)) + minScenesCount;
+  
+  const totalDurationSeconds = totalDurationInMinutes * 60;
+  const avgDurationPerScene = totalDurationSeconds / scenesCount;
+  
+  for (let i = 0; i < scenesCount; i++) {
+    const sentenceIndex = Math.floor((i / scenesCount) * sentences.length);
+    const description = sentences[sentenceIndex];
+    
+    // Randomize duration slightly around the average
+    const variationFactor = 0.3; // 30% variation
+    const minDuration = avgDurationPerScene * (1 - variationFactor);
+    const maxDuration = avgDurationPerScene * (1 + variationFactor);
+    const duration = Math.floor(minDuration + Math.random() * (maxDuration - minDuration));
+    
+    scenes.push({
+      description: description.trim(),
+      durationInSeconds: duration
+    });
+  }
+  
+  return scenes;
+};

@@ -10,7 +10,7 @@ interface StoryListProps {
 }
 
 const StoryList: React.FC<StoryListProps> = ({ onDeleteStory }) => {
-  const { activeProject, activeScene, setActiveScene, dispatch } = useStoryboard();
+  const { activeProject, activeScene, setActiveScene } = useStoryboard();
 
   if (!activeProject) return null;
   if (activeProject.stories.length === 0) {
