@@ -288,12 +288,12 @@ export const ChannelStrip = ({
             </div>
           </div>
 
-          <div className="w-full flex flex-col items-center gap-2 border-b border-konform-neon-blue/10 pb-2">
+          <div className="w-full flex flex-col items-center gap-1 border-b border-konform-neon-blue/10 pb-1">
             <DropdownMenu open={showPersonasDropdown} onOpenChange={setShowPersonasDropdown}>
               <DropdownMenuTrigger asChild>
                 {currentCollaborator ? (
                   <Avatar 
-                    className="h-12 w-12 cursor-pointer hover:ring-2 hover:ring-konform-neon-blue/50 transition-all"
+                    className="h-9 w-9 cursor-pointer hover:ring-2 hover:ring-konform-neon-blue/50 transition-all"
                   >
                     <AvatarImage src={currentCollaborator.avatar_url} />
                     <AvatarFallback>{currentCollaborator.name?.[0]}</AvatarFallback>
@@ -302,15 +302,16 @@ export const ChannelStrip = ({
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    className="h-12 w-12 rounded-full border-2 border-dashed border-konform-neon-blue/20 hover:border-konform-neon-blue/50"
+                    className="h-9 w-9 rounded-full border-2 border-dashed border-konform-neon-blue/20 hover:border-konform-neon-blue/50"
                     onDoubleClick={handleDoubleClick}
                   >
-                    <UserPlus2 className="h-6 w-6 text-konform-neon-blue/50" />
+                    <UserPlus2 className="h-4 w-4 text-konform-neon-blue/50" />
                   </Button>
                 )}
               </DropdownMenuTrigger>
               <DropdownMenuContent 
                 className="w-56 bg-[#1A1F2C] border border-konform-neon-blue/20"
+                style={{ backgroundColor: "#1A1F2C" }}
               >
                 <DropdownMenuLabel>
                   {currentCollaborator ? "Change Persona" : "Add Persona"}
@@ -351,7 +352,7 @@ export const ChannelStrip = ({
           </div>
 
           {!isMaster && (
-            <div className="w-full space-y-1 border-b border-konform-neon-blue/10 pb-2">
+            <div className="w-full space-y-1 border-b border-konform-neon-blue/10 pb-1 pt-1">
               <div className="flex items-center justify-between px-2">
                 <span className="text-xs text-konform-neon-blue">Sends</span>
                 <Button 
@@ -392,7 +393,7 @@ export const ChannelStrip = ({
                         <SelectTrigger className="h-6 text-xs flex-1 bg-black/20">
                           <SelectValue placeholder="Select target" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-[#1A1F2C] border border-konform-neon-blue/20">
                           {availableSendTargets.map(target => (
                             <SelectItem key={target.id} value={target.id}>
                               {target.name} ({target.type})
@@ -430,7 +431,7 @@ export const ChannelStrip = ({
           )}
 
           {!isMaster && (
-            <div className="w-full space-y-1 border-b border-konform-neon-blue/10 pb-2">
+            <div className="w-full space-y-1 border-b border-konform-neon-blue/10 pb-1 pt-1">
               <div className="flex items-center justify-between px-2">
                 <span className="text-xs text-konform-neon-blue">Plugin</span>
                 <Button variant="ghost" size="sm" className="h-6 w-6 p-0 relative">
@@ -442,7 +443,7 @@ export const ChannelStrip = ({
                   <SelectTrigger className="h-7 text-xs bg-black/20">
                     <SelectValue placeholder="Add Plugin" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-[#1A1F2C] border border-konform-neon-blue/20">
                     <SelectItem value="comp">Compressor</SelectItem>
                     <SelectItem value="eq">EQ</SelectItem>
                     <SelectItem value="reverb">Reverb</SelectItem>
@@ -452,7 +453,7 @@ export const ChannelStrip = ({
             </div>
           )}
 
-          <div className="w-full space-y-1 border-b border-konform-neon-blue/10 pb-2">
+          <div className="w-full space-y-1 border-b border-konform-neon-blue/10 pb-1 pt-1">
             <div className="flex items-center justify-between px-2">
               <span className="text-xs text-konform-neon-blue">Output</span>
               <Volume2 className="h-3 w-3 text-konform-neon-blue" />
@@ -461,7 +462,7 @@ export const ChannelStrip = ({
               <SelectTrigger className="h-7 text-xs bg-black/20">
                 <SelectValue placeholder="Select Output" defaultValue="master" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-[#1A1F2C] border border-konform-neon-blue/20">
                 {isMaster ? (
                   hardwareOutputs.map(output => (
                     <SelectItem key={output.id} value={output.id}>
@@ -482,24 +483,22 @@ export const ChannelStrip = ({
             </Select>
           </div>
 
-          <div className="h-[300px] w-full flex items-center gap-2">
-            <div className="h-full flex-1 flex items-center gap-4">
+          <div className="h-[130px] w-full flex items-center gap-2">
+            <div className="h-full flex-1 flex items-center gap-2">
               <div className="h-full flex flex-col justify-between text-xs text-gray-400 pr-1">
                 <span>+12</span>
-                <span>+6</span>
                 <span>0</span>
-                <span>-6</span>
                 <span>-12</span>
                 <span>-24</span>
-                <span>-48</span>
+                <span>-∞</span>
               </div>
 
-              <div className="h-full w-3 bg-black/40 rounded-sm overflow-hidden">
+              <div className="h-full w-2 bg-black/40 rounded-sm overflow-hidden">
                 <div className="w-full h-full bg-black/20" />
               </div>
 
               <div className="flex-1 h-full flex justify-center items-center">
-                <div className="h-full w-12 flex justify-center relative">
+                <div className="h-full w-10 flex justify-center relative">
                   <style>
                     {`
                       [class*="Slider"] [role="slider"] {
@@ -548,10 +547,6 @@ export const ChannelStrip = ({
                     className="h-full relative"
                   />
                 </div>
-              </div>
-
-              <div className="h-full w-3 bg-black/40 rounded-sm overflow-hidden">
-                <div className="w-full h-full bg-black/20" />
               </div>
             </div>
           </div>

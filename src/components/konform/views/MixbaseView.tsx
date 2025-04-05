@@ -54,6 +54,7 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuCheckboxItem,
+  DropdownMenuLabel
 } from "@/components/ui/dropdown-menu";
 import { useKonformProject } from "@/hooks/useKonformProject";
 import { useToast } from "@/hooks/use-toast";
@@ -523,6 +524,31 @@ export const MixbaseView = () => {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const { width: containerWidth } = useResizeObserver(containerRef);
+  const { updateMixerState } = useKonformProject();
+
+  // Save channel state when it changes
+  useEffect(() => {
+    updateMixerState(channels);
+  }, [channels, updateMixerState]);
+
+  // Load mixer state when component mounts
+  useEffect(() => {
+    const savedMixerState = localStorage.getItem('konform-mixer-state');
+    if (savedMixerState) {
+      try {
+        const parsed = JSON.parse(savedMixerState);
+        if (parsed.channels && Array.isArray(parsed.channels) && parsed.channels.length > 0) {
+          setChannels(parsed.channels);
+          toast({
+            title: "Mixer State Loaded",
+            description: "Previous mixer session restored"
+          });
+        }
+      } catch (error) {
+        console.error('Error loading mixer state:', error);
+      }
+    }
+  }, []);
 
   const [channelGroups, setChannelGroups] = useState<Array<{
     id: string;
@@ -737,6 +763,21 @@ export const MixbaseView = () => {
       window.removeEventListener('add-channel', handleAddChannelEvent as EventListener);
     };
   }, []);
+  
+  // Event listener for snapshot recall from sidebar
+  useEffect(() => {
+    const handleRecallSnapshotEvent = (e: CustomEvent) => {
+      if (e.detail?.channelStates) {
+        handleRecallSnapshot(e.detail.channelStates);
+      }
+    };
+    
+    window.addEventListener('recall-snapshot', handleRecallSnapshotEvent as EventListener);
+    
+    return () => {
+      window.removeEventListener('recall-snapshot', handleRecallSnapshotEvent as EventListener);
+    };
+  }, [channels]);
 
   return (
     <div className="h-full bg-black/80 rounded-lg p-1 flex flex-col max-w-[1440px] mx-auto" ref={containerRef}>
@@ -754,34 +795,42 @@ export const MixbaseView = () => {
             <FolderPlus className="h-4 w-4 mr-2" />
             Group Selected
           </Button>
-          
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowSnapshots(!showSnapshots)}
-            className="bg-konform-neon-blue/10 hover:bg-konform-neon-blue/20 border-konform-neon-blue/30"
-          >
-            {showSnapshots ? (
-              <>
-                <ChevronDown className="h-4 w-4 mr-2" />
-                Hide Snapshots
-              </>
-            ) : (
-              <>
-                <ChevronRight className="h-4 w-4 mr-2" />
-                Show Snapshots
-              </>
-            )}
-          </Button>
         </div>
         
-        <div className="w-64">
-          {showSnapshots && (
-            <MixerSnapshots 
-              currentChannels={channels}
-              onRecallSnapshot={handleRecallSnapshot}
-            />
-          )}
+        <div className="flex items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="outline" 
+                className="bg-black/40 border-konform-neon-blue/30 h-8"
+              >
+                <Settings2 className="h-4 w-4 mr-2" />
+                View Options
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-black/90 border-konform-neon-blue/30">
+              <DropdownMenuLabel>Metering</DropdownMenuLabel>
+              <DropdownMenuRadioGroup 
+                value={meteringMode} 
+                onValueChange={(value) => handleMeterModeChange('', value as MeteringModeType)}
+              >
+                <DropdownMenuRadioItem value="peak">Peak</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="rms">RMS</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="peakRMS">Peak + RMS</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="lufs">LUFS</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="k12">K-12</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="k14">K-14</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="k20">K-20</DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuCheckboxItem
+                checked={preFaderMetering}
+                onCheckedChange={() => handleTogglePreFaderMetering()}
+              >
+                Pre-Fader Metering
+              </DropdownMenuCheckboxItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
       
@@ -817,9 +866,9 @@ export const MixbaseView = () => {
             )}
 
             {/* All Channels in a single horizontal row */}
-            <div>
+            <div className="h-full">
               <div className="text-sm font-medium text-white/60 mb-2">Mixer Channels</div>
-              <div className="flex overflow-x-auto pb-4">
+              <div className="flex overflow-x-auto pb-4 h-[calc(100vh-220px)]">
                 {/* Order channels by type: Master first, then buses, FX, instruments, audio */}
                 {[
                   ...masterChannels,
@@ -828,7 +877,7 @@ export const MixbaseView = () => {
                   ...channels.filter(c => c.type === 'instrument'),
                   ...audioChannels
                 ].map(channel => (
-                  <div key={channel.id} className="mr-2 relative">
+                  <div key={channel.id} className="mr-2 relative h-full">
                     {/* Optional type indicator badge */}
                     <div className="absolute top-0 left-0 z-10 px-1.5 py-0.5 text-[10px] rounded-br font-medium" 
                       style={{ 
@@ -867,6 +916,8 @@ export const MixbaseView = () => {
                         ...fxChannels.map(c => ({ id: c.id, name: c.name, type: 'fx' as const })),
                         ...masterAndBusChannels.map(c => ({ id: c.id, name: c.name, type: c.type === 'master' ? 'master' as const : 'bus' as const }))
                       ]}
+                      consoleMode="large"
+                      style={{ height: '100%' }}
                     />
                   </div>
                 ))}

@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -9,21 +8,40 @@ export const useKonformProject = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [currentProject, setCurrentProject] = useState<KonformProject | null>(null);
+  const [recentProjects, setRecentProjects] = useState<KonformProject[]>([]);
+  const [mixerState, setMixerState] = useState<any>(null);
 
-  // Fetch recent projects
-  const { data: recentProjects, isLoading: isLoadingRecent } = useQuery({
-    queryKey: ['recent-projects'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('recent_konform_projects')
-        .select('*')
-        .order('recent_rank', { ascending: true })
-        .limit(10);
-
-      if (error) throw error;
-      return data as KonformProject[];
+  // Load mixer state and recent projects from localStorage on mount
+  useEffect(() => {
+    try {
+      // Load recent projects
+      const savedProjects = localStorage.getItem('konform-recent-projects');
+      if (savedProjects) {
+        setRecentProjects(JSON.parse(savedProjects));
+      }
+      
+      // Load current project
+      const savedCurrentProject = localStorage.getItem('konform-current-project');
+      if (savedCurrentProject) {
+        setCurrentProject(JSON.parse(savedCurrentProject));
+      }
+      
+      // Load mixer state
+      const savedMixerState = localStorage.getItem('konform-mixer-state');
+      if (savedMixerState) {
+        setMixerState(JSON.parse(savedMixerState));
+      }
+    } catch (error) {
+      console.error('Error loading project data:', error);
     }
-  });
+  }, []);
+  
+  // Save mixer state whenever it changes
+  useEffect(() => {
+    if (mixerState) {
+      localStorage.setItem('konform-mixer-state', JSON.stringify(mixerState));
+    }
+  }, [mixerState]);
 
   // Fetch project versions
   const { data: projectVersions, isLoading: isLoadingVersions } = useQuery({
@@ -215,17 +233,40 @@ export const useKonformProject = () => {
     }
   };
 
+  // Update mixer state function
+  const updateMixerState = (channels: any[]) => {
+    const newMixerState = {
+      ...mixerState || {},
+      channels,
+      lastUpdated: new Date().toISOString()
+    };
+    
+    setMixerState(newMixerState);
+    localStorage.setItem('konform-mixer-state', JSON.stringify(newMixerState));
+    
+    // If there's a current project, update its mixer state reference
+    if (currentProject) {
+      const updatedProject = {
+        ...currentProject,
+        mixerStateLastUpdated: new Date().toISOString()
+      };
+      setCurrentProject(updatedProject);
+      localStorage.setItem('konform-current-project', JSON.stringify(updatedProject));
+    }
+  };
+
   return {
     currentProject,
     recentProjects,
     projectVersions,
-    isLoadingRecent,
     isLoadingVersions,
     setCurrentProject,
     createProject,
     saveProject,
     loadVersion,
     exportProject,
-    importProject
+    importProject,
+    mixerState,
+    updateMixerState
   };
 };
