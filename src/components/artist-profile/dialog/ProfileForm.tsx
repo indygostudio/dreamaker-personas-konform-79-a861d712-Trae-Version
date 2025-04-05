@@ -4,7 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { AvatarUpload } from "@/components/persona/AvatarUpload";
 import { BannerUpload } from "./BannerUpload";
-import { Globe2, Lock, Upload } from "lucide-react";
+import { Globe2, Lock, Upload, Settings2 } from "lucide-react";
 import type { BannerPosition } from "@/types/types";
 import type { PersonaType } from "@/types/persona";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -73,7 +73,9 @@ const PERSONA_TYPES: { type: PersonaType; icon: React.ReactNode; label: string }
   { type: "AI_ARRANGER", icon: <Folder className="w-5 h-5" />, label: "Arranger" },
   { type: "AI_DJ", icon: <Disc className="w-5 h-5" />, label: "DJ" },
   { type: "AI_VISUAL_ARTIST", icon: <Palette className="w-5 h-5" />, label: "Visual Artist" },
-  { type: "AI_AUDIO_ENGINEER", icon: <Wrench className="w-5 h-5" />, label: "Audio Engineer" }
+  { type: "AI_AUDIO_ENGINEER", icon: <Wrench className="w-5 h-5" />, label: "Audio Engineer" },
+  { type: "AI_MASTERING", icon: <Settings2 className="w-5 h-5" />, label: "Mastering" },
+  { type: "AI_MIX", icon: <SlidersHorizontal className="w-5 h-5" />, label: "Mix" }
 ];
 
 const AVAILABLE_GENRES = [

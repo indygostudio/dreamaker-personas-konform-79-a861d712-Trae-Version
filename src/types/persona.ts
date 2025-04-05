@@ -6,7 +6,7 @@ export type MidjourneyDimension = 'square' | 'portrait' | 'landscape';
 export type MidjourneyUpscaleIndex = '1' | '2' | '3' | '4' | 'light' | 'beta' | '2x' | '4x' | 'subtle' | 'creative';
 export type MidjourneyVariationIndex = '1' | '2' | '3' | '4' | 'high_variation' | 'low_variation';
 
-export type PersonaType = "AI_CHARACTER" | "AI_VOCALIST" | "AI_INSTRUMENTALIST" | "AI_EFFECT" | "AI_SOUND" | "AI_MIXER" | "AI_WRITER" | "AI_PRODUCER" | "AI_COMPOSER" | "AI_ARRANGER" | "AI_DJ" | "AI_VISUAL_ARTIST" | "AI_AUDIO_ENGINEER";
+export type PersonaType = "AI_CHARACTER" | "AI_VOCALIST" | "AI_INSTRUMENTALIST" | "AI_EFFECT" | "AI_SOUND" | "AI_MIXER" | "AI_WRITER" | "AI_PRODUCER" | "AI_COMPOSER" | "AI_ARRANGER" | "AI_DJ" | "AI_VISUAL_ARTIST" | "AI_AUDIO_ENGINEER" | "AI_MASTERING" | "AI_MIX";
 
 export interface Persona {
   id: string;

@@ -11,7 +11,15 @@ export const personaFormSchema = z.object({
     "AI_CHARACTER",
     "AI_MIXER",
     "AI_EFFECT",
-    "AI_SOUND"
+    "AI_SOUND",
+    "AI_PRODUCER",
+    "AI_COMPOSER",
+    "AI_ARRANGER",
+    "AI_DJ",
+    "AI_VISUAL_ARTIST",
+    "AI_AUDIO_ENGINEER",
+    "AI_MASTERING",
+    "AI_MIX"
   ] as const),
   subtype: z.string().nullable().optional(),
   description: z.string()

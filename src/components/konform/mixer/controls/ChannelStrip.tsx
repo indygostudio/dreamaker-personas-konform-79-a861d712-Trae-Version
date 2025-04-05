@@ -1,10 +1,9 @@
-
 import { useState } from "react";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Volume2, Power, Mic, Copy, Trash2, UserPlus2, PlusSquare, ChevronDown, ToggleLeft, ToggleRight, ArrowDownLeft, ArrowUpRight, FolderPlus, Headphones, Speaker, Monitor } from "lucide-react";
+import { Volume2, Power, Mic, Copy, Trash2, UserPlus2, PlusSquare, ChevronDown, ToggleLeft, ToggleRight, ArrowDownLeft, ArrowUpRight, FolderPlus, Headphones, Speaker, Monitor, CornerUpRight } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSelectedPersonasStore } from "@/stores/selectedPersonasStore";
 import { useToast } from "@/hooks/use-toast";
@@ -35,11 +34,35 @@ interface ChannelStripProps {
   collaborator?: Persona;
   isSelected?: boolean;
   className?: string;
-  type?: 'audio' | 'bus' | 'master';
+  type?: 'audio' | 'bus' | 'master' | 'instrument';
   viewMode?: 'large' | 'normal' | 'compact';
   onSelect?: (e: React.MouseEvent) => void;
   onDelete?: () => void;
   onDuplicate?: () => void;
+  sends?: Array<{
+    target: string;
+    targetId: string;
+    level: number;
+    preFader: boolean;
+  }>;
+  onUpdateSend?: (sendIndex: number, updates: Partial<{
+    target: string;
+    targetId: string;
+    level: number;
+    preFader: boolean;
+  }>) => void;
+  onRemoveSend?: (sendIndex: number) => void;
+  onAddSend?: (send: {
+    target: string;
+    targetId: string;
+    level: number;
+    preFader: boolean;
+  }) => void;
+  availableSendTargets?: Array<{
+    id: string;
+    name: string;
+    type: 'bus' | 'fx' | 'master';
+  }>;
 }
 
 interface AutomationState {
@@ -66,7 +89,12 @@ export const ChannelStrip = ({
   viewMode = 'normal',
   onSelect,
   onDelete,
-  onDuplicate 
+  onDuplicate,
+  sends = [],
+  onUpdateSend,
+  onRemoveSend,
+  onAddSend,
+  availableSendTargets = []
 }: ChannelStripProps) => {
   const [isMuted, setIsMuted] = useState(false);
   const [isSolo, setIsSolo] = useState(false);
@@ -83,6 +111,7 @@ export const ChannelStrip = ({
   const [selectedOutput, setSelectedOutput] = useState<string>('default-speakers');
   const { selectedPersonas } = useSelectedPersonasStore();
   const { toast } = useToast();
+  const [showSendsPanel, setShowSendsPanel] = useState(false);
 
   const { data: sessionPersonas, isLoading: isLoadingPersonas } = useQuery({
     queryKey: ['latest_collaboration_personas'],
@@ -110,11 +139,21 @@ export const ChannelStrip = ({
     }
   });
 
-  const filteredPersonas = (sessionPersonas || []).filter(persona => 
-    isMaster 
-      ? persona.type === 'AI_MIXER' || persona.type === 'AI_EFFECT'
-      : !['AI_MIXER', 'AI_EFFECT'].includes(persona.type)
-  );
+  const filteredPersonas = (sessionPersonas || []).filter(persona => {
+    if (isMaster) {
+      // Master channels can receive AI_MASTERING or AI_MIXER
+      return persona.type === 'AI_MASTERING' || persona.type === 'AI_MIXER' || persona.type === 'AI_AUDIO_ENGINEER';
+    } else if (type === 'bus') {
+      // Bus/Mix channels can receive AI_MIX and others
+      return persona.type === 'AI_MIX' || persona.type === 'AI_MIXER' || persona.type === 'AI_PRODUCER' || persona.type === 'AI_AUDIO_ENGINEER';
+    } else if (type === 'instrument') {
+      // Instrument tracks get AI_INSTRUMENTALIST
+      return persona.type === 'AI_INSTRUMENTALIST' || persona.type === 'AI_COMPOSER' || persona.type === 'AI_DJ' || persona.type === 'AI_ARRANGER';
+    } else {
+      // Audio tracks get everything else
+      return !['AI_MASTERING', 'AI_MIXER', 'AI_MIX'].includes(persona.type);
+    }
+  });
 
   const toggleAutomation = (type: keyof AutomationState) => {
     setAutomation(prev => ({
@@ -174,6 +213,25 @@ export const ChannelStrip = ({
     { id: 'headphones-1', name: 'Headphones 1', type: 'headphones', icon: <Headphones className="h-4 w-4" /> },
     { id: 'headphones-2', name: 'Headphones 2', type: 'headphones', icon: <Headphones className="h-4 w-4" /> }
   ];
+
+  const handleAddSend = () => {
+    if (availableSendTargets.length === 0) {
+      toast({
+        title: "No Send Destinations",
+        description: "Create a bus or FX track to send to.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const target = availableSendTargets[0];
+    onAddSend?.({
+      target: target.name,
+      targetId: target.id,
+      level: 0,
+      preFader: false
+    });
+  };
 
   return (
     <ContextMenu>
@@ -291,6 +349,85 @@ export const ChannelStrip = ({
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
+
+          {!isMaster && (
+            <div className="w-full space-y-1 border-b border-konform-neon-blue/10 pb-2">
+              <div className="flex items-center justify-between px-2">
+                <span className="text-xs text-konform-neon-blue">Sends</span>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-6 w-6 p-0 relative"
+                  onClick={handleAddSend}
+                >
+                  <PlusSquare className="h-3 w-3 text-konform-neon-blue" />
+                </Button>
+              </div>
+              
+              {sends.length > 0 ? (
+                <div className="space-y-1 max-h-40 overflow-y-auto scrollbar-thin scrollbar-thumb-konform-neon-blue/20">
+                  {sends.map((send, index) => (
+                    <div key={index} className="flex items-center gap-1 px-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-5 w-5 p-0"
+                        onClick={() => onRemoveSend?.(index)}
+                      >
+                        <Trash2 className="h-3 w-3 text-red-500" />
+                      </Button>
+                      
+                      <Select
+                        value={send.targetId}
+                        onValueChange={(value) => {
+                          const target = availableSendTargets.find(t => t.id === value);
+                          if (target) {
+                            onUpdateSend?.(index, { 
+                              targetId: value,
+                              target: target.name 
+                            });
+                          }
+                        }}
+                      >
+                        <SelectTrigger className="h-6 text-xs flex-1 bg-black/20">
+                          <SelectValue placeholder="Select target" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableSendTargets.map(target => (
+                            <SelectItem key={target.id} value={target.id}>
+                              {target.name} ({target.type})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className={`h-5 w-5 p-0 ${send.preFader ? 'text-konform-neon-orange' : 'text-konform-neon-blue/50'}`}
+                        onClick={() => onUpdateSend?.(index, { preFader: !send.preFader })}
+                        title={send.preFader ? "Pre-Fader" : "Post-Fader"}
+                      >
+                        <CornerUpRight className="h-3 w-3" />
+                      </Button>
+                      
+                      <Slider
+                        value={[send.level]}
+                        max={100}
+                        step={1}
+                        className="h-6 w-16"
+                        onValueChange={([value]) => onUpdateSend?.(index, { level: value })}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-xs text-center text-gray-500 py-1">
+                  No sends
+                </div>
+              )}
+            </div>
+          )}
 
           {!isMaster && (
             <div className="w-full space-y-1 border-b border-konform-neon-blue/10 pb-2">

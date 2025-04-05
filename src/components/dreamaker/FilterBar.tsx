@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { useUIStore } from "@/stores/uiStore";
 
 export type MediaType = 'loop' | 'midi' | 'plugin' | 'patch' | 'album';
-export type PersonaType = 'AI_CHARACTER' | 'AI_VOCALIST' | 'AI_INSTRUMENTALIST' | 'AI_EFFECT' | 'AI_SOUND' | 'AI_MIXER' | 'AI_WRITER' | 'AI_PRODUCER' | 'AI_COMPOSER' | 'AI_ARRANGER' | 'AI_DJ' | 'AI_VISUAL_ARTIST' | 'AI_AUDIO_ENGINEER';
+export type PersonaType = 'AI_CHARACTER' | 'AI_VOCALIST' | 'AI_INSTRUMENTALIST' | 'AI_EFFECT' | 'AI_SOUND' | 'AI_MIXER' | 'AI_WRITER' | 'AI_PRODUCER' | 'AI_COMPOSER' | 'AI_ARRANGER' | 'AI_DJ' | 'AI_VISUAL_ARTIST' | 'AI_AUDIO_ENGINEER' | 'AI_MASTERING' | 'AI_MIX';
 
 interface FilterBarProps {
   searchQuery: string;
