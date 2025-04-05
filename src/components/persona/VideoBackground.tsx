@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useVideoCache } from "@/hooks/useVideoCache";
 import type { BannerPosition } from "@/types/types";
@@ -74,15 +73,14 @@ export const VideoBackground = ({
         const handleTimeUpdate = () => {
           // Check if we're approaching the end or beginning of the video
           if (!isReversed && video.currentTime >= video.duration - 0.1) {
-            // Near the end, reverse playback
-            video.playbackRate = -1;
-            setIsReversed(true);
-            setLastPlaybackRate(-1);
+            // Near the end, pause instead of reversing
+            if (!continuePlayback) {
+              video.pause();
+              setIsPlaying(false);
+            }
           } else if (isReversed && video.currentTime <= 0.1) {
             // Near the beginning, play forward
             video.playbackRate = 1;
-            setIsReversed(false);
-            setLastPlaybackRate(1);
             
             // If not supposed to continue playing
             if (!continuePlayback && !autoPlay && !isHovering) {

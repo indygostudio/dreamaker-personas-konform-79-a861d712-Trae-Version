@@ -364,10 +364,12 @@ export const ProfileForm = ({
                 <SelectValue placeholder="Select a subtype" />
               </SelectTrigger>
               <SelectContent className="bg-black/90 border-dreamaker-purple/20 text-white">
-                {getSubtypeOptions(profileType[0]).map((option) => (
+                {getSubtypeOptions(profileType[0])
+                  .filter(option => option.value !== null)
+                  .map((option) => (
                   <SelectItem 
                     key={option.label} 
-                    value={option.value || ""}
+                    value={option.value as string}
                     className="text-white hover:bg-dreamaker-purple/20"
                   >
                     {option.label}
